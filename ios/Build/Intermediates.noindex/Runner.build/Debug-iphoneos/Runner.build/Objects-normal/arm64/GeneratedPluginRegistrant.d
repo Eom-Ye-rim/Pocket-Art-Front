@@ -1,0 +1,24 @@
+dependencies: \
+  /Users/jspman/Developer/flutter_ar_example/ios/Runner/GeneratedPluginRegistrant.m \
+  /Users/jspman/Developer/flutter_ar_example/ios/Runner/GeneratedPluginRegistrant.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Modules/module.modulemap \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterViewController.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterHeadlessDartRunner.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterEngineGroup.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterEngine.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterDartProject.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterCallbackCache.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterTexture.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterPlatformViews.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterCodecs.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterChannels.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterBinaryMessenger.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterPlugin.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterMacros.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/FlutterAppDelegate.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/Flutter.framework/Headers/Flutter.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/arkit_plugin/arkit_plugin.framework/Headers/ArkitPlugin.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/arkit_plugin/arkit_plugin.framework/Modules/module.modulemap \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/arkit_plugin/arkit_plugin.framework/Headers/arkit_plugin-Swift.h \
+  /Users/jspman/Developer/flutter_ar_example/build/ios/Debug-iphoneos/arkit_plugin/arkit_plugin.framework/Headers/arkit_plugin-umbrella.h
