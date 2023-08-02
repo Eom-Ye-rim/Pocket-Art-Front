@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -357,6 +358,8 @@ List<Widget> createPhotos(int numImg) {
 }
 
 class HeartButton extends StatefulWidget {
+  final Function(bool isLiked) onLiked;
+  HeartButton({required this.onLiked});
   @override
   _HeartButtonState createState() => _HeartButtonState();
 }
@@ -385,7 +388,10 @@ class _HeartButtonState extends State<HeartButton> {
           onPressed: () {
             setState(() {
               _isLiked = !_isLiked;
+              widget.onLiked(_isLiked);
+
             });
+           // widget.onLiked(_isLiked);
           },
         ),
       ],
@@ -393,6 +399,7 @@ class _HeartButtonState extends State<HeartButton> {
   }
 }
 class ContestData {
+  final BigInt id;
   final String author;
   final String title;
   final String contents;
@@ -401,6 +408,7 @@ class ContestData {
   final String createdDate;
 
   ContestData({
+    required this.id,
     required this.author,
     required this.title,
     required this.contents,
@@ -417,6 +425,7 @@ class ContestData {
 }
 
 
+
 Future<List<ContestData>> getTop5Image()  async {
   List<String> Best5ImgUrls = [];
   final url = Uri.parse(
@@ -428,6 +437,7 @@ Future<List<ContestData>> getTop5Image()  async {
 
     final List<ContestData> contestDataList = data.map((item) {
       return ContestData(
+        id:BigInt.from(item['id']),
         author: item['author'],
         title: item['title'],
         contents: item['contents'],
@@ -445,20 +455,75 @@ Future<List<ContestData>> getTop5Image()  async {
 }
 
 
+Future<void> _makeLikeAPIRequest(BigInt postId) async {
+  String accessToken='eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U';
+  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
+
+  try {
+    print("좋아요 API 호출");
+    final response = await http.post(
+        url,
+        headers: {
+          'Authorization':'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U',
+        },
+    );
+
+    if (response.statusCode == 200) {
+      // The like API call was successful.
+      print('Like API call successful.');
+    } else {
+      // The like API call failed.
+      print('Failed to like the post. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // An error occurred during the API call.
+    print('Error while liking the post: $e');
+  }
+}
+
+Future<void> _makeDislikeAPIRequest(BigInt postId) async {
+  final url = Uri.parse('http://localhost:8080/api/v1/unheart/$postId');
+
+  try {
+    final response = await http.post(url);
+
+    if (response.statusCode == 200) {
+      // The dislike API call was successful.
+      print('Dislike API call successful.');
+    } else {
+      // The dislike API call failed.
+      print('Failed to dislike the post. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // An error occurred during the API call.
+    print('Error while disliking the post: $e');
+  }
+}
+
 
 
 Future<List<Widget>> Best5(int numImg) async{
-
-
   List<Widget> Best5images = [];
   List<ContestData> Best5ImgUrls = await getTop5Image();
   List<String> images = [];
   List<String> PostTitle = [];
   List<String> PostContent = [];
   int j = 0;
+
   while (j < numImg && j < Best5ImgUrls.length) {
     for (String photoUrl in Best5ImgUrls[j].photoList) {
       images.add(photoUrl);
+
+      HeartButton heartButton = HeartButton(onLiked: (isLiked) {
+        print("호출");
+        // Handle the postId here based on the isLiked value.
+        if (isLiked) {
+          print("좋아요 버튼 호출");
+          _makeLikeAPIRequest(Best5ImgUrls[j].id);
+        } else {
+          _makeDislikeAPIRequest(Best5ImgUrls[j].id);
+        }
+      });
     }
     j++;
   }
@@ -466,6 +531,7 @@ Future<List<Widget>> Best5(int numImg) async{
   for (ContestData contestData in Best5ImgUrls) {
        PostTitle.add(contestData.getTitle());
        PostContent.add(contestData.getContents());
+
   }
     } catch (e) {
     print(e);
@@ -482,12 +548,6 @@ Future<List<Widget>> Best5(int numImg) async{
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
   UserProfileImg.add(
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-
-
-
-
-
-
 
   Widget image;
   int i = 0;
@@ -514,7 +574,7 @@ Future<List<Widget>> Best5(int numImg) async{
         Positioned(
           top: 4,
           right: 30,
-          child: HeartButton(),
+          child: HeartButton(onLiked: (bool isLiked) {  },),
         ),
         Positioned(
             bottom: 20,
@@ -659,4 +719,4 @@ class NormalPhotosScreen extends StatelessWidget {
     return SingleChildScrollView();
   }
 }
-//하트 클릭하면 조회 수 증가
+
