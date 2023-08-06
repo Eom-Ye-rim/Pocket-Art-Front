@@ -1,10 +1,10 @@
-import 'dart:convert';
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(const PhotoBoard());
+}
 
 class PhotoBoard extends StatefulWidget {
   const PhotoBoard({Key? key}) : super(key: key);
@@ -199,43 +199,16 @@ class RowScrollPhotos extends StatefulWidget {
 class _RowScrollPhotosState extends State<RowScrollPhotos> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Widget>>(
-      future: Best5(5), // Best5 함수 호출하고 Future가 완료되기를 기다립니다.
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Future가 완료될 때까지 로딩 인디케이터를 표시합니다.
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
-          return Text('오류: ${snapshot.error}');
-        } else {
-          // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근할 수 있습니다.
-          List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
-          return SizedBox(
-            height: 276,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: ScrollPhysics(),
-              primary: true,
-              child: Row(
-                children: best5Widgets,
-              ),
-            ),
-          );
-        }
-      },
-    );
-
-    // return SizedBox(
-    //     height: 276,
-    //     child: SingleChildScrollView(
-    //       scrollDirection: Axis.horizontal,
-    //       physics: ScrollPhysics(),
-    //       primary: true,
-    //       child: Row(
-    //         children: Best5(5),
-    //       ),
-    //     ));
+    return SizedBox(
+        height: 276,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: ScrollPhysics(),
+          primary: true,
+          child: Row(
+            children: Best5(5),
+          ),
+        ));
   }
 }
 
@@ -255,7 +228,7 @@ class Viewallbtn extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(11),
         image: DecorationImage(
-            fit: BoxFit.cover, image: AssetImage('images/img_6.png')),
+            fit: BoxFit.cover, image: AssetImage('assets/img_6.png')),
       ),
       child: FilledButton(
         style: ButtonStyle(
@@ -286,10 +259,22 @@ class GridViewPhotos extends StatefulWidget {
 }
 
 class _GridViewPhotosState extends State<GridViewPhotos> {
+  List<Widget> images = [];
+
+  @override
+  void initState() {
+    super.initState();
+    images = createPhotos(context); // Initialize images list here
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+
+
+    return Expanded(
       child: GridView.count(
+        childAspectRatio: 1 / 1.3,
+        //가로1, 세로2 비율
         crossAxisCount: 2,
         // 1개의 행애 보여줄 item 갯수
         mainAxisSpacing: 20,
@@ -300,66 +285,205 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
         // 뷰 크기 고정
         primary: false,
         //내부는 스크롤 없게 지정
-        children: createPhotos(2),
+        children: images,
       ),
     );
   }
 }
 
-List<Widget> createPhotos(int numImg) {
+List<Widget> createPhotos(BuildContext context) {
+
   List<Widget> images = [];
   List<String> urls = [];
 
+
   urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  urls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+
+
+
+  List<String> UserProfileImg = [];
+  UserProfileImg.add(
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  urls.add(
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
 
-  Widget image;
-  int i = 0;
-  while (i < numImg) {
-    image = Container(
-      padding: EdgeInsets.fromLTRB(5, 5, 5, 10),
-      width: 170,
-      height: 218,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(
-          color: Colors.grey,
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 0.5,
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  UserProfileImg.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+
+  List<String> PostTitle = [];
+  PostTitle.add('제목1111111111111111');
+  PostTitle.add('제목2');
+  PostTitle.add('제목3');
+  PostTitle.add('제목4');
+  PostTitle.add('제목5');
+
+  PostTitle.add('제목1111111111111111');
+  PostTitle.add('제목2');
+  PostTitle.add('제목3');
+  PostTitle.add('제목4');
+  PostTitle.add('제목5');
+
+  for (int i = 0; i < urls.length; i++) {
+    Widget image = Card(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.grey, width: 1)),
+      child: Padding(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 1, // 사진 비율
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image(
+                      image: NetworkImage(urls[i]),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(12),
-                image: DecorationImage(
-                  alignment: Alignment.center,
-                  fit: BoxFit.cover,
-                  image: NetworkImage(urls[i]), //하단의 전체 게시글 사진
-                )),
-            height: 160,
-            width: 160,
-          ),
-        ],
+                Positioned(
+                  child: HeartButton2(),
+                  top: 1,
+                  right: 1,
+                )
+              ],
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 15, //
+                    backgroundImage: NetworkImage(UserProfileImg[i]),
+                  ),
+                  Container(
+                    width: 85,
+                    padding: EdgeInsets.fromLTRB(6, 7, 9, 4),
+                    child: Text(
+                      PostTitle[i], // 게시글 제목
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      style: TextStyle(
+                        color: Color(0xFF535252),
+                        fontSize: 12,
+                        fontFamily: 'SUIT',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      onPressed: () {
+                        print("게시글 버튼 ");
+                      },
+                      icon: Icon(Icons.more_vert),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.remove_red_eye_outlined,
+                      size: 15,
+                      color: Color(0xffBDBDBD),
+                    ),
+                    Text(
+                      '11111',
+                      style: TextStyle(
+                        color: Color(0xffBDBDBD),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 15,
+                      color: Color(0xffBDBDBD),
+                    ),
+                    Text(
+                      '11111',
+                      style: TextStyle(
+                        color: Color(0xffBDBDBD),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.favorite_border,
+                      size: 15,
+                      color: Color(0xffBDBDBD),
+                    ),
+                    Text(
+                      '11111',
+                      style: TextStyle(
+                        color: Color(0xffBDBDBD),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
 
     images.add(image);
-    i++;
   }
   return images;
 }
 
 class HeartButton extends StatefulWidget {
-  final Function(bool isLiked) onLiked;
-  HeartButton({required this.onLiked});
   @override
   _HeartButtonState createState() => _HeartButtonState();
 }
@@ -388,154 +512,64 @@ class _HeartButtonState extends State<HeartButton> {
           onPressed: () {
             setState(() {
               _isLiked = !_isLiked;
-              widget.onLiked(_isLiked);
-
             });
-           // widget.onLiked(_isLiked);
           },
         ),
       ],
     );
   }
 }
-class ContestData {
-  final BigInt id;
-  final String author;
-  final String title;
-  final String contents;
-  final int viewCount;
-  final List<String> photoList;
-  final String createdDate;
 
-  ContestData({
-    required this.id,
-    required this.author,
-    required this.title,
-    required this.contents,
-    required this.viewCount,
-    required this.photoList,
-    required this.createdDate,
-  });
-  String getTitle(){
-    return title;
-  }
-  String getContents(){
-    return contents;
-  }
+class HeartButton2 extends StatefulWidget {
+  @override
+  _HeartButton2State createState() => _HeartButton2State();
 }
 
+class _HeartButton2State extends State<HeartButton2> {
+  bool _isLiked = false;
 
-
-Future<List<ContestData>> getTop5Image()  async {
-  List<String> Best5ImgUrls = [];
-  final url = Uri.parse(
-      'http://localhost:8080/api/v1/contest/best');
-  final response = await http.get(url);
-  if(response.statusCode==200){
-    final jsonData = json.decode(response.body);
-    final data = jsonData['data'] as List<dynamic>;
-
-    final List<ContestData> contestDataList = data.map((item) {
-      return ContestData(
-        id:BigInt.from(item['id']),
-        author: item['author'],
-        title: item['title'],
-        contents: item['contents'],
-        viewCount: item['view_count'],
-        photoList: List<String>.from(item['photo_list']),
-        createdDate: item['created_date'],
-      );
-    }).toList();
-    print(contestDataList);
-    return contestDataList;
-
-  } else {
-    throw Exception('Failed to load contest data');
-  }
-}
-
-
-Future<void> _makeLikeAPIRequest(BigInt postId) async {
-  String accessToken='eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U';
-  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
-
-  try {
-    print("좋아요 API 호출");
-    final response = await http.post(
-        url,
-        headers: {
-          'Authorization':'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U',
-        },
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0x802D59EA), // 0x80 투명도 50%
+          ),
+        ),
+        IconButton(
+          icon: Icon(
+            _isLiked ? Icons.favorite : Icons.favorite_border,
+            color: _isLiked ? Colors.red : Colors.white,
+          ),
+          onPressed: () {
+            setState(() {
+              _isLiked = !_isLiked;
+            });
+          },
+        ),
+      ],
     );
-
-    if (response.statusCode == 200) {
-      // The like API call was successful.
-      print('Like API call successful.');
-    } else {
-      // The like API call failed.
-      print('Failed to like the post. Status code: ${response.statusCode}');
-    }
-  } catch (e) {
-    // An error occurred during the API call.
-    print('Error while liking the post: $e');
   }
 }
 
-Future<void> _makeDislikeAPIRequest(BigInt postId) async {
-  final url = Uri.parse('http://localhost:8080/api/v1/unheart/$postId');
-
-  try {
-    final response = await http.post(url);
-
-    if (response.statusCode == 200) {
-      // The dislike API call was successful.
-      print('Dislike API call successful.');
-    } else {
-      // The dislike API call failed.
-      print('Failed to dislike the post. Status code: ${response.statusCode}');
-    }
-  } catch (e) {
-    // An error occurred during the API call.
-    print('Error while disliking the post: $e');
-  }
-}
-
-
-
-Future<List<Widget>> Best5(int numImg) async{
+List<Widget> Best5(int numImg) {
   List<Widget> Best5images = [];
-  List<ContestData> Best5ImgUrls = await getTop5Image();
-  List<String> images = [];
-  List<String> PostTitle = [];
-  List<String> PostContent = [];
-  int j = 0;
-
-  while (j < numImg && j < Best5ImgUrls.length) {
-    for (String photoUrl in Best5ImgUrls[j].photoList) {
-      images.add(photoUrl);
-
-      HeartButton heartButton = HeartButton(onLiked: (isLiked) {
-        print("호출");
-        // Handle the postId here based on the isLiked value.
-        if (isLiked) {
-          print("좋아요 버튼 호출");
-          _makeLikeAPIRequest(Best5ImgUrls[j].id);
-        } else {
-          _makeDislikeAPIRequest(Best5ImgUrls[j].id);
-        }
-      });
-    }
-    j++;
-  }
-  try{
-  for (ContestData contestData in Best5ImgUrls) {
-       PostTitle.add(contestData.getTitle());
-       PostContent.add(contestData.getContents());
-
-  }
-    } catch (e) {
-    print(e);
-  }
+  List<String> Best5ImgUrls = [];
+  Best5ImgUrls.add(
+      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
+  Best5ImgUrls.add(
+      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+  Best5ImgUrls.add(
+      'https://seoartgallery.com/wp-content/uploads/2016/07/%EB%B0%98%EA%B3%A0%ED%9D%90-%EC%B4%88%EC%83%81%ED%99%94-633x767.jpg');
+  Best5ImgUrls.add(
+      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
+  Best5ImgUrls.add(
+      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
 
   List<String> UserProfileImg = [];
   UserProfileImg.add(
@@ -549,13 +583,27 @@ Future<List<Widget>> Best5(int numImg) async{
   UserProfileImg.add(
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
 
+  List<String> PostTitle = [];
+  PostTitle.add('제목1 ');
+  PostTitle.add('제목2 ');
+  PostTitle.add('제목3 ');
+  PostTitle.add('제목4 ');
+  PostTitle.add('제목5 ');
+
+  List<String> PostContent = [];
+  PostContent.add("이 게시글 내용의 길이가 길어서 Overflow가 생기는 것을 방지하기 위한 설정 필요");
+  PostContent.add("내용2222222222222");
+  PostContent.add("내용3333333333333");
+  PostContent.add("내용4444444444444");
+  PostContent.add("내용555555555555");
+
   Widget image;
   int i = 0;
   while (i < numImg) {
     image = Stack(
       children: [
         Container(
-          child: Image.asset('images/img_8.png'),
+          child: Image.asset('assets/img_8.png'),
           height: 276,
           width: 233,
           margin: EdgeInsets.fromLTRB(0, 0, 26, 0),
@@ -567,14 +615,14 @@ Future<List<Widget>> Best5(int numImg) async{
             borderRadius: BorderRadius.circular(22),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(images[i]) //Best5 사진 url , body 값에 photourl만 가져오기
+                image: NetworkImage(Best5ImgUrls[i]) //Best5 사진 url
             ),
           ),
         ),
         Positioned(
           top: 4,
           right: 30,
-          child: HeartButton(onLiked: (bool isLiked) {  },),
+          child: HeartButton(),
         ),
         Positioned(
             bottom: 20,
@@ -719,4 +767,3 @@ class NormalPhotosScreen extends StatelessWidget {
     return SingleChildScrollView();
   }
 }
-
