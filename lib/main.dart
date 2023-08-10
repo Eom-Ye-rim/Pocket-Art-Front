@@ -297,7 +297,7 @@ Widget build(BuildContext context) {
                 ,
                 // onPressed: () async {
                 //   final url =
-                //       'https://kauth.kakao.com/oauth/authorize?client_id=179011b75542e1a21fa2207d50a4df57&redirect_uri=http://localhost:8080/auth/kakao/callback&response_type=code';
+                //       'https://kauth.kakao.com/oauth/authorize?client_id=&redirect_uri=http://localhost:8080/auth/kakao/callback&response_type=code';
                 //   if (await canLaunch(url)) {
                 //     await launch(url);
                 //   } else {

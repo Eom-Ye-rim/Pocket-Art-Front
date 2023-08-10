@@ -1,6 +1,14 @@
+
+
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+
 
 void main() {
   runApp(const PhotoBoard());
@@ -197,18 +205,36 @@ class RowScrollPhotos extends StatefulWidget {
 }
 
 class _RowScrollPhotosState extends State<RowScrollPhotos> {
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        height: 276,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: ScrollPhysics(),
-          primary: true,
-          child: Row(
-            children: Best5(5),
-          ),
-        ));
+  return FutureBuilder<List<Widget>>(
+  future: Best5(5), // Best5 함수 호출하고 Future가 완료되기를 기다립니다.
+  builder: (context, snapshot) {
+  if (snapshot.connectionState == ConnectionState.waiting) {
+  // Future가 완료될 때까지 로딩 인디케이터를 표시합니다.
+  return CircularProgressIndicator();
+  } else if (snapshot.hasError) {
+  // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
+  return Text('오류: ${snapshot.error}');
+  } else {
+  // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근할 수 있습니다.
+  List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
+  return SizedBox(
+  height: 276,
+  child: SingleChildScrollView(
+  scrollDirection: Axis.horizontal,
+  physics: ScrollPhysics(),
+  primary: true,
+  child: Row(
+  children: best5Widgets,
+  ),
+  ),
+  );
+  }
+  },
+  );
+
   }
 }
 
@@ -228,7 +254,7 @@ class Viewallbtn extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(11),
         image: DecorationImage(
-            fit: BoxFit.cover, image: AssetImage('assets/img_6.png')),
+            fit: BoxFit.cover, image: AssetImage('images/img_6.png')),
       ),
       child: FilledButton(
         style: ButtonStyle(
@@ -378,7 +404,7 @@ List<Widget> createPhotos(BuildContext context) {
                   ),
                 ),
                 Positioned(
-                  child: HeartButton2(),
+                  child: HeartButton2(onLiked: (bool isLiked) {  },),
                   top: 1,
                   right: 1,
                 )
@@ -484,6 +510,9 @@ List<Widget> createPhotos(BuildContext context) {
 }
 
 class HeartButton extends StatefulWidget {
+  final Function(bool isLiked) onLiked;
+  HeartButton({required this.onLiked});
+
   @override
   _HeartButtonState createState() => _HeartButtonState();
 }
@@ -512,6 +541,7 @@ class _HeartButtonState extends State<HeartButton> {
           onPressed: () {
             setState(() {
               _isLiked = !_isLiked;
+              widget.onLiked(_isLiked);
             });
           },
         ),
@@ -521,6 +551,9 @@ class _HeartButtonState extends State<HeartButton> {
 }
 
 class HeartButton2 extends StatefulWidget {
+  final Function(bool isLiked) onLiked;
+  HeartButton2({required this.onLiked});
+
   @override
   _HeartButton2State createState() => _HeartButton2State();
 }
@@ -549,6 +582,7 @@ class _HeartButton2State extends State<HeartButton2> {
           onPressed: () {
             setState(() {
               _isLiked = !_isLiked;
+              widget.onLiked(_isLiked);
             });
           },
         ),
@@ -557,19 +591,147 @@ class _HeartButton2State extends State<HeartButton2> {
   }
 }
 
-List<Widget> Best5(int numImg) {
-  List<Widget> Best5images = [];
+Future<void> _makeLikeAPIRequest(BigInt postId) async {
+  String accessToken='eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MTQyMzgzM30.Y3tKrh2U4vXXUDliPvMMAm59YbNG9UeLvZbUA4I0ftE';
+  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
+
+  try {
+    print("좋아요 API 호출");
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization':'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // The like API call was successful.
+      print('Like API call successful.');
+    } else {
+      // The like API call failed.
+      print('Failed to like the post. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // An error occurred during the API call.
+    print('Error while liking the post: $e');
+  }
+}
+
+class ContestData {
+  final BigInt id;
+  final String author;
+  final String title;
+  final String contents;
+  final int viewCount;
+  final List<String> photoList;
+  final String createdDate;
+
+  ContestData({
+    required this.id,
+    required this.author,
+    required this.title,
+    required this.contents,
+    required this.viewCount,
+    required this.photoList,
+    required this.createdDate,
+  });
+  String getTitle(){
+    return title;
+  }
+  String getContents(){
+    return contents;
+  }
+}
+
+
+
+
+
+Future<List<ContestData>> getTop5Image()  async {
   List<String> Best5ImgUrls = [];
-  Best5ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
-  Best5ImgUrls.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  Best5ImgUrls.add(
-      'https://seoartgallery.com/wp-content/uploads/2016/07/%EB%B0%98%EA%B3%A0%ED%9D%90-%EC%B4%88%EC%83%81%ED%99%94-633x767.jpg');
-  Best5ImgUrls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  Best5ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
+  final url = Uri.parse(
+      'http://localhost:8080/api/v1/contest/best');
+  final response = await http.get(url);
+  if(response.statusCode==200){
+    final jsonData = json.decode(response.body);
+    final data = jsonData['data'] as List<dynamic>;
+
+    final List<ContestData> contestDataList = data.map((item) {
+      return ContestData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        contents: item['contents'],
+        viewCount: item['view_count'],
+        photoList: List<String>.from(item['photo_list']),
+        createdDate: item['created_date'],
+      );
+    }).toList();
+    print(contestDataList);
+    return contestDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
+
+
+Future<void> _makeDislikeAPIRequest(BigInt postId) async {
+  final url = Uri.parse('http://localhost:8080/api/v1/unheart/$postId');
+
+  try {
+    final response = await http.post(url);
+
+    if (response.statusCode == 200) {
+      // The dislike API call was successful.
+      print('Dislike API call successful.');
+    } else {
+      // The dislike API call failed.
+      print('Failed to dislike the post. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // An error occurred during the API call.
+    print('Error while disliking the post: $e');
+  }
+}
+
+//Best5 image
+Future<List<Widget>> Best5(int numImg) async{
+  List<Widget> Best5images = [];
+  List<ContestData> Best5ImgUrls = await getTop5Image();
+  List<String> images = [];
+  List<String> PostTitle = [];
+  List<String> PostContent = [];
+  int j = 0;
+
+  while (j < numImg && j < Best5ImgUrls.length) {
+    for (String photoUrl in Best5ImgUrls[j].photoList) {
+      images.add(photoUrl);
+
+      // HeartButton heartButton = HeartButton(onLiked: (isLiked) {
+      //   print("호출");
+      //   // Handle the postId here based on the isLiked value.
+      //   if (isLiked) {
+      //     print("좋아요 버튼 호출");
+      //     _makeLikeAPIRequest(Best5ImgUrls[j].id);
+      //   } else {
+      //     _makeDislikeAPIRequest(Best5ImgUrls[j].id);
+      //   }
+      // }
+      // );
+    }
+    j++;
+  }
+  try{
+    for (ContestData contestData in Best5ImgUrls) {
+      PostTitle.add(contestData.getTitle());
+      PostContent.add(contestData.getContents());
+
+    }
+  } catch (e) {
+    print(e);
+  }
+
 
   List<String> UserProfileImg = [];
   UserProfileImg.add(
@@ -583,19 +745,6 @@ List<Widget> Best5(int numImg) {
   UserProfileImg.add(
       'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
 
-  List<String> PostTitle = [];
-  PostTitle.add('제목1 ');
-  PostTitle.add('제목2 ');
-  PostTitle.add('제목3 ');
-  PostTitle.add('제목4 ');
-  PostTitle.add('제목5 ');
-
-  List<String> PostContent = [];
-  PostContent.add("이 게시글 내용의 길이가 길어서 Overflow가 생기는 것을 방지하기 위한 설정 필요");
-  PostContent.add("내용2222222222222");
-  PostContent.add("내용3333333333333");
-  PostContent.add("내용4444444444444");
-  PostContent.add("내용555555555555");
 
   Widget image;
   int i = 0;
@@ -603,7 +752,7 @@ List<Widget> Best5(int numImg) {
     image = Stack(
       children: [
         Container(
-          child: Image.asset('assets/img_8.png'),
+          child: Image.asset('images/img_8.png'),
           height: 276,
           width: 233,
           margin: EdgeInsets.fromLTRB(0, 0, 26, 0),
@@ -615,14 +764,14 @@ List<Widget> Best5(int numImg) {
             borderRadius: BorderRadius.circular(22),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(Best5ImgUrls[i]) //Best5 사진 url
+                image: NetworkImage(images[i]) //Best5 사진 url
             ),
           ),
         ),
         Positioned(
           top: 4,
           right: 30,
-          child: HeartButton(),
+          child: HeartButton(onLiked: (bool isLiked) {  },),
         ),
         Positioned(
             bottom: 20,
@@ -767,3 +916,5 @@ class NormalPhotosScreen extends StatelessWidget {
     return SingleChildScrollView();
   }
 }
+
+//page가 동적으로 바뀌도록 해야하는거 아님?
