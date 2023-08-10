@@ -4,6 +4,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -285,13 +287,25 @@ class GridViewPhotos extends StatefulWidget {
 }
 
 class _GridViewPhotosState extends State<GridViewPhotos> {
-  List<Widget> images = [];
+  List<Widget> _images = [];
 
   @override
   void initState() {
     super.initState();
-    images = createPhotos(context); // Initialize images list here
+    // Schedule the asynchronous task to run after the initial build
+    Future.delayed(Duration(milliseconds: 0), () async {
+      List<Widget> images = await createPhotos(context);
+      setState(() {
+        // Update the state with the list of images
+        _images = images;
+      });
+    });
   }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -311,75 +325,39 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
         // 뷰 크기 고정
         primary: false,
         //내부는 스크롤 없게 지정
-        children: images,
+        children: _images,
       ),
     );
   }
 }
 
-List<Widget> createPhotos(BuildContext context) {
-
-  List<Widget> images = [];
-  List<String> urls = [];
-
-
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  urls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-
-
-
-  List<String> UserProfileImg = [];
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-
+Future<List<Widget>> createPhotos(BuildContext context) async {
+  List<ContestPageData> urls = await getBoard();
+  print(urls);
+  List<String> PostImage=[];
   List<String> PostTitle = [];
-  PostTitle.add('제목1111111111111111');
-  PostTitle.add('제목2');
-  PostTitle.add('제목3');
-  PostTitle.add('제목4');
-  PostTitle.add('제목5');
+  List<int> PostView = [];
+  List<int> PostId=[];
+  List<int> PostComment = [];
+  List<int> PostLike = [];
+  List<String> PostWriter = [];
+  List<Widget> images = [];
+  List<String> UserProfileImg = [];
+    for (ContestPageData pagedata in urls) {
 
-  PostTitle.add('제목1111111111111111');
-  PostTitle.add('제목2');
-  PostTitle.add('제목3');
-  PostTitle.add('제목4');
-  PostTitle.add('제목5');
+
+      PostTitle.add(pagedata.getTitle());
+      PostView.add(pagedata.getViewCount());
+      PostWriter.add(pagedata.getAuthor());
+      PostComment.add(pagedata.getCommentCnt());
+      PostLike.add(pagedata.getLikecnt());
+      PostImage.add(pagedata.getPhoto());
+      UserProfileImg.add('https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+      HeartButton heartButton = _createHeartButton(pagedata.id);
+    }
+
+
+
 
   for (int i = 0; i < urls.length; i++) {
     Widget image = Card(
@@ -398,13 +376,13 @@ List<Widget> createPhotos(BuildContext context) {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image(
-                      image: NetworkImage(urls[i]),
+                      image: NetworkImage(PostImage[i]),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 Positioned(
-                  child: HeartButton2(onLiked: (bool isLiked) {  },),
+                  child: _createHeartButton(urls[i].id),
                   top: 1,
                   right: 1,
                 )
@@ -453,7 +431,7 @@ List<Widget> createPhotos(BuildContext context) {
                       color: Color(0xffBDBDBD),
                     ),
                     Text(
-                      '11111',
+                      PostView[i].toString(),
                       style: TextStyle(
                         color: Color(0xffBDBDBD),
                         fontSize: 10,
@@ -471,7 +449,7 @@ List<Widget> createPhotos(BuildContext context) {
                       color: Color(0xffBDBDBD),
                     ),
                     Text(
-                      '11111',
+                      PostComment[i].toString(),
                       style: TextStyle(
                         color: Color(0xffBDBDBD),
                         fontSize: 10,
@@ -488,7 +466,7 @@ List<Widget> createPhotos(BuildContext context) {
                       color: Color(0xffBDBDBD),
                     ),
                     Text(
-                      '11111',
+                      PostLike[i].toString(),
                       style: TextStyle(
                         color: Color(0xffBDBDBD),
                         fontSize: 10,
@@ -511,7 +489,8 @@ List<Widget> createPhotos(BuildContext context) {
 
 class HeartButton extends StatefulWidget {
   final Function(bool isLiked) onLiked;
-  HeartButton({required this.onLiked});
+  final BigInt postId;
+  HeartButton({required this.onLiked, required this.postId}); //생성자
 
   @override
   _HeartButtonState createState() => _HeartButtonState();
@@ -519,6 +498,22 @@ class HeartButton extends StatefulWidget {
 
 class _HeartButtonState extends State<HeartButton> {
   bool _isLiked = false;
+  @override
+  void initState() {
+    super.initState();
+    _loadLikedState(); // 위젯이 초기화될 때 좋아요 상태를 로드
+  }
+  Future<void> _loadLikedState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isLiked = prefs.getBool(widget.postId.toString()) ?? false;
+    });
+  }
+
+  Future<void> _saveLikedState(bool isLiked) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(widget.postId.toString(), isLiked);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -539,8 +534,12 @@ class _HeartButtonState extends State<HeartButton> {
             color: _isLiked ? Colors.red : Colors.white,
           ),
           onPressed: () {
+            print("button click");
             setState(() {
+              print("button click2");
               _isLiked = !_isLiked;
+              _saveLikedState(_isLiked); // 눌렸을 때 좋아요 상태 저장
+
               widget.onLiked(_isLiked);
             });
           },
@@ -580,7 +579,11 @@ class _HeartButton2State extends State<HeartButton2> {
             color: _isLiked ? Colors.red : Colors.white,
           ),
           onPressed: () {
+            print("button click");
+            print(_isLiked);
             setState(() {
+              print("button click");
+              print(_isLiked);
               _isLiked = !_isLiked;
               widget.onLiked(_isLiked);
             });
@@ -592,15 +595,18 @@ class _HeartButton2State extends State<HeartButton2> {
 }
 
 Future<void> _makeLikeAPIRequest(BigInt postId) async {
-  String accessToken='eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MTQyMzgzM30.Y3tKrh2U4vXXUDliPvMMAm59YbNG9UeLvZbUA4I0ftE';
-  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
+  print(postId);
 
+  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var accessToken = prefs.getString('accessToken');
   try {
     print("좋아요 API 호출");
     final response = await http.post(
       url,
       headers: {
-        'Authorization':'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiUk9MRV9VU0VSIiwic3ViIjoieWVyaW1AZG9jLmNvbSIsImV4cCI6MTY5MDc4MzkyMn0.Q4_oEKazdHJh0fpJFqK6dVlvT5pSAmU4dRKXbREdO0U',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
@@ -616,6 +622,52 @@ Future<void> _makeLikeAPIRequest(BigInt postId) async {
     print('Error while liking the post: $e');
   }
 }
+
+class ContestPageData {
+  final BigInt id;
+
+  final String author;
+  final String title;
+  final int viewCount;
+  final int likecnt;
+  final int commentCnt;
+  final String photo;
+
+
+  ContestPageData({
+    required this.id,
+    required this.author,
+    required this.title,
+    required this.viewCount,
+    required this.likecnt,
+    required this.photo,
+    required this.commentCnt,
+  });
+
+  BigInt getId(){
+    return id;
+  }
+  String getTitle(){
+    return title;
+  }
+  String getAuthor(){
+    return author;
+  }
+  String getPhoto(){
+  return photo;
+  }
+  int getViewCount(){
+    return viewCount;
+  }
+  int getLikecnt(){
+    return likecnt;
+  }
+  int getCommentCnt(){
+    return commentCnt;
+  }
+
+}
+
 
 class ContestData {
   final BigInt id;
@@ -645,6 +697,44 @@ class ContestData {
 
 
 
+Future<List<ContestPageData>> getBoard()  async {
+  List<String> boardList = [];
+  final url = Uri.parse(
+      'http://localhost:8080/api/v1/contest/all');
+  final Map<String, String> data = {
+    "title": "",
+    "content": "",
+    "writer": ""
+  };
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(data),
+  );
+
+  if(response.statusCode==200){
+    final jsonData = json.decode(response.body);
+    final data = jsonData['content'] as List<dynamic>;
+
+    final List<ContestPageData> contestPageDataList = data.map((item) {
+      return ContestPageData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        viewCount: item['view_count'],
+        photo: item['first_photo'],
+        likecnt: item['likecnt'],
+        commentCnt: item['comment_cnt'],
+      );
+    }).toList();
+    print(contestPageDataList);
+    return contestPageDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
 
 
 Future<List<ContestData>> getTop5Image()  async {
@@ -678,21 +768,45 @@ Future<List<ContestData>> getTop5Image()  async {
 
 Future<void> _makeDislikeAPIRequest(BigInt postId) async {
   final url = Uri.parse('http://localhost:8080/api/v1/unheart/$postId');
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var accessToken = prefs.getString('accessToken');
 
   try {
-    final response = await http.post(url);
+    final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+    );
+
 
     if (response.statusCode == 200) {
-      // The dislike API call was successful.
+      // The dislike API 호출
       print('Dislike API call successful.');
     } else {
-      // The dislike API call failed.
+      // API 호출 실패
       print('Failed to dislike the post. Status code: ${response.statusCode}');
     }
   } catch (e) {
     // An error occurred during the API call.
     print('Error while disliking the post: $e');
   }
+}
+
+HeartButton _createHeartButton(BigInt postId) {
+  return HeartButton(
+    postId: postId,
+    onLiked: (bool isLiked) {
+      print("onLiked callback executed with isLiked: $isLiked");
+      if (isLiked) {
+        print("Call the Like button");
+        _makeLikeAPIRequest(postId);
+      } else {
+        _makeDislikeAPIRequest(postId);
+      }
+    },
+  );
 }
 
 //Best5 image
@@ -707,18 +821,8 @@ Future<List<Widget>> Best5(int numImg) async{
   while (j < numImg && j < Best5ImgUrls.length) {
     for (String photoUrl in Best5ImgUrls[j].photoList) {
       images.add(photoUrl);
+      HeartButton heartButton = _createHeartButton(Best5ImgUrls[j].id);
 
-      // HeartButton heartButton = HeartButton(onLiked: (isLiked) {
-      //   print("호출");
-      //   // Handle the postId here based on the isLiked value.
-      //   if (isLiked) {
-      //     print("좋아요 버튼 호출");
-      //     _makeLikeAPIRequest(Best5ImgUrls[j].id);
-      //   } else {
-      //     _makeDislikeAPIRequest(Best5ImgUrls[j].id);
-      //   }
-      // }
-      // );
     }
     j++;
   }
@@ -771,7 +875,7 @@ Future<List<Widget>> Best5(int numImg) async{
         Positioned(
           top: 4,
           right: 30,
-          child: HeartButton(onLiked: (bool isLiked) {  },),
+          child: _createHeartButton(Best5ImgUrls[i].id), // HeartButton 적용
         ),
         Positioned(
             bottom: 20,

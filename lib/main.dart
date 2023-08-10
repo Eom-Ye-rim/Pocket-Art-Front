@@ -7,6 +7,8 @@ import 'package:flutter_ar_example/board/PhotoBoard.dart';
 import 'package:flutter_ar_example/user/signupcode.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   KakaoSdk.init(nativeAppKey:'077a09d06719ae6dd518a8049399d4a0');
@@ -246,6 +248,13 @@ Widget build(BuildContext context) {
                     );
 
                     if (response.statusCode == 200) {
+                      var responseData = json.decode(response.body);
+                      var accessToken = responseData['data']['accessToken'];
+                      print(accessToken);
+
+                      // shared_preferences를 사용하여 accessToken 안전하게 저장
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('accessToken', accessToken);
                         Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => PhotoBoard()),
