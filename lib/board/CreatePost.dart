@@ -44,7 +44,7 @@ class _CreatePostState extends State<CreatePost> {
                 style: TextStyle(
                   color: Color(0xFF727272),
                   fontSize: 22,
-                  fontFamily: 'Apple SD Gothic Neo',
+                  fontFamily: 'SUIT',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -137,7 +137,7 @@ class _CreatePostState extends State<CreatePost> {
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
-                  fontFamily: 'Apple SD Gothic Neo',
+                  fontFamily: 'SUIT',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -171,7 +171,7 @@ class _CreatePostState extends State<CreatePost> {
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
-                  fontFamily: 'Apple SD Gothic Neo',
+                  fontFamily: 'SUIT',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -187,14 +187,49 @@ class _CreatePostState extends State<CreatePost> {
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
-                  fontFamily: 'Apple SD Gothic Neo',
+                  fontFamily: 'SUIT',
                   fontWeight: FontWeight.w500,
                 ),
               ),
               SizedBox(
                 height: 6,
               ),
-              TagInputChip()
+              TagInputChip(),
+
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                child: FilledButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Color(0xFF363636),
+                    ),
+                  ),
+                  onPressed: () {},
+                  child: Center(
+                    child: Text(
+                      '업로드',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontFamily: 'SUIT',
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                ),
+                width: 356,
+                height: 56,
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.50),
+                  ),
+                ),
+              ),
+
+
             ],
           ),
         ),
