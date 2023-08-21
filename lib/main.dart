@@ -8,6 +8,7 @@ import 'package:flutter_ar_example/user/signupcode.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 void main() {
@@ -231,6 +232,7 @@ Widget build(BuildContext context) {
               //   bottom: 20,
               // ),
               child: TextButton(
+                  //
 
                   onPressed: () async {
                     final url = Uri.parse(
@@ -241,72 +243,75 @@ Widget build(BuildContext context) {
                     };
                     String jsonData = json.encode(data);
                     try {
-                    final response =await http.post(
-                    url,
-                    headers: {'Content-Type': 'application/json'}, // Set the request header
-                    body: jsonData, // Set the JSON data as the request body
-                    );
+                      final response = await http.post(
+                        url,
+                        headers: {'Content-Type': 'application/json'},
+                        // Set the request header
+                        body: jsonData, // Set the JSON data as the request body
+                      );
 
-                    if (response.statusCode == 200) {
-                      var responseData = json.decode(response.body);
-                      var accessToken = responseData['data']['accessToken'];
-                      print(accessToken);
+                      if (response.statusCode == 200) {
+                        var responseData = json.decode(response.body);
+                        var accessToken = responseData['data']['accessToken'];
+                        print(accessToken);
 
-                      // shared_preferences를 사용하여 accessToken 안전하게 저장
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('accessToken', accessToken);
+                        // shared_preferences를 사용하여 accessToken 안전하게 저장
+                        SharedPreferences prefs = await SharedPreferences
+                            .getInstance();
+                        await prefs.setString('accessToken', accessToken);
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PhotoBoard()),
+                          context,
+                          MaterialPageRoute(builder: (context) => PhotoBoard()),
                         );
 
-                    // Request successful
-                    print('Data sent successfully.');
-                    } else {
-                    // Request failed
-                    print('Failed to send data. Status code: ${response.statusCode}');
-                    }
+                        // Request successful
+                        print('Data sent successfully.');
+                      } else {
+                        // Request failed
+                        print('Failed to send data. Status code: ${response
+                            .statusCode}');
+                      }
                     } catch (e) {
-
-                    // Handle any exceptions that might occur during the API call
-                    print('Error: $e');
+                      // Handle any exceptions that might occur during the API call
+                      print('Error: $e');
                     }
+                  },
 
 
-                    // if (await isKakaoTalkInstalled()) {
-                    //   try {
-                    //     await UserApi.instance.loginWithKakaoTalk();
-                    //     print('카카오톡으로 로그인 성공');
-                    //   } catch (error) {
-                    //     print('카카오톡으로 로그인 실패 $error');
-                    //
-                    //     // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-                    //     // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-                    //     if (error is PlatformException && error.code == 'CANCELED') {
-                    //       return;
-                    //     }
-                    //     // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
-                    //     try {
-                    //       await UserApi.instance.loginWithKakaoAccount();
-                    //       print('카카오계정으로 로그인 성공');
-                    //     } catch (error) {
-                    //       print('카카오계정으로 로그인 실패 $error');
-                    //     }
-                    //   }
-                    // } else {
-                    //   try {
-                    //     await UserApi.instance.loginWithKakaoAccount();
-                    //     print('카카오계정으로 로그인 성공');
-                    //   } catch (error) {
-                    //     print('카카오계정으로 로그인 실패 $error');
-                    //   }
-                    // }
 
-                }
-                ,
+                //     if (await isKakaoTalkInstalled()) {
+                //       try {
+                //         await UserApi.instance.loginWithKakaoTalk();
+                //         print('카카오톡으로 로그인 성공');
+                //       } catch (error) {
+                //         print('카카오톡으로 로그인 실패 $error');
+                //
+                //         // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
+                //         // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
+                //         if (error is PlatformException && error.code == 'CANCELED') {
+                //           return;
+                //         }
+                //         // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
+                //         try {
+                //           await UserApi.instance.loginWithKakaoAccount();
+                //           print('카카오계정으로 로그인 성공');
+                //         } catch (error) {
+                //           print('카카오계정으로 로그인 실패 $error');
+                //         }
+                //       }
+                //     } else {
+                //       try {
+                //         await UserApi.instance.loginWithKakaoAccount();
+                //         print('카카오계정으로 로그인 성공');
+                //       } catch (error) {
+                //         print('카카오계정으로 로그인 실패 $error');
+                //       }
+                //     }
+                //
+                // },
                 // onPressed: () async {
                 //   final url =
-                //       'https://kauth.kakao.com/oauth/authorize?client_id=&redirect_uri=http://localhost:8080/auth/kakao/callback&response_type=code';
+                //       'https://kauth.kakao.com/oauth/authorize?client_id=179011b75542e1a21fa2207d50a4df57&redirect_uri=http://localhost:8080/auth/kakao/callback&response_type=code';
                 //   if (await canLaunch(url)) {
                 //     await launch(url);
                 //   } else {
@@ -541,39 +546,38 @@ Widget build(BuildContext context) {
           ),
 
 
-          // Positioned(
-          //   left: 149,
-          //   top: 740,
-          //   child: Container(
-          //     width: 104,
-          //     height: 57,
-          //     child: Column(
-          //
-          //       children: [
-          //         Container(
-          //           width: 104,
-          //           child: Row(
-          //             children: [
-          //               ElevatedButton(
-          //                 onPressed: () {
-          //
-          //                 },
-          //                 style: ElevatedButton.styleFrom(
-          //                   elevation: 0,
-          //                   padding: EdgeInsets.zero,
-          //                 ),
-          //                 child: Image.asset(
-          //                   'images/kakao_login_large.png',  // 이미지 경로 및 파일명으로 수정해야 합니다.
-          //                 ),
-          //               ),
-          //
-          //             ],
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
+          Positioned(
+            left: 110,
+            top: 740,
+            child: Container(
+              width: 400,
+              height: 57,
+              child: Column(
+
+                children: [
+                  Container(
+                    width: 400,
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                          },
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Image.asset(
+                            'images/kakao_login_medium_narrow.png',  // 이미지 경로 및 파일명으로 수정해야 합니다.
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
 
 
           Positioned(
@@ -1507,7 +1511,7 @@ Widget build(BuildContext context) {
 // }
 
 
-
+//AR
 
 // import 'dart:io';
 // import 'package:flutter/material.dart';
@@ -1725,95 +1729,91 @@ Widget build(BuildContext context) {
 //                   topRight: Radius.circular(16),
 //                 ),
 //               ),
-//               child: Stack(
+//               child: Column(
 //                 children: [
-//                   Positioned.fill(
-//                     child: Container(
-//                       decoration: BoxDecoration(
-//                         color: Color(0xffa1a1a1).withOpacity(1), // Set the desired background color and opacity
-//                         borderRadius: BorderRadius.only(
-//                           topLeft: Radius.circular(16),
-//                           topRight: Radius.circular(16),
+//                   Container(
+//                     padding: EdgeInsets.all(16),
+//                     child: Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                       children: [
+//                         ClipOval(
+//                           child: Container(
+//                             color: Color(0xff5d5d5d), // 원하는 배경 색상 설정
+//                             child: IconButton(
+//                               onPressed: () {
+//                                 setState(() {
+//                                   predefinedImages = predefinedImages2;
+//                                 });
+//                               },
+//                               icon: Icon(Icons.brush),
+//                               color: Color(0xff7e1111), // 아이콘 색상 설정
+//                             ),
+//                           ),
 //                         ),
-//                       ),
+//                         ClipOval(
+//                           child: Container(
+//                             color: Color(0xff5d5d5d), // 원하는 배경 색상 설정
+//                             child: IconButton(
+//                               onPressed: () {
+//                                 setState(() {
+//                                   predefinedImages = predefinedImages;
+//                                 });
+//                               },
+//                               icon: Icon(Icons.palette),
+//                               color: Color(0xff801d1d), // 아이콘 색상 설정
+//                             ),
+//                           ),
+//                         ),
+//                         ClipOval(
+//                           child: Container(
+//                             color: Color(0xff5d5d5d), // 원하는 배경 색상 설정
+//                             child: IconButton(
+//                               onPressed: () {
+//                                 _showUserPhotoAlbum();
+//                               },
+//                               icon: Icon(Icons.photo),
+//                               color: Color(0xff673333), // 아이콘 색상 설정
+//                             ),
+//                           ),
+//                         ),
+//                       ],
 //                     ),
 //                   ),
-//                   Column(
-//                     children: [
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                         children: [
-//                           ElevatedButton(
-//                             onPressed: () {
-//                               setState(() {
-//                                 predefinedImages = predefinedImages2;
-//                               });
-//                             },
-//                             style: ButtonStyle(
-//                               backgroundColor: MaterialStateProperty.all<Color>(Color(
-//                                   0xff5d5d5d)), // Set the desired background color
-//                             ),
-//                             child: Text('동양화'),
-//                           ),
-//                           ElevatedButton(
-//                             onPressed: () {
-//                               setState(() {
-//                                 predefinedImages = predefinedImages;
-//                               });
-//                             },
-//                             style: ButtonStyle(
-//                               backgroundColor: MaterialStateProperty.all<Color>(Color(0xff5d5d5d)), // Set the desired background color
-//                             ),
-//                             child: Text('서양화'),
-//                           ),
-//                           ElevatedButton(
-//                             onPressed: () {
-//                               _showUserPhotoAlbum();
-//                             },
-//                             style: ButtonStyle(
-//                               backgroundColor: MaterialStateProperty.all<Color>(Color(0xff5d5d5d)), // Set the desired background color
-//                             ),
-//                             child: Text('갤러리'),
-//                           ),
-//                         ],
+//                   Expanded(
+//                     child: ClipRRect(
+//                       borderRadius: BorderRadius.only(
+//                         topLeft: Radius.circular(16),
+//                         topRight: Radius.circular(16),
 //                       ),
-//                       Expanded(
-//                         child: ClipRRect(
-//                           borderRadius: BorderRadius.only(
-//                             topLeft: Radius.circular(16),
-//                             topRight: Radius.circular(16),
-//                           ),
-//                           child: PageView.builder(
-//                             itemCount: pageCount,
-//                             itemBuilder: (context, pageIndex) {
-//                               final startIndex = pageIndex * imagesPerPage;
-//                               final endIndex = (startIndex + imagesPerPage) < predefinedImages.length
-//                                   ? (startIndex + imagesPerPage)
-//                                   : predefinedImages.length;
-//                               final pageImages = predefinedImages.sublist(startIndex, endIndex);
+//                       child: PageView.builder(
+//                         itemCount: pageCount,
+//                         itemBuilder: (context, pageIndex) {
+//                           final startIndex = pageIndex * imagesPerPage;
+//                           final endIndex = (startIndex + imagesPerPage) < predefinedImages.length
+//                               ? (startIndex + imagesPerPage)
+//                               : predefinedImages.length;
+//                           final pageImages = predefinedImages.sublist(startIndex, endIndex);
 //
-//                               return GridView.count(
-//                                 crossAxisCount: 3,
-//                                 padding: EdgeInsets.all(8),
-//                                 crossAxisSpacing: 8,
-//                                 children: List.generate(pageImages.length, (index) {
-//                                   final imagePath = pageImages[index];
-//                                   return GestureDetector(
-//                                     onTap: () {
-//                                       _addImageNode(imagePath);
-//                                       Navigator.pop(context);
-//                                     },
-//                                     child: GridTile(
-//                                       child: Image.asset(imagePath),
-//                                     ),
-//                                   );
-//                                 }),
+//                           return GridView.count(
+//                             crossAxisCount: 3,
+//                             padding: EdgeInsets.all(8),
+//                             crossAxisSpacing: 8,
+//                             children: List.generate(pageImages.length, (index) {
+//                               final imagePath = pageImages[index];
+//                               return GestureDetector(
+//                                 onTap: () {
+//                                   _addImageNode(imagePath);
+//                                   Navigator.pop(context);
+//                                 },
+//                                 child: GridTile(
+//                                   child: Image.asset(imagePath),
+//                                 ),
 //                               );
-//                             },
-//                           ),
-//                         ),
+//                             }),
+//                           );
+//                         },
 //                       ),
-//                     ],
+//                     ),
 //                   ),
 //                 ],
 //               ),
@@ -1823,6 +1823,7 @@ Widget build(BuildContext context) {
 //       },
 //     );
 //   }
+//
 //
 //   Future<void> _showUserPhotoAlbum() async {
 //     final picker = ImagePicker();

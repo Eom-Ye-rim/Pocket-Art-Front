@@ -81,7 +81,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 76,),
+                SizedBox(height: 40,),
                 Text(
                   '회원정보를 입력해주세요.',
                   style: TextStyle(
@@ -99,6 +99,33 @@ class _ManipulationPageState extends State<ManipulationPage> {
                     fontFamily: 'SUIT',
                     fontWeight: FontWeight.w500,
                   ),
+                ),
+
+                SizedBox(height: 12,),
+                Text(
+                  '아이디',
+                  style: TextStyle(
+                    color: Color(0xFF1C1C1C),
+                    fontSize: 15,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextFormField(
+                    onChanged: (value) {
+                      setState(() {
+                        name =
+                            value; // Update the 'name' variable when the text changes
+                      });
+                    },
+
+                    decoration: InputDecoration(
+                      hintText: '아이디를 입력해주세요',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                    )
+
                 ),
                 SizedBox(height: 12,),
                 Text(
@@ -130,7 +157,6 @@ class _ManipulationPageState extends State<ManipulationPage> {
                 SizedBox(height: 22,),
 
                 Text(
-
                   '이메일',
                   style: TextStyle(
                     color: Color(0xFF1C1C1C),
@@ -149,53 +175,66 @@ class _ManipulationPageState extends State<ManipulationPage> {
                       ),
                     )
                 ),
-                SizedBox(height: 22,),
-                Text(
-                  '비밀번호',
-                  style: TextStyle(
-                    color: Color(0xFF1C1C1C),
-                    fontSize: 15,
-                    fontFamily: 'SUIT',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        password =
-                            value; // Update the 'name' variable when the text changes
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: '비밀번호를 입력해주세요.',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 22),
+                    Text(
+                      '비밀번호 입력',
+                      style: TextStyle(
+                        color: Color(0xFF1C1C1C),
+                        fontSize: 15,
+                        fontFamily: 'SUIT',
+                        fontWeight: FontWeight.w600,
                       ),
-                    )
-                ),
-                SizedBox(height: 22,),
-                Text(
-                  '비밀번호 확인',
-                  style: TextStyle(
-                    color: Color(0xFF1C1C1C),
-                    fontSize: 15,
-                    fontFamily: 'SUIT',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        passwordConfirm = value; // Update the 'name' variable when the text changes
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: '비밀번호 확인을 입력해주세요.',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
+                    ),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          password = value; // Update the 'password' variable when the text changes
+                        });
+                      },
+                      obscureText: true, // This property makes the entered text obscure
+                      decoration: InputDecoration(
+                        hintText: '비밀번호 입력',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
                       ),
-                    )
+                    ),
+                  ],
                 ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    SizedBox(height: 22),
+                    Text(
+                      '비밀번호 확인',
+                      style: TextStyle(
+                        color: Color(0xFF1C1C1C),
+                        fontSize: 15,
+                        fontFamily: 'SUIT',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          passwordConfirm = value; // Update the 'passwordConfirm' variable when the text changes
+                        });
+                      },
+                      obscureText: true, // This property makes the entered text obscure
+                      decoration: InputDecoration(
+                        hintText: '비밀번호를 한 번 더 입력해주세요',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
                 SizedBox(height: 22,),
                 SizedBox(height: 0),
                 Container(

@@ -576,7 +576,7 @@ class _HeartButton2State extends State<HeartButton2> {
         IconButton(
           icon: Icon(
             _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.red : Colors.white,
+            color: _isLiked ? Colors.white : Color(0xFFFFFF),
           ),
           onPressed: () {
             print("button click");
@@ -605,7 +605,7 @@ Future<void> _makeLikeAPIRequest(BigInt postId) async {
     final response = await http.post(
       url,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8 ',
         'Authorization': 'Bearer $accessToken',
       },
     );
@@ -649,9 +649,11 @@ class ContestPageData {
   }
   String getTitle(){
     return title;
+    //return utf8.decode(base64.decode(title));
   }
   String getAuthor(){
     return author;
+   // return utf8.decode(base64.decode(author));
   }
   String getPhoto(){
   return photo;
@@ -689,9 +691,11 @@ class ContestData {
   });
   String getTitle(){
     return title;
+   // return utf8.decode(base64.decode(title));
   }
   String getContents(){
     return contents;
+    return utf8.decode(base64.decode(contents));
   }
 }
 
@@ -709,12 +713,12 @@ Future<List<ContestPageData>> getBoard()  async {
 
   final response = await http.post(
     url,
-    headers: {'Content-Type': 'application/json'},
+    headers: {'Content-Type': 'application/json; charset=utf-8'},
     body: json.encode(data),
   );
 
   if(response.statusCode==200){
-    final jsonData = json.decode(response.body);
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
     final data = jsonData['content'] as List<dynamic>;
 
     final List<ContestPageData> contestPageDataList = data.map((item) {
@@ -743,7 +747,7 @@ Future<List<ContestData>> getTop5Image()  async {
       'http://localhost:8080/api/v1/contest/best');
   final response = await http.get(url);
   if(response.statusCode==200){
-    final jsonData = json.decode(response.body);
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
     final data = jsonData['data'] as List<dynamic>;
 
     final List<ContestData> contestDataList = data.map((item) {
@@ -775,7 +779,7 @@ Future<void> _makeDislikeAPIRequest(BigInt postId) async {
     final response = await http.delete(
         url,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
           'Authorization': 'Bearer $accessToken',
         },
     );
@@ -829,6 +833,9 @@ Future<List<Widget>> Best5(int numImg) async{
   try{
     for (ContestData contestData in Best5ImgUrls) {
       PostTitle.add(contestData.getTitle());
+      final koreanText=contestData.getTitle();
+      final encodedKoreanText = base64.encode(utf8.encode(koreanText));
+      print(encodedKoreanText);
       PostContent.add(contestData.getContents());
 
     }
