@@ -231,7 +231,7 @@ class Viewallbtn extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(11),
         image: DecorationImage(
-            fit: BoxFit.cover, image: AssetImage('assets/img_6.png')),
+            fit: BoxFit.cover, image: AssetImage('images/img_6.png')),
       ),
       child: FilledButton(
         style: ButtonStyle(
@@ -606,7 +606,7 @@ List<Widget> Best5(int numImg) {
     image = Stack(
       children: [
         Container(
-          child: Image.asset('assets/img_8.png'),
+          child: Image.asset('images/img_8.png'),
           height: 276,
           width: 233,
           margin: EdgeInsets.fromLTRB(0, 0, 26, 0),
@@ -758,7 +758,25 @@ class AIPhotosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+
+
+
+          Container(
+            padding: EdgeInsets.all(20),
+            width: 390,
+            decoration: BoxDecoration(
+                color: Color(0xffF6F6F6),
+                border: Border(
+                    top: BorderSide(color: Color(0xff444444), width: 0.2))),
+            child: GridViewPhotos(),
+          ),
+
+        ],
+      ),
+    );
   }
 }
 
@@ -767,6 +785,24 @@ class NormalPhotosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+
+
+
+          Container(
+            padding: EdgeInsets.all(20),
+            width: 390,
+            decoration: BoxDecoration(
+                color: Color(0xffF6F6F6),
+                border: Border(
+                    top: BorderSide(color: Color(0xff444444), width: 0.2))),
+            child: GridViewPhotos(),
+          ),
+
+        ],
+      ),
+    );
   }
 }
