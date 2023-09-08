@@ -313,8 +313,10 @@ class _ManipulationPageState extends State<ManipulationPage> {
 
 
       try {
+        print(enteredEmail);
         final url = Uri.parse(
-            'http://localhost:8080/emailConfirm?email=$enteredEmail');
+
+            'http://13.209.160.87:8080/emailConfirm?email=$enteredEmail');
         final response = http.post(url);
         Navigator.push(
           context,

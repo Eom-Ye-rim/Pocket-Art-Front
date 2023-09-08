@@ -4,11 +4,15 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ar_example/board/Search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'CreatePost.dart';
+
 
 
 
@@ -24,6 +28,23 @@ class PhotoBoard extends StatefulWidget {
 }
 
 class _PhotoBoardState extends State<PhotoBoard> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    print("Tapped index: $index");
+    if (index == 1) {
+      // Navigate to the CreatePostPage when "글쓰기" button is clicked.
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CreatePost()), // Replace CreatePostPage with your actual page name.
+      );
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,7 +67,10 @@ class _PhotoBoardState extends State<PhotoBoard> {
             actions: <Widget>[
               IconButton(
                 onPressed: () {
-                  print("검색 버튼 test");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Search()), // Replace CreatePostPage with your actual page name.
+                    );
                 },
                 icon: Icon(Icons.search),
                 color: Color(0xff626262),
@@ -103,6 +127,8 @@ class _PhotoBoardState extends State<PhotoBoard> {
           bottomNavigationBar: BottomNavigationBar(
             selectedItemColor: Color(0xff0066FF),
             unselectedItemColor: Color(0xff484848),
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
             // showSelectedLabels: false, //아이콘 밑에 라벨 유무
             // showUnselectedLabels: false, // 라벨 유무
 
@@ -127,6 +153,7 @@ class _PhotoBoardState extends State<PhotoBoard> {
     );
   }
 }
+
 
 class AllPhotosScreen extends StatelessWidget {
   const AllPhotosScreen({Key? key}) : super(key: key);
@@ -211,30 +238,30 @@ class _RowScrollPhotosState extends State<RowScrollPhotos> {
   @override
   Widget build(BuildContext context) {
   return FutureBuilder<List<Widget>>(
-  future: Best5(5), // Best5 함수 호출하고 Future가 완료되기를 기다립니다.
-  builder: (context, snapshot) {
-  if (snapshot.connectionState == ConnectionState.waiting) {
-  // Future가 완료될 때까지 로딩 인디케이터를 표시합니다.
-  return CircularProgressIndicator();
-  } else if (snapshot.hasError) {
-  // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
-  return Text('오류: ${snapshot.error}');
-  } else {
-  // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근할 수 있습니다.
-  List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
-  return SizedBox(
-  height: 276,
-  child: SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  physics: ScrollPhysics(),
-  primary: true,
-  child: Row(
-  children: best5Widgets,
-  ),
-  ),
-  );
-  }
-  },
+      future: Best5(5), // Best5 함수 호출
+      builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+      // Future가 완료될 때까지 로딩 인디케이터를 표시
+          return CircularProgressIndicator();
+      } else if (snapshot.hasError) {
+      // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
+           return Text('오류: ${snapshot.error}');
+      } else {
+      // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근
+      List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
+        return SizedBox(
+          height: 276,
+          child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: ScrollPhysics(),
+          primary: true,
+          child: Row(
+           children: best5Widgets,
+        ),
+          ),
+        );
+       }
+      },
   );
 
   }
@@ -352,7 +379,7 @@ Future<List<Widget>> createPhotos(BuildContext context) async {
       PostComment.add(pagedata.getCommentCnt());
       PostLike.add(pagedata.getLikecnt());
       PostImage.add(pagedata.getPhoto());
-      UserProfileImg.add('https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
+      UserProfileImg.add(pagedata.getUserImg());
       HeartButton heartButton = _createHeartButton(pagedata.id);
     }
 
@@ -531,7 +558,7 @@ class _HeartButtonState extends State<HeartButton> {
         IconButton(
           icon: Icon(
             _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.red : Colors.white,
+            color: _isLiked ? Colors.grey : Colors.white,
           ),
           onPressed: () {
             print("button click");
@@ -597,7 +624,7 @@ class _HeartButton2State extends State<HeartButton2> {
 Future<void> _makeLikeAPIRequest(BigInt postId) async {
   print(postId);
 
-  final url = Uri.parse('http://localhost:8080/api/v1/heart/$postId');
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/heart/$postId');
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('accessToken');
   try {
@@ -632,6 +659,7 @@ class ContestPageData {
   final int likecnt;
   final int commentCnt;
   final String photo;
+  final String userImg;
 
 
   ContestPageData({
@@ -642,6 +670,7 @@ class ContestPageData {
     required this.likecnt,
     required this.photo,
     required this.commentCnt,
+    required this.userImg,
   });
 
   BigInt getId(){
@@ -657,6 +686,9 @@ class ContestPageData {
   }
   String getPhoto(){
   return photo;
+  }
+  String getUserImg(){
+    return userImg;
   }
   int getViewCount(){
     return viewCount;
@@ -679,6 +711,7 @@ class ContestData {
   final int viewCount;
   final List<String> photoList;
   final String createdDate;
+  final String userImg;
 
   ContestData({
     required this.id,
@@ -688,6 +721,7 @@ class ContestData {
     required this.viewCount,
     required this.photoList,
     required this.createdDate,
+    required this.userImg,
   });
   String getTitle(){
     return title;
@@ -695,7 +729,12 @@ class ContestData {
   }
   String getContents(){
     return contents;
-    return utf8.decode(base64.decode(contents));
+
+  }
+
+  String getUserImg(){
+    return userImg;
+
   }
 }
 
@@ -704,11 +743,12 @@ class ContestData {
 Future<List<ContestPageData>> getBoard()  async {
   List<String> boardList = [];
   final url = Uri.parse(
-      'http://localhost:8080/api/v1/contest/all');
+      'http://13.209.160.87:8080/api/v1/contest/all');
   final Map<String, String> data = {
     "title": "",
     "content": "",
-    "writer": ""
+    "writer": "",
+    "userImg":"",
   };
 
   final response = await http.post(
@@ -726,6 +766,7 @@ Future<List<ContestPageData>> getBoard()  async {
         id:BigInt.from(item['id']),
         author: item['author'],
         title: item['title'],
+        userImg: item['user_img'],
         viewCount: item['view_count'],
         photo: item['first_photo'],
         likecnt: item['likecnt'],
@@ -744,7 +785,7 @@ Future<List<ContestPageData>> getBoard()  async {
 Future<List<ContestData>> getTop5Image()  async {
   List<String> Best5ImgUrls = [];
   final url = Uri.parse(
-      'http://localhost:8080/api/v1/contest/best');
+      'http://13.209.160.87:8080/api/v1/contest/best');
   final response = await http.get(url);
   if(response.statusCode==200){
     final jsonData = json.decode(utf8.decode(response.bodyBytes));
@@ -754,6 +795,7 @@ Future<List<ContestData>> getTop5Image()  async {
       return ContestData(
         id:BigInt.from(item['id']),
         author: item['author'],
+        userImg: item['user_img'],
         title: item['title'],
         contents: item['contents'],
         viewCount: item['view_count'],
@@ -771,7 +813,7 @@ Future<List<ContestData>> getTop5Image()  async {
 
 
 Future<void> _makeDislikeAPIRequest(BigInt postId) async {
-  final url = Uri.parse('http://localhost:8080/api/v1/unheart/$postId');
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/unheart/$postId');
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('accessToken');
 
@@ -820,6 +862,7 @@ Future<List<Widget>> Best5(int numImg) async{
   List<String> images = [];
   List<String> PostTitle = [];
   List<String> PostContent = [];
+  List<String> UserProfileImg = [];
   int j = 0;
 
   while (j < numImg && j < Best5ImgUrls.length) {
@@ -837,24 +880,13 @@ Future<List<Widget>> Best5(int numImg) async{
       final encodedKoreanText = base64.encode(utf8.encode(koreanText));
       print(encodedKoreanText);
       PostContent.add(contestData.getContents());
+      UserProfileImg.add(contestData.getUserImg());
 
     }
   } catch (e) {
     print(e);
   }
 
-
-  List<String> UserProfileImg = [];
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  UserProfileImg.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
 
 
   Widget image;

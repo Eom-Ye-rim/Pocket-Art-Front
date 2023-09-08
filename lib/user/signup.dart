@@ -294,7 +294,7 @@ Future<bool> signup(String name, String password, String passwordConfirm)  async
    print("호출");
    var email = widget.enteredEmail;
    bool isSuccess=false;
-   final url = Uri.parse('http://localhost:8080/signUp');
+   final url = Uri.parse('http://13.209.160.87:8080/signUp');
    Map<String, dynamic> data = {
      'name': name,
      'password': password,

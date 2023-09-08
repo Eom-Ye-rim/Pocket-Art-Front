@@ -163,7 +163,7 @@ class _TextToImg extends State<TextToImg> {
                               ),
 
                               onPressed: () async {
-                                final url = Uri.parse('http://localhost:8080/api/image/generate?prompt=$prompt');
+                                final url = Uri.parse('http://13.209.160.87:8080/api/image/generate?prompt=$prompt');
                                 final response = await http.post(url);
                                 List<dynamic> responseBody = jsonDecode(response.body);
                                 setState(() {

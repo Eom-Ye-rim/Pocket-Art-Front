@@ -378,7 +378,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
       return isSuccess;
     }
     final url = Uri.parse(
-        'http://localhost:8080/verifyCode?email=$enteredEmail&code=$number');
+        'http://13.209.160.87:8080/verifyCode?email=$enteredEmail&code=$number');
     print(url);
     final response = await http.post(url);
     print(response.statusCode);
