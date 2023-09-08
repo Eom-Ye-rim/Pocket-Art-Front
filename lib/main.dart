@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ar_example/style/ChangeStyle.dart';
+import 'package:flutter_ar_example/mainpage/MainPage.dart';
 import 'package:flutter_ar_example/user/signupcode.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:http/http.dart' as http;
@@ -257,7 +257,7 @@ class _FirstRouteState extends State<FirstRoute> {
                         Navigator.push(
                           context,
                           //PhotoBoard
-                          MaterialPageRoute(builder: (context) => ChangeStyle()),
+                          MaterialPageRoute(builder: (context) => MainPage()),
                         );
 
                         // Request successful

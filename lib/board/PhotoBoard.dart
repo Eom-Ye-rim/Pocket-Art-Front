@@ -67,10 +67,10 @@ class _PhotoBoardState extends State<PhotoBoard> {
             actions: <Widget>[
               IconButton(
                 onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Search()), // Replace CreatePostPage with your actual page name.
-                    );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Search()), // Replace CreatePostPage with your actual page name.
+                  );
                 },
                 icon: Icon(Icons.search),
                 color: Color(0xff626262),
@@ -237,32 +237,32 @@ class _RowScrollPhotosState extends State<RowScrollPhotos> {
 
   @override
   Widget build(BuildContext context) {
-  return FutureBuilder<List<Widget>>(
+    return FutureBuilder<List<Widget>>(
       future: Best5(5), // Best5 함수 호출
       builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-      // Future가 완료될 때까지 로딩 인디케이터를 표시
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Future가 완료될 때까지 로딩 인디케이터를 표시
           return CircularProgressIndicator();
-      } else if (snapshot.hasError) {
-      // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
-           return Text('오류: ${snapshot.error}');
-      } else {
-      // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근
-      List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
-        return SizedBox(
-          height: 276,
-          child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: ScrollPhysics(),
-          primary: true,
-          child: Row(
-           children: best5Widgets,
-        ),
-          ),
-        );
-       }
+        } else if (snapshot.hasError) {
+          // 데이터 가져오는 동안 오류가 발생하면 이곳에서 처리합니다.
+          return Text('오류: ${snapshot.error}');
+        } else {
+          // Future가 성공적으로 완료되면, snapshot.data에서 위젯 목록에 접근
+          List<Widget> best5Widgets = snapshot.data ?? []; // 데이터가 null일 경우 기본값 제공
+          return SizedBox(
+            height: 276,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: ScrollPhysics(),
+              primary: true,
+              child: Row(
+                children: best5Widgets,
+              ),
+            ),
+          );
+        }
       },
-  );
+    );
 
   }
 }
@@ -370,18 +370,18 @@ Future<List<Widget>> createPhotos(BuildContext context) async {
   List<String> PostWriter = [];
   List<Widget> images = [];
   List<String> UserProfileImg = [];
-    for (ContestPageData pagedata in urls) {
+  for (ContestPageData pagedata in urls) {
 
 
-      PostTitle.add(pagedata.getTitle());
-      PostView.add(pagedata.getViewCount());
-      PostWriter.add(pagedata.getAuthor());
-      PostComment.add(pagedata.getCommentCnt());
-      PostLike.add(pagedata.getLikecnt());
-      PostImage.add(pagedata.getPhoto());
-      UserProfileImg.add(pagedata.getUserImg());
-      HeartButton heartButton = _createHeartButton(pagedata.id);
-    }
+    PostTitle.add(pagedata.getTitle());
+    PostView.add(pagedata.getViewCount());
+    PostWriter.add(pagedata.getAuthor());
+    PostComment.add(pagedata.getCommentCnt());
+    PostLike.add(pagedata.getLikecnt());
+    PostImage.add(pagedata.getPhoto());
+    UserProfileImg.add(pagedata.getUserImg());
+    HeartButton heartButton = _createHeartButton(pagedata.id);
+  }
 
 
 
@@ -682,10 +682,10 @@ class ContestPageData {
   }
   String getAuthor(){
     return author;
-   // return utf8.decode(base64.decode(author));
+    // return utf8.decode(base64.decode(author));
   }
   String getPhoto(){
-  return photo;
+    return photo;
   }
   String getUserImg(){
     return userImg;
@@ -725,7 +725,7 @@ class ContestData {
   });
   String getTitle(){
     return title;
-   // return utf8.decode(base64.decode(title));
+    // return utf8.decode(base64.decode(title));
   }
   String getContents(){
     return contents;
@@ -819,11 +819,11 @@ Future<void> _makeDislikeAPIRequest(BigInt postId) async {
 
   try {
     final response = await http.delete(
-        url,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Authorization': 'Bearer $accessToken',
-        },
+      url,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer $accessToken',
+      },
     );
 
 

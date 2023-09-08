@@ -382,7 +382,7 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 }
-  class CustomCategoryToggleButtons extends StatefulWidget {
+class CustomCategoryToggleButtons extends StatefulWidget {
   final ValueChanged<int> onCategoryChanged;
 
   const CustomCategoryToggleButtons({Key? key,required this.onCategoryChanged}) : super(key: key);
@@ -536,7 +536,7 @@ class _TagInputChipState extends State<TagInputChip> {
             spacing: 8.0,
             children: [
               ...tags.map(
-                (tag) => InputChip(
+                    (tag) => InputChip(
                   label: Text(tag),
                   onDeleted: () => _removeTag(tag),
                   backgroundColor: Colors.transparent,

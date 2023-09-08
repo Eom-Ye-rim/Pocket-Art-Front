@@ -58,19 +58,19 @@ class _ViewPostState extends State<ViewPost> {
     super.initState();
     print(widget.responseData);
     // Initialize postString with the responseData contents if available
-      if (widget.responseData!=null) {
-        postString = widget.responseData['data']['contents'];
-        PostUserName = widget.responseData['data']['author'];
-        Views = widget.responseData['data']['view_count'];
-        PostTitle = widget.responseData['data']['title'];
-        photolist = (widget.responseData['data']['photo_list'] as List<dynamic>?)?.cast<String>() ?? [];
-        user_img = widget.responseData['data']['user_img'];
-        TimeStamp = widget.responseData['data']['created_date'];
-        taglist = (widget.responseData['data']['tag_list'] as List<dynamic>?)?.cast<String>() ?? [];
-        print(taglist);
+    if (widget.responseData!=null) {
+      postString = widget.responseData['data']['contents'];
+      PostUserName = widget.responseData['data']['author'];
+      Views = widget.responseData['data']['view_count'];
+      PostTitle = widget.responseData['data']['title'];
+      photolist = (widget.responseData['data']['photo_list'] as List<dynamic>?)?.cast<String>() ?? [];
+      user_img = widget.responseData['data']['user_img'];
+      TimeStamp = widget.responseData['data']['created_date'];
+      taglist = (widget.responseData['data']['tag_list'] as List<dynamic>?)?.cast<String>() ?? [];
+      print(taglist);
 
-        print("실행");
-      }
+      print("실행");
+    }
   }
 
   TextEditingController _commentController = TextEditingController();
@@ -105,17 +105,17 @@ class _ViewPostState extends State<ViewPost> {
                   padding: EdgeInsets.fromLTRB(17, 17, 17, 17),
                   child: Column(
                     children: [
-                        Container(
-                          height: 356,
-                          width: 356,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  fit: BoxFit.cover, image: NetworkImage(
-                                // 게시글 사진 url
-                                  photolist[0]))),
-                        ),
+                      Container(
+                        height: 356,
+                        width: 356,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.cover, image: NetworkImage(
+                              // 게시글 사진 url
+                                photolist[0]))),
+                      ),
 
-                SizedBox(
+                      SizedBox(
                         height: 15,
                       ),
                       Row(
@@ -385,7 +385,7 @@ class _ViewPostState extends State<ViewPost> {
                 children: [
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                       user_img), // 사용자 프로필 이미지 경로로 변경
+                        user_img), // 사용자 프로필 이미지 경로로 변경
                   ),
                   SizedBox(
                     width: 10,
