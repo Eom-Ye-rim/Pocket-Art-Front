@@ -1,0 +1,1 @@
+../../../../.symlinks/plugins/wakelock/ios/Classes/UIApplication+idleTimerLock.h
