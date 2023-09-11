@@ -2,6 +2,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ar_example/board/PhotoBoard.dart';
+import 'package:flutter_ar_example/ARScreen.dart';
+
+import '../style/Chocie.dart';
 
 
 
@@ -36,9 +40,16 @@ class _MainPageState extends State<MainPage> {
         break;
       case 1:
       // 두 번째 탭을 클릭했을 때의 작업
-
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Choice()),
+        );
         break;
       case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ARScreen()),
+        );
       // 세 번째 탭을 클릭했을 때의 작업
       //   Navigator.push(
       //     context,
@@ -57,7 +68,7 @@ class _MainPageState extends State<MainPage> {
       home: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                fit: BoxFit.cover, image: AssetImage('assets/img_11.png'))),
+                fit: BoxFit.cover, image: AssetImage('images/img_11.png'))),
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: PreferredSize(
@@ -109,6 +120,11 @@ class _MainPageState extends State<MainPage> {
                                     Colors.transparent),
                               ),
                               onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  //PhotoBoard
+                                  MaterialPageRoute(builder: (context) => PhotoBoard()),
+                                );
                                 print('사진 게시');
                               },
                               child: Row(
@@ -117,7 +133,7 @@ class _MainPageState extends State<MainPage> {
                                     width: 6,
                                   ),
                                   Image.asset(
-                                    'assets/img_12.png',
+                                    'images/img_12.png',
                                     width: 51,
                                     height: 51,
                                   ),
@@ -177,7 +193,7 @@ class _MainPageState extends State<MainPage> {
                                     width: 6,
                                   ),
                                   Image.asset(
-                                    'assets/img_13.png',
+                                    'images/img_13.png',
                                     width: 51,
                                     height: 51,
                                   ),
@@ -318,12 +334,12 @@ class _MainPageState extends State<MainPage> {
                 label: '홈',
               ),
               BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/img_16.png'),
+                icon: Image(image: AssetImage('images/img_16.png'),
                   height: 34, width: 41,),
                 label: '사진변환',
               ),
               BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/img_17.png'),
+                icon: Image(image: AssetImage('images/img_17.png'),
                   width: 32, height: 30,),
                 label: 'AR',
               ),
@@ -373,7 +389,7 @@ List<Widget> Post_1(int numImg) {
           child: Column(
             children: [
               SizedBox(height: 106,),
-              Image.asset('assets/img_14.png'),
+              Image.asset('images/img_14.png'),
             ],
           ) ,
           height: 171,
@@ -482,7 +498,7 @@ List<Widget> Post_2(int numImg) {
           child: Column(
             children: [
               SizedBox(height: 106,),
-              Image.asset('assets/img_14.png'),
+              Image.asset('images/img_14.png'),
             ],
           ) ,
           height: 171,

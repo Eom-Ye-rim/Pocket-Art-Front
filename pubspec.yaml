@@ -52,10 +52,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 922db2a9e510b9be12f3a6a86d2d1090373a4d77
   image_picker:
 
   # The "flutter_lints" package below contains a set of recommended lints to

@@ -6,11 +6,11 @@ import 'package:vector_math/vector_math_64.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ARScreen());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class ARScreen extends StatelessWidget {
+  const ARScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

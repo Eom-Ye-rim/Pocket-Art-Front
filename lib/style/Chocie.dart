@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'ChangeStyle.dart';
+
 void main() {
   runApp(const Choice());
 }
@@ -206,10 +208,18 @@ class Frame427320722 extends StatelessWidget {
                   ),
                 ),
               ),
+
               Positioned(
                 left: 254,
                 top: 339,
-                child: Container(
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to the ChangeStyle screen when clicked
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ChangeStyle()),
+                    );
+                  },
+                child:Container(
                   width: 91,
                   height: 82,
                   decoration: BoxDecoration(
@@ -219,6 +229,7 @@ class Frame427320722 extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
               ),
               Positioned(
                 left: 0,
