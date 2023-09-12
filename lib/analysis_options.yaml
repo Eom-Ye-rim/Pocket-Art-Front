@@ -26,3 +26,4 @@ linter:
     perfer_const_constructors_in_immutables : false
     perfer_const_constructors : false
     avoid_print : false
+    prefer_const_constructors:
