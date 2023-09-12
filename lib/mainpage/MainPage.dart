@@ -1,10 +1,12 @@
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/board/PhotoBoard.dart';
 import 'package:flutter_ar_example/ARScreen.dart';
-
+import 'package:http/http.dart' as http;
 import '../style/Chocie.dart';
 
 
@@ -355,34 +357,172 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class ContestPageData {
+  final BigInt id;
+
+  final String author;
+  final String title;
+  final int viewCount;
+  final int likecnt;
+  final int commentCnt;
+  final String photo;
+  final String userImg;
+
+
+  ContestPageData({
+    required this.id,
+    required this.author,
+    required this.title,
+    required this.viewCount,
+    required this.likecnt,
+    required this.photo,
+    required this.commentCnt,
+    required this.userImg,
+  });
+
+  BigInt getId(){
+    return id;
+  }
+  String getTitle(){
+    return title;
+    //return utf8.decode(base64.decode(title));
+  }
+  String getAuthor(){
+    return author;
+    // return utf8.decode(base64.decode(author));
+  }
+  String getPhoto(){
+    return photo;
+  }
+  String getUserImg(){
+    return userImg;
+  }
+  int getViewCount(){
+    return viewCount;
+  }
+  int getLikecnt(){
+    return likecnt;
+  }
+  int getCommentCnt(){
+    return commentCnt;
+  }
+
+}
+
+Future<List<ContestPageData>> getGeneralBoard()  async {
+  List<String> boardList = [];
+
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=일반');
+  final Map<String, String> data = {
+    "title": "",
+    "content": "",
+    "writer": "",
+    "userImg":"",
+  };
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json; charset=utf-8'},
+    body: json.encode(data),
+  );
+
+  if(response.statusCode==200){
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
+    final data = jsonData['content'] as List<dynamic>;
+
+    final List<ContestPageData> contestPageDataList = data.map((item) {
+      return ContestPageData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        userImg: item['user_img'],
+        viewCount: item['view_count'],
+        photo: item['first_photo'],
+        likecnt: item['likecnt'],
+        commentCnt: item['comment_cnt'],
+      );
+    }).toList();
+    print(contestPageDataList);
+    return contestPageDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
+
+Future<List<ContestPageData>> getAIBoard()  async {
+  List<String> boardList = [];
+
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=AI');
+  final Map<String, String> data = {
+    "title": "",
+    "content": "",
+    "writer": "",
+    "userImg":"",
+  };
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json; charset=utf-8'},
+    body: json.encode(data),
+  );
+
+  if(response.statusCode==200){
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
+    final data = jsonData['content'] as List<dynamic>;
+
+    final List<ContestPageData> contestPageDataList = data.map((item) {
+      return ContestPageData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        userImg: item['user_img'],
+        viewCount: item['view_count'],
+        photo: item['first_photo'],
+        likecnt: item['likecnt'],
+        commentCnt: item['comment_cnt'],
+      );
+    }).toList();
+    print(contestPageDataList);
+    return contestPageDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
+
+
 
 //#우와.. AI가 만든 사진이야 <--- 이 부분 관련
-List<Widget> Post_1(int numImg) {
-  List<Widget> Post_1images = [];
+Future<List<Widget>> Post_1() async {
+  List<ContestPageData> urls= await getAIBoard();
+  List<Widget> Post_1Widgets = [];
+  List<String> Post_1images = [];
   List<String> Post_1ImgUrls = [];
-  Post_1ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
-  Post_1ImgUrls.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  Post_1ImgUrls.add(
-      'https://seoartgallery.com/wp-content/uploads/2016/07/%EB%B0%98%EA%B3%A0%ED%9D%90-%EC%B4%88%EC%83%81%ED%99%94-633x767.jpg');
-  Post_1ImgUrls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  Post_1ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
-
-
   List<String> Post_1Title = [];
-  Post_1Title.add('제목1 ');
-  Post_1Title.add('제목2 ');
-  Post_1Title.add('제목3 ');
-  Post_1Title.add('제목4 ');
-  Post_1Title.add('제목5 ');
+  List<int> PostComment = [];
+  List<int> PostView = [];
+  List<int> PostLike = [];
+  List<String> PostWriter = [];
+
+  for (ContestPageData pagedata in urls) {
+    Post_1images.add(pagedata.getPhoto());
+    Post_1ImgUrls.add(pagedata.getUserImg());
+    Post_1Title.add(pagedata.getTitle());
+    PostComment.add(pagedata.getCommentCnt());
+    PostLike.add(pagedata.getLikecnt());
+    PostWriter.add(pagedata.getAuthor());
+    PostView.add(pagedata.getViewCount());
+
+  }
+
+
+
 
 
   Widget image;
   int i = 0;
-  while (i < numImg) {
+  while (i < urls.length) {
     image = Stack(
       children: [
         Container(
@@ -403,7 +543,7 @@ List<Widget> Post_1(int numImg) {
             borderRadius: BorderRadius.circular(11),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(Post_1ImgUrls[i]) //Best5 사진 url
+                image: NetworkImage(Post_1images[i]) //Best5 사진 url
             ),
           ),
         ),
@@ -458,40 +598,39 @@ List<Widget> Post_1(int numImg) {
       ],
     );
 
-    Post_1images.add(image);
+    Post_1Widgets.add(image);
     i++;
   }
-  return Post_1images;
+  return Post_1Widgets;
 }
 
 
 // #이게 내가 찍은 사진이라고? <---- 아부분 관련
-List<Widget> Post_2(int numImg) {
-  List<Widget> Post_2images = [];
+Future<List<Widget>> Post_2() async {
+  List<ContestPageData> urls= await getGeneralBoard();
+  List<String> Post_2images = [];
+  List<Widget> Post_2Widgets = [];
   List<String> Post_2ImgUrls = [];
-  Post_2ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
-  Post_2ImgUrls.add(
-      'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg');
-  Post_2ImgUrls.add(
-      'https://seoartgallery.com/wp-content/uploads/2016/07/%EB%B0%98%EA%B3%A0%ED%9D%90-%EC%B4%88%EC%83%81%ED%99%94-633x767.jpg');
-  Post_2ImgUrls.add(
-      'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-  Post_2ImgUrls.add(
-      'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
-
-
   List<String> Post_2Title = [];
-  Post_2Title.add('제목1 ');
-  Post_2Title.add('제목2 ');
-  Post_2Title.add('제목3 ');
-  Post_2Title.add('제목4 ');
-  Post_2Title.add('제목5 ');
+  List<int> PostComment = [];
+  List<int> PostView = [];
+  List<int> PostLike = [];
+  List<String> PostWriter = [];
+
+  for (ContestPageData pagedata in urls) {
+    Post_2images.add(pagedata.getPhoto());
+    Post_2ImgUrls.add(pagedata.getUserImg());
+    Post_2Title.add(pagedata.getTitle());
+    PostComment.add(pagedata.getCommentCnt());
+    PostLike.add(pagedata.getLikecnt());
+    PostWriter.add(pagedata.getAuthor());
+    PostView.add(pagedata.getViewCount());
+  }
 
 
   Widget image;
   int i = 0;
-  while (i < numImg) {
+  while (i < urls.length) {
     image = Stack(
       children: [
         Container(
@@ -512,7 +651,7 @@ List<Widget> Post_2(int numImg) {
             borderRadius: BorderRadius.circular(11),
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(Post_2ImgUrls[i]) //Best5 사진 url
+                image: NetworkImage(Post_2images[i]) //Best5 사진 url
             ),
           ),
         ),
@@ -567,10 +706,10 @@ List<Widget> Post_2(int numImg) {
       ],
     );
 
-    Post_2images.add(image);
+    Post_2Widgets.add(image);
     i++;
   }
-  return Post_2images;
+  return Post_2Widgets;
 }
 
 class RowScrollPhotos_1 extends StatefulWidget {
@@ -581,18 +720,36 @@ class RowScrollPhotos_1 extends StatefulWidget {
 }
 
 class _RowScrollPhotos_1State extends State<RowScrollPhotos_1> {
+  List<Widget> post1Widgets = []; // Store the widgets
+  @override
+  void initState() {
+    super.initState();
+    // Call the asynchronous function when the widget initializes
+    loadPost1Widgets();
+  }
+
+  Future<void> loadPost1Widgets() async {
+    // Call the asynchronous function
+    List<Widget> result = await Post_1();
+    setState(() {
+      // Update the widget tree with the result
+      post1Widgets = result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 171,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: ScrollPhysics(),
-          primary: true,
-          child: Row(
-            children: Post_1(5),
-          ),
-        ));
+      height: 171,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: ScrollPhysics(),
+        primary: true,
+        child: Row(
+          children: post1Widgets, // Use the stored widgets
+        ),
+      ),
+    );
   }
 }
 
@@ -605,18 +762,36 @@ class RowScrollPhotos_2 extends StatefulWidget {
 }
 
 class _RowScrollPhotos_2State extends State<RowScrollPhotos_2> {
+  List<Widget> post2Widgets = []; // Store the widgets
+  @override
+  void initState() {
+    super.initState();
+    // Call the asynchronous function when the widget initializes
+    loadPost1Widgets();
+  }
+
+  Future<void> loadPost1Widgets() async {
+    // Call the asynchronous function
+    List<Widget> result = await Post_2();
+    setState(() {
+      // Update the widget tree with the result
+      post2Widgets = result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 171,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: ScrollPhysics(),
-          primary: true,
-          child: Row(
-            children: Post_2(5),
-          ),
-        ));
+      height: 171,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: ScrollPhysics(),
+        primary: true,
+        child: Row(
+          children: post2Widgets, // Use the stored widgets
+        ),
+      ),
+    );
   }
 }
 

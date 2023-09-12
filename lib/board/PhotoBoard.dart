@@ -218,7 +218,7 @@ class AllPhotosScreen extends StatelessWidget {
                 color: Color(0xffF6F6F6),
                 border: Border(
                     top: BorderSide(color: Color(0xff444444), width: 0.2))),
-            child: GridViewPhotos(),
+            child: GridViewPhotos(num:0),
           )
         ],
       ),
@@ -307,32 +307,32 @@ class Viewallbtn extends StatelessWidget {
 }
 
 class GridViewPhotos extends StatefulWidget {
-  const GridViewPhotos({Key? key}) : super(key: key);
+  final int num;
+  const GridViewPhotos({Key? key, required this.num}) : super(key: key);
 
   @override
-  State<GridViewPhotos> createState() => _GridViewPhotosState();
+  State<GridViewPhotos> createState() => _GridViewPhotosState(num);
 }
 
 class _GridViewPhotosState extends State<GridViewPhotos> {
   List<Widget> _images = [];
-
+  int num;
+  _GridViewPhotosState(this.num);
   @override
   void initState() {
     super.initState();
     // Schedule the asynchronous task to run after the initial build
     Future.delayed(Duration(milliseconds: 0), () async {
-      List<Widget> images = await createPhotos(context);
+      List<Widget> images = await createPhotos(context,num);
+
       setState(() {
         // Update the state with the list of images
         _images = images;
+
+
       });
     });
   }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -358,8 +358,18 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
   }
 }
 
-Future<List<Widget>> createPhotos(BuildContext context) async {
-  List<ContestPageData> urls = await getBoard();
+Future<List<Widget>> createPhotos(BuildContext context , int num) async {
+  List<ContestPageData> urls=[];
+  if (num==0) {
+   urls = await getBoard();
+  }
+
+  else if (num==1) {
+   urls = await getAIBoard();
+  }
+  else if (num==2) {
+    urls = await getGeneralBoard();
+  }
   print(urls);
   List<String> PostImage=[];
   List<String> PostTitle = [];
@@ -737,7 +747,87 @@ class ContestData {
 
   }
 }
+Future<List<ContestPageData>> getGeneralBoard()  async {
+  List<String> boardList = [];
 
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=일반');
+  final Map<String, String> data = {
+    "title": "",
+    "content": "",
+    "writer": "",
+    "userImg":"",
+  };
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json; charset=utf-8'},
+    body: json.encode(data),
+  );
+
+  if(response.statusCode==200){
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
+    final data = jsonData['content'] as List<dynamic>;
+
+    final List<ContestPageData> contestPageDataList = data.map((item) {
+      return ContestPageData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        userImg: item['user_img'],
+        viewCount: item['view_count'],
+        photo: item['first_photo'],
+        likecnt: item['likecnt'],
+        commentCnt: item['comment_cnt'],
+      );
+    }).toList();
+    print(contestPageDataList);
+    return contestPageDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
+
+Future<List<ContestPageData>> getAIBoard()  async {
+  List<String> boardList = [];
+
+  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=AI');
+  final Map<String, String> data = {
+    "title": "",
+    "content": "",
+    "writer": "",
+    "userImg":"",
+  };
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json; charset=utf-8'},
+    body: json.encode(data),
+  );
+
+  if(response.statusCode==200){
+    final jsonData = json.decode(utf8.decode(response.bodyBytes));
+    final data = jsonData['content'] as List<dynamic>;
+
+    final List<ContestPageData> contestPageDataList = data.map((item) {
+      return ContestPageData(
+        id:BigInt.from(item['id']),
+        author: item['author'],
+        title: item['title'],
+        userImg: item['user_img'],
+        viewCount: item['view_count'],
+        photo: item['first_photo'],
+        likecnt: item['likecnt'],
+        commentCnt: item['comment_cnt'],
+      );
+    }).toList();
+    print(contestPageDataList);
+    return contestPageDataList;
+
+  } else {
+    throw Exception('Failed to load contest data');
+  }
+}
 
 
 Future<List<ContestPageData>> getBoard()  async {
@@ -1047,7 +1137,23 @@ class AIPhotosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+
+          Container(
+            padding: EdgeInsets.all(20),
+            width: 390,
+            decoration: BoxDecoration(
+                color: Color(0xffF6F6F6),
+                border: Border(
+                    top: BorderSide(color: Color(0xff444444), width: 0.2))),
+            child: GridViewPhotos(num:1),
+          ),
+
+        ],
+      ),
+    );
   }
 }
 
@@ -1056,7 +1162,25 @@ class NormalPhotosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+
+
+
+          Container(
+            padding: EdgeInsets.all(20),
+            width: 390,
+            decoration: BoxDecoration(
+                color: Color(0xffF6F6F6),
+                border: Border(
+                    top: BorderSide(color: Color(0xff444444), width: 0.2))),
+            child: GridViewPhotos(num:2),
+          ),
+
+        ],
+      ),
+    );
   }
 }
 

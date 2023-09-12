@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/board/PhotoBoard.dart';
 import 'package:flutter_ar_example/user/signupcode.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -229,31 +229,34 @@ class _FirstRouteState extends State<FirstRoute> {
                 child: TextButton(
                   //
 
+
                   onPressed: () async {
-                    final url = Uri.parse(
-                        'http://13.209.160.87:8080/login');
-                    Map<String, dynamic> data = {
+                    final dio = Dio(); // Dio 객체 생성
+
+                    final url = 'http://13.209.160.87:8080/login';
+                    final data = {
                       'email': email,
                       'password': password,
                     };
-                    String jsonData = json.encode(data);
+
                     try {
-                      final response = await http.post(
+                      final response = await dio.post(
                         url,
-                        headers: {'Content-Type': 'application/json'},
-                        // Set the request header
-                        body: jsonData, // Set the JSON data as the request body
+                        options: Options(
+                          headers: {'Content-Type': 'application/json'},
+                        ),
+                        data: data,
                       );
 
                       if (response.statusCode == 200) {
-                        var responseData = json.decode(response.body);
+                        var responseData = response.data;
                         var accessToken = responseData['data']['accessToken'];
                         print(accessToken);
 
                         // shared_preferences를 사용하여 accessToken 안전하게 저장
-                        SharedPreferences prefs = await SharedPreferences
-                            .getInstance();
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
                         await prefs.setString('accessToken', accessToken);
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => PhotoBoard()),
@@ -263,8 +266,7 @@ class _FirstRouteState extends State<FirstRoute> {
                         print('Data sent successfully.');
                       } else {
                         // Request failed
-                        print('Failed to send data. Status code: ${response
-                            .statusCode}');
+                        print('Failed to send data. Status code: ${response.statusCode}');
                       }
                     } catch (e) {
                       // Handle any exceptions that might occur during the API call

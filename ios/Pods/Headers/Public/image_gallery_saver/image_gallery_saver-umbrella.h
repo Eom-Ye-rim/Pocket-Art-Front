@@ -1,0 +1,1 @@
+../../../Target Support Files/image_gallery_saver/image_gallery_saver-umbrella.h

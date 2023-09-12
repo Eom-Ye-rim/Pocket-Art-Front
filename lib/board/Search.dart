@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_ar_example/board/PostSearch.dart';
+import 'package:http/http.dart' as http;
 void main() {
   runApp(const Search());
 }
@@ -14,8 +17,43 @@ class Search extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
         body: Frame427320768(),
       ),
+    );
+  }
+}
+class SearchResult {
+    final String title;
+    final String author;
+    final String user_img;
+    final int view_count;
+    final int likecnt;
+    final int comment_cnt;
+    final String first_photo;
+
+
+  SearchResult({required this.title, required this.author, required this.user_img,required this.view_count,
+    required this.likecnt,required this.comment_cnt,required this.first_photo});
+
+  factory SearchResult.fromJson(Map<String, dynamic> json) {
+    return SearchResult(
+      title: json['title'],
+      author: json['author'],
+      user_img: json['user_img'],
+      view_count: json['view_count'],
+      likecnt: json['likecnt'],
+      comment_cnt: json['comment_cnt'],
+      first_photo: json['first_photo'],
+
     );
   }
 }
@@ -135,34 +173,34 @@ class _Frame427320768State extends State<Frame427320768> {
                                     ]),
                                   ),
                                 ),
-                                Positioned(
-                                  left: 22.03,
-                                  top: 0,
-                                  child: Container(
-                                    width: 15.27,
-                                    height: 10.97,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage("https://via.placeholder.com/15x11"),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 0,
-                                  top: 0.34,
-                                  child: Container(
-                                    width: 17,
-                                    height: 10.67,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage("https://via.placeholder.com/17x11"),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Positioned(
+                                //   left: 22.03,
+                                //   top: 0,
+                                //   child: Container(
+                                //     width: 15.27,
+                                //     height: 10.97,
+                                //     decoration: BoxDecoration(
+                                //       image: DecorationImage(
+                                //         image: NetworkImage("https://via.placeholder.com/15x11"),
+                                //         fit: BoxFit.fill,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                // Positioned(
+                                //   left: 0,
+                                //   top: 0.34,
+                                //   child: Container(
+                                //     width: 17,
+                                //     height: 10.67,
+                                //     decoration: BoxDecoration(
+                                //       image: DecorationImage(
+                                //         image: NetworkImage("https://via.placeholder.com/17x11"),
+                                //         fit: BoxFit.fill,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -241,16 +279,75 @@ class _Frame427320768State extends State<Frame427320768> {
                   left: 337,
                   top: 250,
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       print("검색 버튼 클릭됨");
                       String searchText = searchController.text;
                       if (searchText.isNotEmpty) {
                         searchHistory.add(searchText);
                         searchController.clear();
                         setState(() {});
-                      }
-                      // 여기에서 원하는 페이지로 이동하도록 수정
+
+                        // Make an HTTP request to your server with the search criteria
+                        Uri uri = Uri.parse(
+                            'http://13.209.160.87:8080/api/v1/contest/all');
+                        final response = await http.post(
+                          uri,
+                          headers: {
+                            'Content-Type': 'application/json',
+                            // Specify JSON content type
+                          },
+                          body: json.encode({
+                            "title": searchText,
+                            "content": "",
+                            "writer": "",
+                          }),
+                        );
+
+                        if (response.statusCode == 200) {
+                          print("success");
+
+                          final Map<String, dynamic> jsonResponse = json.decode(response.body);
+                          final List<dynamic> searchResultsData = jsonResponse['content'] as List<dynamic>;
+
+                          List<SearchResult> searchResults = searchResultsData
+                              .map((data) => SearchResult.fromJson(data))
+                              .toList();
+                            // Navigate to the PostSearch() screen and pass the searchResults
+                          for (SearchResult result in searchResults) {
+                            print("Title: ${result.title}");
+                            print("Author: ${result.author}");
+                            // Print other properties as needed
+                          }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PostSearch(searchResults: searchResults),
+                              ),
+                            );
+                          } else {
+                            // Handle errors here
+                            print("HTTP request failed with status ${response
+                                .statusCode}");
+                          }
+                        }
                     },
+
+
+                  // onTap: () {
+                    //   print("검색 버튼 클릭됨");
+                    //   String searchText = searchController.text;
+                    //   if (searchText.isNotEmpty) {
+                    //     searchHistory.add(searchText);
+                    //     searchController.clear();
+                    //     setState(() {});
+                    //   }
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(builder: (context) => PostSearch()), // Replace CreatePostPage with your actual page name.
+                    //   );
+                    //   // 여기에서 원하는 페이지로 이동하도록 수정
+                    // },
                     child: Container(
                       width: 35,
                       height: 35,
@@ -281,7 +378,7 @@ class _Frame427320768State extends State<Frame427320768> {
                     ),
                   ),
                 ),
-                ...searchHistoryWidgets,
+
         if (searchHistory.isNotEmpty) // Only show "모두삭제" when there are items
               Positioned(
                 left: 315,
@@ -317,9 +414,14 @@ class _Frame427320768State extends State<Frame427320768> {
                 ),
                   ],
             ),
+
           ),
+
         ],
       ),
     );
+
   }
+
+
 }

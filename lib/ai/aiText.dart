@@ -53,9 +53,6 @@ class _TextToImg extends State<TextToImg> {
                 leadingWidth: 113,
                 toolbarHeight: 66,
                 leading: gotoMainBtn(),
-
-
-
                 backgroundColor: Colors.transparent, // 투명으로 해도 appBar 자체 그림자 생김
                 elevation: 0.0, // appBar 그림자 0.0 해주면 완전 투명됨
               ),
@@ -163,7 +160,7 @@ class _TextToImg extends State<TextToImg> {
                               ),
 
                               onPressed: () async {
-                                final url = Uri.parse('http://13.209.160.87:8080/api/image/generate?prompt=$prompt');
+                                final url = Uri.parse('http://13.124.39.63:8080/api/image/generate?prompt=$prompt');
                                 final response = await http.post(url);
                                 List<dynamic> responseBody = jsonDecode(response.body);
                                 setState(() {

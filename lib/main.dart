@@ -230,6 +230,7 @@ class _FirstRouteState extends State<FirstRoute> {
                   //
 
                   onPressed: () async {
+                    print("click");
                     final url = Uri.parse(
                         'http://13.209.160.87:8080/login');
                     Map<String, dynamic> data = {
@@ -237,6 +238,7 @@ class _FirstRouteState extends State<FirstRoute> {
                       'password': password,
                     };
                     String jsonData = json.encode(data);
+                    print(jsonData);
                     try {
                       final response = await http.post(
                         url,
@@ -244,6 +246,8 @@ class _FirstRouteState extends State<FirstRoute> {
                         // Set the request header
                         body: jsonData, // Set the JSON data as the request body
                       );
+                      print(response);
+                      print(response.statusCode);
 
                       if (response.statusCode == 200) {
                         var responseData = json.decode(response.body);
