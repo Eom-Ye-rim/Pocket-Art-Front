@@ -1,10 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-
-
 
 void main() {
   runApp(MaterialApp(
@@ -21,7 +17,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
   int _currentIndex = 0;
 
   void onTabTapped(int index) {
@@ -31,24 +26,290 @@ class _MainPageState extends State<MainPage> {
 
     switch (index) {
       case 0:
-      // 첫 번째 탭을 클릭했을 때의 작업
+        // 첫 번째 탭을 클릭했을 때의 작업
 
         break;
       case 1:
-      // 두 번째 탭을 클릭했을 때의 작업
+        // 두 번째 탭을 클릭했을 때의 작업( 화풍 변환 )
+        showModalBottomSheet(
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          elevation: 0.0,
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              height: 480,
+              // 모달 높이 크기
+              margin: EdgeInsets.only(
+                left: 15,
+                right: 15,
+                bottom: 99,
+              ),
+              // 모달 좌우 여백 크기
+
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(255, 255, 255, 0.8), //모달 배경색
+                border: Border.all(
+                  color: Color(0xff6886F2),
+                  width: 1.0,
+                ),
+              ),
+              padding: EdgeInsets.fromLTRB(21, 21, 20, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Art Transfer',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontFamily: 'SUIT',
+                          fontWeight: FontWeight.w900,
+                          height: 0,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close), // 닫기 아이콘
+                        onPressed: () {
+                          Navigator.of(context).pop(); // 모달 닫기
+                        },
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '내가 원하는 사진을 고전 예술 스타일로 만들고\n색칠하고 art transfer art transfer',
+                    style: TextStyle(
+                      color: Color(0xFF7D7D7D),
+                      fontSize: 11,
+                      fontFamily: 'SUIT',
+                      fontWeight: FontWeight.w400,
+                      height: 0,
+                      letterSpacing: -0.77,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 33,
+                  ),
+                  InkWell(
+                    highlightColor: Color(0xffFFD600), // 눌림 효과 색상
+                    splashColor: Color(0xffFFD600), // 터치 효과 색상
+                    onTap: () {
+                      // AI 이미지 만들기 동작 코드 작성
+                      print('AI 이미지 만들기');
+                    },
+
+
+                    child: Container(
+                      width: 321,
+                      height: 145,
+                      decoration: ShapeDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(width: 2, color: Color(0xFF979797)),
+                          borderRadius: BorderRadius.circular(23),
+                        ),
+                        shadows: [
+                          BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 30,
+                          ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(21, 24, 21, 24),
+                            width: 103,
+                            height: 103,
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: OvalBorder(),
+                            ),
+                            child: Image(
+                              image: AssetImage('images/img_12.png'),
+                              width: 62,
+                              height: 56,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: 17,
+                              ),
+                              Row(
+
+                                children: [
+                                  SizedBox(width: 151,),
+                                  Container(
+                                    width: 17,
+                                    height: 17,
+                                    decoration: ShapeDecoration(
+                                      color: Color(0xFFA7B1BE),
+                                      shape: OvalBorder(
+                                        side: BorderSide(
+                                            width: 1, color: Color(0xFFE8E8E8)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 21,),
+
+                              Text(
+                                'AI 이미지 만들기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontFamily: 'SUIT',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                ),
+                              ),
+
+                              Text(
+                                'AI로 이미지를 생성해요',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF8A8A8A),
+                                  fontSize: 10,
+                                  fontFamily: 'SUIT',
+                                  fontWeight: FontWeight.w400,
+                                  height: 0,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 22,),
+
+                  InkWell(
+                    highlightColor: Color(0xffFFD600), // 눌림 효과 색상
+                    splashColor: Color(0xffFFD600), // 터치 효과 색상
+                    onTap: () {
+                      // 터치 이벤트 발생 시 실행할 코드 작성
+                      print('갤러리에서 가져오기');
+                    },
+                    child: Container(
+                      width: 321,
+                      height: 145,
+                      decoration: ShapeDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(width: 2, color: Color(0xFF979797)),
+                          borderRadius: BorderRadius.circular(23),
+                        ),
+                        shadows: [
+                          BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 30,
+                          ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(21, 24, 21, 24),
+                            width: 103,
+                            height: 103,
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: OvalBorder(),
+                            ),
+                            child: Image(
+                              image: AssetImage('images/img_12.png'),
+                              width: 62,
+                              height: 56,
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                height: 17,
+                              ),
+                              Row(
+
+                                children: [
+                                  SizedBox(width: 151,),
+                                  Container(
+                                    width: 17,
+                                    height: 17,
+                                    decoration: ShapeDecoration(
+                                      color: Color(0xFFA7B1BE),
+                                      shape: OvalBorder(
+                                        side: BorderSide(
+                                            width: 1, color: Color(0xFFE8E8E8)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 21,),
+
+                              Text(
+                                '갤러리에서 가져오기',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontFamily: 'SUIT',
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                ),
+                              ),
+
+                              Text(
+                                '내가 원하는 그림을 가져와요',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF8A8A8A),
+                                  fontSize: 10,
+                                  fontFamily: 'SUIT',
+                                  fontWeight: FontWeight.w400,
+                                  height: 0,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+
+
+                ],
+              ),
+            );
+          },
+        );
 
         break;
       case 2:
-      // 세 번째 탭을 클릭했을 때의 작업
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => const textToImg()),
-      //   );
+        // 세 번째 탭을 클릭했을 때의 작업
+
+        break;
+
+      case 3:
+        //네 번째 탭을 클릭했을 떄의 작업
         break;
     }
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +318,7 @@ class _MainPageState extends State<MainPage> {
       home: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                fit: BoxFit.cover, image: AssetImage('assets/img_11.png'))),
+                fit: BoxFit.cover, image: AssetImage('images/img_11.png'))),
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: PreferredSize(
@@ -84,8 +345,6 @@ class _MainPageState extends State<MainPage> {
                     children: [
                       Row(
                         children: [
-
-
                           Container(
                             height: 64,
                             width: 156,
@@ -105,8 +364,8 @@ class _MainPageState extends State<MainPage> {
                                   EdgeInsets.all(0), // 여백 제거
                                 ),
                                 backgroundColor:
-                                MaterialStateProperty.all<Color>(
-                                    Colors.transparent),
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.transparent),
                               ),
                               onPressed: () {
                                 print('사진 게시');
@@ -117,7 +376,7 @@ class _MainPageState extends State<MainPage> {
                                     width: 6,
                                   ),
                                   Image.asset(
-                                    'assets/img_12.png',
+                                    'images/img_12.png',
                                     width: 51,
                                     height: 51,
                                   ),
@@ -137,15 +396,9 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                           ),
-
-
-
                           SizedBox(
                             width: 26,
                           ),
-
-
-
                           Container(
                             height: 64,
                             width: 156,
@@ -165,8 +418,8 @@ class _MainPageState extends State<MainPage> {
                                   EdgeInsets.all(0), // 여백 제거
                                 ),
                                 backgroundColor:
-                                MaterialStateProperty.all<Color>(
-                                    Colors.transparent),
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.transparent),
                               ),
                               onPressed: () {
                                 print('AR전시장가기');
@@ -177,7 +430,7 @@ class _MainPageState extends State<MainPage> {
                                     width: 6,
                                   ),
                                   Image.asset(
-                                    'assets/img_13.png',
+                                    'images/img_13.png',
                                     width: 51,
                                     height: 51,
                                   ),
@@ -199,9 +452,9 @@ class _MainPageState extends State<MainPage> {
                           ),
                         ],
                       ),
-
-                      SizedBox(height: 27,),
-
+                      SizedBox(
+                        height: 27,
+                      ),
                       Row(
                         children: [
                           Column(
@@ -227,34 +480,37 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ],
                           ),
-
-                          SizedBox(width:110 ,),
-
-
-                          IconButton(onPressed: (){
-                            print('AI로 변환한 사진 보기');
-                          }, icon:Icon(Icons.navigate_next) )
-
+                          SizedBox(
+                            width: 110,
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                print('AI로 변환한 사진 보기');
+                              },
+                              icon: Icon(Icons.navigate_next))
                         ],
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       RowScrollPhotos_1(),
-
-                      SizedBox(height: 19,),
-
-
-
-
-
+                      SizedBox(
+                        height: 19,
+                      ),
                     ],
                   ),
                 ),
-                Container(height: 5,width: 390,color: Color(0xffE6E6E6),
+                Container(
+                  height: 5,
+                  width: 390,
+                  color: Color(0xffE6E6E6),
                 ),
-                SizedBox(height: 15,),
+                SizedBox(
+                  height: 15,
+                ),
                 Container(
                   padding: EdgeInsets.only(left: 26),
-                  child:Column(
+                  child: Column(
                     children: [
                       Row(
                         children: [
@@ -281,36 +537,35 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ],
                           ),
-
-                          SizedBox(width:101 ,),
-
-
-                          IconButton(onPressed: (){
-                            print('내가 찍은 사진 바꿔보기');
-                          }, icon:Icon(Icons.navigate_next) )
-
+                          SizedBox(
+                            width: 101,
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                print('내가 찍은 사진 바꿔보기');
+                              },
+                              icon: Icon(Icons.navigate_next))
                         ],
                       ),
-
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       RowScrollPhotos_2(),
-
                     ],
                   ),
                 )
-
               ],
             ),
           ),
-
           bottomNavigationBar: BottomNavigationBar(
             selectedItemColor: Color(0xff0066FF),
             unselectedItemColor: Color(0xff484848),
-            showSelectedLabels: true, //해당 탭 선택시 아이콘 밑에 라벨 유무
-            showUnselectedLabels: false, // 라벨 유무
+            showSelectedLabels: true,
+            //해당 탭 선택시 아이콘 밑에 라벨 유무
+            showUnselectedLabels: false,
+            // 라벨 유무
             onTap: onTabTapped,
             currentIndex: _currentIndex,
-
 
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
@@ -318,13 +573,19 @@ class _MainPageState extends State<MainPage> {
                 label: '홈',
               ),
               BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/img_16.png'),
-                  height: 34, width: 41,),
+                icon: Image(
+                  image: AssetImage('images/img_16.png'),
+                  height: 34,
+                  width: 41,
+                ),
                 label: '사진변환',
               ),
               BottomNavigationBarItem(
-                icon: Image(image: AssetImage('assets/img_17.png'),
-                  width: 32, height: 30,),
+                icon: Image(
+                  image: AssetImage('images/img_17.png'),
+                  width: 32,
+                  height: 30,
+                ),
                 label: 'AR',
               ),
               BottomNavigationBarItem(
@@ -338,7 +599,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-
 
 //#우와.. AI가 만든 사진이야 <--- 이 부분 관련
 List<Widget> Post_1(int numImg) {
@@ -355,14 +615,12 @@ List<Widget> Post_1(int numImg) {
   Post_1ImgUrls.add(
       'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
 
-
   List<String> Post_1Title = [];
   Post_1Title.add('제목1 ');
   Post_1Title.add('제목2 ');
   Post_1Title.add('제목3 ');
   Post_1Title.add('제목4 ');
   Post_1Title.add('제목5 ');
-
 
   Widget image;
   int i = 0;
@@ -372,10 +630,12 @@ List<Widget> Post_1(int numImg) {
         Container(
           child: Column(
             children: [
-              SizedBox(height: 106,),
-              Image.asset('assets/img_14.png'),
+              SizedBox(
+                height: 106,
+              ),
+              Image.asset('images/img_14.png'),
             ],
-          ) ,
+          ),
           height: 171,
           width: 110,
           margin: EdgeInsets.fromLTRB(0, 0, 26, 0),
@@ -388,7 +648,7 @@ List<Widget> Post_1(int numImg) {
             image: DecorationImage(
                 fit: BoxFit.cover,
                 image: NetworkImage(Post_1ImgUrls[i]) //Best5 사진 url
-            ),
+                ),
           ),
         ),
         Positioned(
@@ -408,9 +668,8 @@ List<Widget> Post_1(int numImg) {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Container(
-                        width:63,
+                        width: 63,
                         child: Text(
                           // softWrap: true,
                           Post_1Title[i],
@@ -423,7 +682,6 @@ List<Widget> Post_1(int numImg) {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                   // SizedBox(
@@ -448,7 +706,6 @@ List<Widget> Post_1(int numImg) {
   return Post_1images;
 }
 
-
 // #이게 내가 찍은 사진이라고? <---- 아부분 관련
 List<Widget> Post_2(int numImg) {
   List<Widget> Post_2images = [];
@@ -464,14 +721,12 @@ List<Widget> Post_2(int numImg) {
   Post_2ImgUrls.add(
       'https://upload.wikimedia.org/wikipedia/commons/f/fe/Vincent_van_Gogh_-_Sunflowers_%281888%2C_National_Gallery_London%29.jpg');
 
-
   List<String> Post_2Title = [];
   Post_2Title.add('제목1 ');
   Post_2Title.add('제목2 ');
   Post_2Title.add('제목3 ');
   Post_2Title.add('제목4 ');
   Post_2Title.add('제목5 ');
-
 
   Widget image;
   int i = 0;
@@ -481,10 +736,12 @@ List<Widget> Post_2(int numImg) {
         Container(
           child: Column(
             children: [
-              SizedBox(height: 106,),
-              Image.asset('assets/img_14.png'),
+              SizedBox(
+                height: 106,
+              ),
+              Image.asset('images/img_14.png'),
             ],
-          ) ,
+          ),
           height: 171,
           width: 110,
           margin: EdgeInsets.fromLTRB(0, 0, 26, 0),
@@ -497,7 +754,7 @@ List<Widget> Post_2(int numImg) {
             image: DecorationImage(
                 fit: BoxFit.cover,
                 image: NetworkImage(Post_2ImgUrls[i]) //Best5 사진 url
-            ),
+                ),
           ),
         ),
         Positioned(
@@ -517,9 +774,8 @@ List<Widget> Post_2(int numImg) {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Container(
-                        width:63,
+                        width: 63,
                         child: Text(
                           // softWrap: true,
                           Post_2Title[i],
@@ -532,7 +788,6 @@ List<Widget> Post_2(int numImg) {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                   // SizedBox(
@@ -580,7 +835,6 @@ class _RowScrollPhotos_1State extends State<RowScrollPhotos_1> {
   }
 }
 
-
 class RowScrollPhotos_2 extends StatefulWidget {
   const RowScrollPhotos_2({Key? key}) : super(key: key);
 
@@ -603,8 +857,6 @@ class _RowScrollPhotos_2State extends State<RowScrollPhotos_2> {
         ));
   }
 }
-
-
 
 class HeartButton extends StatefulWidget {
   @override
@@ -643,5 +895,3 @@ class _HeartButtonState extends State<HeartButton> {
     );
   }
 }
-
-
