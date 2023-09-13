@@ -347,19 +347,45 @@ class DownloadComplete extends StatelessWidget {
       width: 300,
       height: 550,
       child: Stack(children: <Widget>[
+        Positioned(
+          child: Image.asset('images/img_4.png',
+            width: 211, height: 228,
+          ),
+          top: 80,
+          right: 50,
+        ),
         Center(
             child:Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(23),
-                color: Color.fromRGBO(255, 255, 255, 0.7),
+              decoration: ShapeDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(0.00, -1.00),
+                  end: Alignment(0, 1),
+                  colors: [Colors.white, Colors.white],
+                ),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: Colors.white,
+                  ),
+                  borderRadius: BorderRadius.circular(23),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Color(0x3F000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 0),
+                    spreadRadius: 0,
+                  )
+                ],
               ),
-              width: 278, height: 185,
+              width: 278, height: 123,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
 
-                  SizedBox(height: 80,),
+                  SizedBox(height: 31,),
                   Text(
                     'Complete!',
                     style: TextStyle(
@@ -394,11 +420,11 @@ class DownloadComplete extends StatelessWidget {
             )
         ),
         Positioned(
-          child: Image.asset('images/img_21.png',
-            width: 244, height: 244,
+          child: Image.asset('images/img_5.png',
+            width: 178.77, height: 61.95,
           ),
-          top: 20,
-          right: 30,
+          top: 181,
+          right: 67,
         )
 
 
