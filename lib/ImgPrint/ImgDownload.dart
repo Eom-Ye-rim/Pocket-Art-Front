@@ -1,3 +1,4 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,16 +11,10 @@ import '../mainpage/MainPage.dart';
 
 
 
-void main() {
-  runApp(MaterialApp(
-    home: ImgDownload(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
-
 class ImgDownload extends StatefulWidget {
-  const ImgDownload({Key? key}) : super(key: key);
+  final String imageUrl; // Define a field to store the URL
+
+  const ImgDownload({required this.imageUrl});
 
   @override
   State<ImgDownload> createState() => _ImgDownloadState();
@@ -27,10 +22,16 @@ class ImgDownload extends StatefulWidget {
 
 class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관련
 
-  String ImgUrl = 'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg';
+  String imgURL = "";
+
+  @override
+  void initState() {
+    super.initState();
+    imgURL = widget.imageUrl;
+  }
 
   void downloadImage() async {
-    var response = await http.get(Uri.parse(ImgUrl));
+    var response = await http.get(Uri.parse(imgURL));
     var bytes = response.bodyBytes;
 
     var dir = await getApplicationDocumentsDirectory();
@@ -113,11 +114,11 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
                               ],
                             ),
                             child: Container(
-                              width: 332, height: 332,
+                              width: 256, height: 256,
                               decoration: BoxDecoration(
                                   image: DecorationImage(
                                       fit: BoxFit.cover,
-                                      image: NetworkImage(ImgUrl))),
+                                      image: NetworkImage(imgURL))),
                             ),
 
                           )

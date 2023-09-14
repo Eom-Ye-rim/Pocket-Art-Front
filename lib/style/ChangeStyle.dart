@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_ar_example/ImgPrint/SelectingPainter.dart';
 
 void main() {
   runApp(const ChangeStyle());
@@ -24,7 +25,12 @@ class ChangeStyle extends StatelessWidget {
   }
 }
 
-class Frame427320730 extends StatelessWidget {
+class Frame427320730 extends StatefulWidget {
+  @override
+  _Frame427320730State createState() => _Frame427320730State();
+}
+class _Frame427320730State extends State<Frame427320730> {
+  Color boxColor = Colors.white; // 초기 색상 설정
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -411,7 +417,7 @@ class Frame427320730 extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     // Handle the click event here
-                    _sendImageForTransformation('east');
+                    // _sendImageForTransformation('east');
                   },
                 child: Text(
                   '동양풍',
@@ -455,6 +461,13 @@ class Frame427320730 extends StatelessWidget {
               Positioned(
                 left: 273,
                 top: 506,
+                child: GestureDetector(
+                  onTap: () {
+                    // "서양풍" 클릭 시 박스 색상 변경
+                    setState(() {
+                      boxColor = Color(0xAFFC634);
+                    });
+                  },
                 child: Text(
                   '서양풍',
                   style: TextStyle(
@@ -465,6 +478,7 @@ class Frame427320730 extends StatelessWidget {
                   ),
                 ),
               ),
+    ),
               Positioned(
                 left: 26,
                 top: 622,
@@ -490,6 +504,14 @@ class Frame427320730 extends StatelessWidget {
               Positioned(
                 left: 188,
                 top: 637,
+                child: GestureDetector(
+                  onTap: () {
+                    // "다음" 버튼 클릭 시 페이지 이동
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SelectingPainter()),
+                    );
+                  },
                 child: Text(
                   '다음',
                   style: TextStyle(
@@ -500,7 +522,7 @@ class Frame427320730 extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
+              )],
           ),
         ),
       ],
@@ -508,31 +530,31 @@ class Frame427320730 extends StatelessWidget {
   }
   // Function to send an image for transformation to the server
 }
-Future<void> _sendImageForTransformation(String modelname) async {
-  try {
-    final dio = Dio();
-    final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile('/path/to/your/image/file.jpg'),
-      'modelname': modelname,
-    });
-
-    final response = await dio.post(
-      'http://13.209.160.87:8080/api/v1/image',
-      data: formData,
-    );
-
-    if (response.statusCode == 200) {
-      // Request was successful
-      final responseData = response.data;
-
-      // Handle the response data as needed
-      print('Response Data: $responseData');
-    } else {
-      // Request failed
-      print('Request failed with status code: ${response.statusCode}');
-    }
-  } catch (e) {
-    // Handle errors
-    print('Error sending image: $e');
-  }
-}
+// Future<void> _sendImageForTransformation(String modelname) async {
+//   try {
+//     final dio = Dio();
+//     final formData = FormData.fromMap({
+//       'file': await MultipartFile.fromFile('/path/to/your/image/file.jpg'),
+//       'modelname': modelname,
+//     });
+//
+//     final response = await dio.post(
+//       'http://13.209.160.87:8080/api/v1/image',
+//       data: formData,
+//     );
+//
+//     if (response.statusCode == 200) {
+//       // Request was successful
+//       final responseData = response.data;
+//
+//       // Handle the response data as needed
+//       print('Response Data: $responseData');
+//     } else {
+//       // Request failed
+//       print('Request failed with status code: ${response.statusCode}');
+//     }
+//   } catch (e) {
+//     // Handle errors
+//     print('Error sending image: $e');
+//   }
+// }
