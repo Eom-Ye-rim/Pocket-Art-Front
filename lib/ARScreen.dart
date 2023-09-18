@@ -1,9 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 import 'package:arkit_plugin/arkit_plugin.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
+
+import 'mainpage/MainPage.dart';
 
 void main() {
   runApp(const ARScreen());
@@ -25,7 +30,10 @@ class ManipulationPage extends StatefulWidget {
   _ManipulationPageState createState() => _ManipulationPageState();
 }
 
+
+
 class _ManipulationPageState extends State<ManipulationPage> {
+  final screenshotController = ScreenshotController();
   ARKitController? arkitController;
   ARKitNode? imageNode;
   ARKitNode? textNode;
@@ -36,13 +44,29 @@ class _ManipulationPageState extends State<ManipulationPage> {
   double scale = 1.0;
   double previousScale = 1.0;
   bool isSphere = false;
+  List<String> selectedImages =[];
+  Map<String, String> imageCaptions = {
+    'images/gogh1.jpeg': '밤의 카페 테라스 ',
+    'images/monet1.jpeg': '생타드레스의 해변가',
+    'images/monet2.jpeg': '수련',
+    'images/monet3.jpeg': '자화상',
+    'images/monet4.jpeg': '파라솔을 든 여인',
+    'images/flower.jpeg': '해바라기',
+    // Add captions for the images in predefinedImages2 as well
+    'images/ko1.jpeg': 'Korean Caption 1',
+    'images/ko2.jpeg': 'Korean Caption 2',
+    'images/ko3.jpeg': 'Korean Caption 3',
+    'images/ko4.jpeg': 'Korean Caption 4',
+    'images/ko5.jpeg': 'Korean Caption 5',
+    'images/ko6.jpeg': 'Korean Caption 6',
+  };
   List<String> predefinedImages = [
     'images/gogh1.jpeg',
-    'images/gogh2.jpeg',
-    'images/gogh3.jpeg',
-    'images/gogh4.jpeg',
-    'images/gogh5.jpeg',
-    'images/star.jpeg',
+    'images/monet1.jpeg',
+    'images/monet2.jpeg',
+    'images/monet3.jpeg',
+    'images/monet4.jpeg',
+    'images/flower.jpeg',
   ];
 
   List<String> predefinedImages2 = [
@@ -74,6 +98,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
     });
   }
 
+
   @override
   void dispose() {
     arkitController?.dispose();
@@ -83,15 +108,15 @@ class _ManipulationPageState extends State<ManipulationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromRGBO(0, 0, 0, 0),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+
+      // backgroundColor:  Color(0x0),
+      // appBar: AppBar(
+      //   leadingWidth: 113,
+      //   toolbarHeight: 66,
+      //   leading: gotoMainBtn(),
+      //   backgroundColor: Color(0x27000000), // 투명으로 해도 appBar 자체 그림자 생김
+      //   elevation: 0.0, // appBar 그림자 0.0 해주면 완전 투명됨
+      // ),
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -107,26 +132,171 @@ class _ManipulationPageState extends State<ManipulationPage> {
               ),
             ),
           ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              _toggleButtons();
-              _showPredefinedImages();
-            },
-            child: Icon(Icons.photo),
+          Positioned(
+            top:  50, // 수직 중앙에 위치
+            left: 30,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  //PhotoBoard
+                  MaterialPageRoute(builder: (context) => MainPage()),
+                );
+              },
+              child: CircleAvatar(
+
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/arrowback.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
           ),
-          SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              _toggleShape();
-              // Handle the shape toggle button click
-            },
-            child: Icon(Icons.transform),
+          Positioned(
+            top:  100, // 수직 중앙에 위치
+            left: 345,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  //PhotoBoard
+                  MaterialPageRoute(builder: (context) => MainPage()),
+                );
+              },
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/back.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
           ),
+          Positioned(
+            top:  145, // 수직 중앙에 위치
+            left: 345,
+            child: GestureDetector(
+              onTap: () {
+                _toggleShape();
+              },
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/circle.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top:  790, // 수직 중앙에 위치
+            left: 65,
+            child: GestureDetector(
+              onTap: () {
+                _toggleButtons();
+                _showPredefinedImages();
+
+              },
+              child: CircleAvatar(
+                radius: 35,
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/art.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 790, // 수직 중앙에 위치
+            left: 170,
+            child: GestureDetector(
+              onTap: () async {
+                final imageUint8List = await screenshotController.capture();
+
+                if (imageUint8List != null) {
+                  // Uint8List 형식의 이미지 데이터를 파일로 저장
+                  final imageFile = File('경로를 지정하세요'); // 저장할 파일 경로를 지정해야 합니다.
+                  await imageFile.writeAsBytes(imageUint8List);
+
+                  // 이미지 갤러리에 저장
+                  final result = await ImageGallerySaver.saveFile(imageFile.path);
+
+                  // 저장 결과 확인
+                  if (result != null && result['isSuccess']) {
+                    print('스크린샷이 갤러리에 저장되었습니다.');
+                  } else {
+                    print('스크린샷 저장에 실패했습니다.');
+                  }
+                } else {
+                  print('스크린샷 촬영에 실패했습니다.');
+                }
+              },
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/cameras.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 790, // 수직 중앙에 위치
+            left: 290,
+            child: GestureDetector(
+              onTap: () {
+                _showUserPhotoAlbum();
+              },
+              child: CircleAvatar(
+                radius: 35,
+                backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+                child: Image.asset(
+                  'images/album.png', // 이미지 파일 경로를 설정합니다.
+                  // 이미지의 색상을 변경합니다.
+                ),
+              ),
+            ),
+          ),
+
+
+
+          // floatingActionButton: Row(
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: [
+          //     InkWell(
+          //       onTap: () {
+          //         _toggleButtons();
+          //         _showPredefinedImages();
+          //       },
+          //       child: CircleAvatar(
+          //         backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+          //         child: Image.asset(
+          //           'images/photo.png', // 이미지 파일 경로를 설정합니다.
+          //           // 이미지의 색상을 변경합니다.
+          //         ),
+          //       ),
+          //     ),
+          //     SizedBox(height: 16),
+          //     InkWell(
+          //       onTap: () {
+          //         _toggleShape();
+          //         // Handle the shape toggle button click
+          //       },
+          //       child: CircleAvatar(
+          //         backgroundColor: Color(0x0), // 배경색을 투명으로 설정합니다.
+          //         child: Image.asset(
+          //           'images/album.png', // 이미지 파일 경로를 설정합니다.
+          //           // 이미지의 색상을 변경합니다.
+          //         ),
+          //       ),
+          //     ),
+
         ],
       ),
     );
@@ -195,18 +365,21 @@ class _ManipulationPageState extends State<ManipulationPage> {
   }
 
   void _showPredefinedImages() {
+    setState(() {
+      _updateSelectedImages(predefinedImages);
+    });
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         final int imagesPerPage = 9;
-        final int pageCount = (predefinedImages.length / imagesPerPage).ceil();
+        final int pageCount = (selectedImages.length / imagesPerPage).ceil();
 
         return Container(
-          height: 300, // Increase the height of the container
+          height: 320, // Increase the height of the container
           decoration: ShapeDecoration(
-            color: Color(0x33EEEEEE),
+            color: Color(0xFF202020),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(19),
+
             ),
           ),
           child: Column(
@@ -216,9 +389,9 @@ class _ManipulationPageState extends State<ManipulationPage> {
                 children: [
                   FloatingActionButton(
                     onPressed: () {
-                      // Handle 동양풍 button click
+                      _updateSelectedImages(predefinedImages);
                     },
-                    backgroundColor: Color(0x4D000000),
+                    backgroundColor: Color(0x3C000000),
                     child: Text(
                       '동양풍',
                       style: TextStyle(fontSize: 12),
@@ -227,9 +400,9 @@ class _ManipulationPageState extends State<ManipulationPage> {
                   SizedBox(width: 40),
                   FloatingActionButton(
                     onPressed: () {
-                      // Handle 서양풍 button click
+                      _updateSelectedImages(predefinedImages2);
                     },
-                    backgroundColor: Color(0x4D000000),
+                    backgroundColor: Color(0x3C000000),
                     child: Text(
                       '서양풍',
                       style: TextStyle(fontSize: 12),
@@ -238,9 +411,10 @@ class _ManipulationPageState extends State<ManipulationPage> {
                   SizedBox(width: 40),
                   FloatingActionButton(
                     onPressed: () {
+                      _showUserPhotoAlbum();
                       // Handle 앨범 button click
                     },
-                    backgroundColor: Color(0x4D000000),
+                    backgroundColor: Color(0x3C000000),
                     child: Text(
                       '앨범',
                       style: TextStyle(fontSize: 12),
@@ -254,42 +428,57 @@ class _ManipulationPageState extends State<ManipulationPage> {
                     itemCount: pageCount,
                     itemBuilder: (context, pageIndex) {
                       final startIndex = pageIndex * imagesPerPage;
-                      final endIndex = (startIndex + imagesPerPage) < predefinedImages.length
+                      final endIndex = (startIndex + imagesPerPage) < selectedImages.length
                           ? (startIndex + imagesPerPage)
-                          : predefinedImages.length;
-                      final pageImages = predefinedImages.sublist(startIndex, endIndex);
+                          : selectedImages.length;
+                      final pageImages = selectedImages.sublist(startIndex, endIndex);
 
                       return Container(
                         color: Color(0x0),//백그라운드
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 23),
                         child: GridView.count(
                           crossAxisCount: 3,
                           padding: EdgeInsets.all(8),
                           crossAxisSpacing: 12,
-                          mainAxisSpacing: 42,
-                          children: List.generate(pageImages.length, (index) {
-                            final imagePath = pageImages[index];
+                          mainAxisSpacing: 50,
+                          children: List.generate(selectedImages.length, (index) {
+                            final imagePath = selectedImages[index];
                             final caption = _getCaptionForImagePath(imagePath);
                             return GestureDetector(
                               onTap: () {
-                                _addImageNode(imagePath);
+                                //캡션은 지워야 함
+                                _addImageNode(imagePath,caption);
                                 Navigator.pop(context);
                               },
-                              child: GridTile(
-                                child: Column(
-                                  children: [
-                                    AspectRatio(
-                                      aspectRatio: 1.0,
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                      ),
+                              child: SingleChildScrollView(
+                                child: GridTile(
+                                  child:Container(
+                                    child: Column(
+
+                                      children: [
+                                        AspectRatio(
+                                          aspectRatio: 1.13,
+                                          child: Image.asset(
+                                            imagePath,
+                                            fit: BoxFit.cover,
+                                            // 이미지의 높이를 원하는 값으로 조절
+                                          ),
+                                        ),
+                                        // SizedBox(height: 15),
+                                        Container(
+                                          child: Text(
+                                            caption,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xffffffff), // Set the text color to white
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      caption,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                  ),
+
                                 ),
                               ),
                             );
@@ -311,11 +500,11 @@ class _ManipulationPageState extends State<ManipulationPage> {
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
-      _addImageNode(pickedImage.path);
+      //꼭 추가!!
+      _PhotoaddImageNode(pickedImage.path);
     }
   }
-
-  void _addImageNode(String imagePath) {
+  void _PhotoaddImageNode(String imagePath) {
     // Remove previous image node and text node if they exist
     if (imageNode != null) {
       arkitController?.remove(imageNode!.name);
@@ -341,24 +530,58 @@ class _ManipulationPageState extends State<ManipulationPage> {
     imageNode = node;
     addedNodes.add(node);
 
-    // Add text node
+  }
+
+  void _addImageNode(String imagePath, String caption) {
+    // Remove previous image node and text node if they exist
+    if (imageNode != null) {
+      arkitController?.remove(imageNode!.name);
+      addedNodes.remove(imageNode);
+    }
+
+    final imageNodePosition = imageNode?.position ?? vector.Vector3.zero();
+    final material = ARKitMaterial(
+      diffuse: ARKitMaterialImage(imagePath),
+      doubleSided: true,
+    );
+
+    final geometry = isSphere
+        ? ARKitSphere(radius: 0.15, materials: [material])
+        : ARKitPlane(width: 0.5, height: 0.5, materials: [material]);
+
+    final node = ARKitNode(
+      geometry: geometry,
+      position: imageNodePosition + vector.Vector3(0.5, 0, 0),
+    );
+
+    arkitController?.add(node);
+    imageNode = node;
+    addedNodes.add(node);
+
+    // Add text node with the caption
     final textGeometry = ARKitText(
-      text: '', // Customize the text content as desired
-      extrusionDepth: 1,
+      text: caption,
+      extrusionDepth: 0,
       materials: [ARKitMaterial(
-        diffuse: ARKitMaterialColor(Color(0xffb3b3b3)),
+        diffuse: ARKitMaterialColor(Color(0x79525252)),
       )],
     );
 
-    final textNodePosition = imageNode!.position + vector.Vector3(0, -0.15, 0); // Adjust the position of the text node relative to the image node
+    final textNodePosition = imageNode!.position +vector.Vector3(-0.15, 0, -8.5) ; // Adjust the position of the text node relative to the image node
     final textNode = ARKitNode(
       geometry: textGeometry,
       position: textNodePosition,
       eulerAngles: vector.Vector3.zero(),
+      scale: vector.Vector3(0.5, 0.5, 0.5), //글자 크기 설정
     );
+    //
+    // arkitController?.add(textNode);
+    // addedNodes.add(textNode);
+  }
 
-    arkitController?.add(textNode);
-    addedNodes.add(textNode);
+  void _updateSelectedImages(List<String> newImages) {
+    selectedImages.clear(); // Clear the existing images
+    selectedImages.addAll(newImages);
   }
 
   void _toggleShape() {
@@ -394,10 +617,8 @@ class _ManipulationPageState extends State<ManipulationPage> {
   }
 
   String _getCaptionForImagePath(String imagePath) {
-    // You can implement logic to retrieve captions based on image paths here
-    // For now, let's use a simple approach by extracting the filename without extension as the caption
-    final filename = imagePath.split('/').last;
-    final caption = filename.split('.').first;
+    // Use the imageCaptions map to look up captions based on the image path
+    final caption = imageCaptions[imagePath] ?? 'Default Caption'; // Provide a default caption if not found
     return caption;
   }
 }

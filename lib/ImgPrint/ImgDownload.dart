@@ -1,4 +1,6 @@
 
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,12 +11,9 @@ import 'package:path_provider/path_provider.dart';
 
 import '../mainpage/MainPage.dart';
 
-
-
 class ImgDownload extends StatefulWidget {
-  final String imageUrl; // Define a field to store the URL
-
-  const ImgDownload({required this.imageUrl});
+  String imageUrl;
+  ImgDownload({super.key, required this.imageUrl});
 
   @override
   State<ImgDownload> createState() => _ImgDownloadState();
@@ -22,13 +21,14 @@ class ImgDownload extends StatefulWidget {
 
 class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관련
 
-  String imgURL = "";
+  String imgURL ="";
 
   @override
   void initState() {
     super.initState();
     imgURL = widget.imageUrl;
   }
+
 
   void downloadImage() async {
     var response = await http.get(Uri.parse(imgURL));
@@ -49,9 +49,8 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false, // 디버그 리본 없애기
-        home: Container(
+    return Scaffold(
+        body: Container(
           decoration: BoxDecoration(
               color: Colors.white),
           child: Scaffold(
@@ -113,15 +112,16 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
                                 ),
                               ],
                             ),
+                            // child: Transform.rotate(
+                            //   angle: 90 * 3.141592653589793 / 180,
                             child: Container(
-                              width: 256, height: 256,
+                              width: 332, height: 332,
                               decoration: BoxDecoration(
                                   image: DecorationImage(
                                       fit: BoxFit.cover,
                                       image: NetworkImage(imgURL))),
                             ),
-
-                          )
+                            )
                         ],
                       ),
 
@@ -347,19 +347,45 @@ class DownloadComplete extends StatelessWidget {
       width: 300,
       height: 550,
       child: Stack(children: <Widget>[
+        Positioned(
+          child: Image.asset('images/img_4.png',
+            width: 211, height: 228,
+          ),
+          top: 80,
+          right: 50,
+        ),
         Center(
             child:Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(23),
-                color: Color.fromRGBO(255, 255, 255, 0.7),
+              decoration: ShapeDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(0.00, -1.00),
+                  end: Alignment(0, 1),
+                  colors: [Colors.white, Colors.white],
+                ),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: Colors.white,
+                  ),
+                  borderRadius: BorderRadius.circular(23),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Color(0x3F000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 0),
+                    spreadRadius: 0,
+                  )
+                ],
               ),
-              width: 278, height: 185,
+              width: 278, height: 123,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
 
-                  SizedBox(height: 80,),
+                  SizedBox(height: 31,),
                   Text(
                     'Complete!',
                     style: TextStyle(
@@ -394,11 +420,11 @@ class DownloadComplete extends StatelessWidget {
             )
         ),
         Positioned(
-          child: Image.asset('images/img_21.png',
-            width: 244, height: 244,
+          child: Image.asset('images/img_5.png',
+            width: 178.77, height: 61.95,
           ),
-          top: 20,
-          right: 30,
+          top: 181,
+          right: 67,
         )
 
 

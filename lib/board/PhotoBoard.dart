@@ -1,10 +1,7 @@
-
-
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ar_example/board/Search.dart';
+import 'package:flutter_ar_example/mainpage/MainPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/services.dart';
@@ -45,6 +42,7 @@ class _PhotoBoardState extends State<PhotoBoard> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,8 +52,10 @@ class _PhotoBoardState extends State<PhotoBoard> {
         length: 3, //탭 갯수
         child: Scaffold(
           appBar: AppBar(
+            leading:gotoMainBtn(),
             title: Text(
               '사진 게시판',
+
               style: TextStyle(
                 color: Color(0xFF484848),
                 fontSize: 20,
@@ -165,7 +165,7 @@ class AllPhotosScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(20), // 전체패딩
+            padding: EdgeInsets.fromLTRB(20, 20, 0, 20), // 전체패딩
             child: Column(
               children: [
                 SizedBox(
@@ -183,7 +183,7 @@ class AllPhotosScreen extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 24,
-                            fontFamily: 'Apple SD Gothic Neo',
+                            fontFamily: 'SUIT',
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -213,7 +213,7 @@ class AllPhotosScreen extends StatelessWidget {
           ),
           Container(
             padding: EdgeInsets.all(20),
-            width: 390,
+            // width: 390,
             decoration: BoxDecoration(
                 color: Color(0xffF6F6F6),
                 border: Border(
@@ -222,6 +222,30 @@ class AllPhotosScreen extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class gotoMainBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          child: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MainPage()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.black,
+          ),
+          width: 25,
+          height: 40,
+        ),
+      ],
     );
   }
 }
@@ -400,7 +424,7 @@ Future<List<Widget>> createPhotos(BuildContext context , int num) async {
     Widget image = Card(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey, width: 1)),
+          side: BorderSide(color: Colors.grey, width: 0.5)),
       child: Padding(
         padding: EdgeInsets.all(5),
         child: Column(
@@ -428,92 +452,115 @@ Future<List<Widget>> createPhotos(BuildContext context , int num) async {
             Expanded(
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 15, //
-                    backgroundImage: NetworkImage(UserProfileImg[i]),
+                  Column(
+
+                    children: [
+                      SizedBox(height: 5,),
+                      Container(
+                        width: 31,
+                        height: 31,
+                        decoration: ShapeDecoration(
+                          image: DecorationImage(
+                            //사용자 프로필 사진 url
+                            image: NetworkImage(UserProfileImg[i]),
+                            fit: BoxFit.fill,
+                          ),
+                          shape: OvalBorder(),
+                        ),
+                      ),
+
+                      // CircleAvatar(
+                      //   radius: 15, //
+                      //   backgroundImage: NetworkImage(UserProfileImg[i],),
+                      // ),
+                    ],
                   ),
                   Container(
-                    width: 85,
+                    width: 100,
                     padding: EdgeInsets.fromLTRB(6, 7, 9, 4),
-                    child: Text(
-                      PostTitle[i], // 게시글 제목
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: Color(0xFF535252),
-                        fontSize: 12,
-                        fontFamily: 'SUIT',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          PostTitle[i], // 게시글 제목
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          style: TextStyle(
+                            color: Color(0xFF535252),
+                            fontSize: 12,
+                            fontFamily: 'SUIT',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.remove_red_eye_outlined,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              PostView[i].toString(),
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+
+
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              PostComment[i].toString(),
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+
+                            Icon(
+                              Icons.favorite_border,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              PostLike[i].toString(),
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                          ],
+                        ),
+
+
+
+
+                      ],
+                    )
                   ),
-                  Expanded(
-                    child: IconButton(
-                      onPressed: () {
-                        print("게시글 버튼 ");
-                      },
-                      icon: Icon(Icons.more_vert),
-                    ),
-                  )
+
+                  Expanded(child: IconButton(
+                    onPressed: () {
+                      print("게시글 버튼 ");
+                    },
+                    icon: Icon(Icons.more_vert),
+                  ),)
+
                 ],
               ),
             ),
-            Row(
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.remove_red_eye_outlined,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      PostView[i].toString(),
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
 
-                Row(
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      PostComment[i].toString(),
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.favorite_border,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      PostLike[i].toString(),
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
           ],
         ),
       ),
@@ -568,7 +615,7 @@ class _HeartButtonState extends State<HeartButton> {
         IconButton(
           icon: Icon(
             _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.grey : Colors.white,
+            color: _isLiked ? Colors.white : Colors.white,
           ),
           onPressed: () {
             print("button click");

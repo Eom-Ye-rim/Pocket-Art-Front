@@ -653,6 +653,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:flutter_ar_example/splash/FirstSplash.dart';
+import 'package:flutter_ar_example/splash/ThirdSplash.dart';
 
 import '../user/LoginMain.dart';
 
@@ -698,10 +699,10 @@ class Frame427320775 extends StatelessWidget {
           child: Stack(
             children: [
               Positioned(
-                left: 100,
-                top: 161,
+                left: 65,
+                top: 181,
                 child: Text(
-                  '사진게시판에서 친구들과 \n내 그림을 공유해보세요!',
+                  '내가 원하는 그림으로 화풍을 변환하고!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
@@ -790,14 +791,14 @@ class Frame427320775 extends StatelessWidget {
               //   ),
               // ),
               Positioned(
-                left: -240,
-                top: 143,
+                left: 17,
+                top: 30,
                 child: Container(
-                  width: 890,
-                  height: 653,
+                  width: 400,
+                  height: 800,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('images/ss.png'),
+                      image: AssetImage('images/fs1.png'),
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -910,11 +911,11 @@ class Frame427320775 extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 265,
+                left: 285,
                 top: 600,
                 child: Container(
-                  width: 110,
-                  height: 130,
+                  width: 60,
+                  height: 120,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('images/character.png'),
@@ -930,7 +931,7 @@ class Frame427320775 extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) =>   LoginMain()),
+                      MaterialPageRoute(builder: (context) => ThirdSplash()),
                     );
                   }
                   ,child: Text(

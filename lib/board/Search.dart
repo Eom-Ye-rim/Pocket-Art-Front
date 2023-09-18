@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_ar_example/board/PhotoBoard.dart';
 import 'package:flutter_ar_example/board/PostSearch.dart';
 import 'package:http/http.dart' as http;
 void main() {
@@ -16,21 +18,56 @@ class Search extends StatelessWidget {
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        body: Frame427320768(),
+
+    home: Scaffold(
+    appBar: AppBar(
+    systemOverlayStyle: SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    ),
+    automaticallyImplyLeading: true,
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+
+    leading: IconButton(
+    icon: Icon(Icons.arrow_back_ios,
+    color: Colors.black,),
+    onPressed: () {
+    //뒤로가기
+    Navigator.pop(context);
+    },
+    ),
+    ),
+            body: Frame427320768(),
       ),
     );
   }
 }
+
+class gotoMainBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          child: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PhotoBoard()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.black,
+          ),
+          width: 25,
+          height: 40,
+        ),
+      ],
+    );
+  }
+}
+
 class SearchResult {
     final String title;
     final String author;

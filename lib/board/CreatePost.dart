@@ -1,19 +1,20 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_ar_example/board/Search.dart';
+import 'package:flutter_ar_example/board/PhotoBoard.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../mainpage/MainPage.dart';
 import 'ViewPost.dart';
 
 // ignore_for_file: prefer_const_constructors
-final GlobalKey<_TagInputChipState> tagInputChipKey = GlobalKey<_TagInputChipState>();
+final GlobalKey<_TagInputChipState> tagInputChipKey =
+    GlobalKey<_TagInputChipState>();
 
 void main() {
   runApp(const CreatePost());
@@ -33,12 +34,12 @@ class _CreatePostState extends State<CreatePost> {
   String type = "";
   String selectedStyle = "";
   List<String> hashtag = [];
+
   void _addTag(String tag) {
     setState(() {
       hashtag.add(tag); // Update the hashtag list
     });
   }
-
 
   TextEditingController _titleController = TextEditingController();
   TextEditingController _contentsController = TextEditingController();
@@ -47,100 +48,183 @@ class _CreatePostState extends State<CreatePost> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
+        home: DefaultTabController(
+      // 상단 탭 만들기 위해서 DefaultTabController로 감싸줘야함
+      length: 3, //탭 갯수
+      child: Scaffold(
         appBar: AppBar(
+          leading: gotoMainBtn(),
+          title: Text(
+            '게시물 작성',
+            style: TextStyle(
+              color: Color(0xFF484848),
+              fontSize: 20,
+              fontFamily: 'SUIT',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+
+          actions: <Widget>[
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.list),
+              color: Color(0xff626262),
+            )
+          ],
           systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
+            //status bar 색 변경 -black
+            statusBarIconBrightness: Brightness.dark, //<-- 안드로이드 설정
+            statusBarBrightness: Brightness.light, //<-- ios설정
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.edit_note, //
-                color: Color(0xFF727272), // 아이콘 색상
-              ),
-              Text(
-                '게시물 작성',
-                style: TextStyle(
-                  color: Color(0xFF727272),
-                  fontSize: 22,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+          // 상위페이지 생기면 뒤로가기 버튼 생성
+
+          backgroundColor: Colors.white,
         ),
+
+        // home: Scaffold(
+        //   appBar: AppBar(
+        //     systemOverlayStyle: SystemUiOverlayStyle(
+        //       statusBarIconBrightness: Brightness.dark,
+        //       statusBarBrightness: Brightness.light,
+        //     ),
+        //     automaticallyImplyLeading: false,
+        //     backgroundColor: Colors.transparent,
+        //     elevation: 0.0,
+        //     leading:gotoMainBtn(),
+        //     title: Row(
+        //
+        //       children: [
+        //
+        //         // Icon(
+        //         //   Icons.edit_note, //
+        //         //   color: Color(0xFF727272), // 아이콘 색상
+        //         // ),
+        //
+        //         Text(
+        //           '게시물 작성',
+        //           style: TextStyle(
+        //             color: Color(0xFF727272),
+        //             fontSize: 22,
+        //             fontFamily: 'SUIT',
+        //             fontWeight: FontWeight.w700,
+        //           ),
+        //         ),
+        //
+        //       IconButton(
+        //         onPressed: () {
+        //         },
+        //         icon: Icon(Icons.menu),
+        //         color: Color(0xff626262),
+        //       )
+        //       ],
+        //     ),
+        //
+        //   ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(21),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 346,
-                height: 346,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 0.50, color: Colors.grey),
-                  ),
-                ),
-                child: GestureDetector(
-                  onTap: () async {
-                    print("사진 추가 ");
-                    var picker = ImagePicker();
-                    var image =
-                    await picker.pickImage(source: ImageSource.gallery);
-                    if (image != null) {
-                      setState(() {
-                        _pickedFile = image;
-                      });
-                    }
-                  },
-                  child: _pickedFile != null
-                      ? Container(
-                    width: 346,
-                    height: 346,
-                    child: Image.file(
-                      File(_pickedFile!.path),
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                      : Container(
-                    width: 346,
-                    height: 346,
-                    color: Colors.transparent, // 빈 상자 채우기용
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      size: 30,
-                      color: Color(0xff4A61DE),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 346,
+                  height: 346,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 0.50, color: Colors.grey),
                     ),
                   ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      print("사진 추가 ");
+                      var picker = ImagePicker();
+                      var image =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        setState(() {
+                          _pickedFile = image;
+                        });
+                      }
+                    },
+                    child: _pickedFile != null
+                        ? Container(
+                            width: 346,
+                            height: 346,
+                            child: Image.file(
+                              File(_pickedFile!.path),
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Container(
+                            width: 346,
+                            height: 346,
+                            color: Colors.transparent, // 빈 상자 채우기용
+                            child: Icon(
+                              Icons.camera_alt_outlined,
+                              size: 30,
+                              color: Color(0xff4A61DE),
+                            ),
+                          ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 26,
-              ),
-              Text(
-                '제목',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                SizedBox(
+                  height: 26,
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Container(
+                Text(
+                  '제목',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Container(
+                    padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
+                    width: 346,
+                    height: 55,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 0.50, color: Colors.grey),
+                      ),
+                    ),
+                    child: TextFormField(
+                      onChanged: (value) {
+                        setState(() {
+                          title =
+                              value; // Set the title variable when the user enters a title
+                        });
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '제목을 입력하세요.',
+                      ),
+                    )),
+                SizedBox(
+                  height: 35,
+                ),
+                Text(
+                  '내용',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Container(
                   padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
                   width: 346,
-                  height: 55,
+                  height: 163,
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -148,174 +232,134 @@ class _CreatePostState extends State<CreatePost> {
                     ),
                   ),
                   child: TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        title =
-                            value; // Set the title variable when the user enters a title
-                      });
-                    },
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '제목을 입력하세요.',
-                    ),
-                  )),
-              SizedBox(
-                height: 35,
-              ),
-              Text(
-                '내용',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                      onChanged: (value) {
+                        setState(() {
+                          contents =
+                              value; // Set the title variable when the user enters a title
+                        });
+                      },
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      maxLength: 800,
+                      decoration: InputDecoration(
+                        hintText: '내용을 입력하세요.',
+                        border: InputBorder.none,
+                      )),
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
-                width: 346,
-                height: 163,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 0.50, color: Colors.grey),
+                SizedBox(
+                  height: 25,
+                ),
+                Text(
+                  '화풍',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                child: TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        contents =
-                            value; // Set the title variable when the user enters a title
-                      });
-                    },
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    maxLength: 800,
-                    decoration: InputDecoration(
-                      hintText: '내용을 입력하세요.',
-                      border: InputBorder.none,
-                    )),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text(
-                '화풍',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                SizedBox(
+                  height: 6,
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              CustomToggleButtons(
-                onChanged: (index) {
-                  setState(() {
-                    selectedStyle = index == 0 ? "동양" : "서양";
-                  });
-                },
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text(
-                '카테고리',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              CustomCategoryToggleButtons(
-                onCategoryChanged: (index) {
-                  setState(() {
-                    type = index == 0 ? "AI" : "일반";
-                  });
-                },
-              ),
-
-              SizedBox(
-                height: 42,
-              ),
-              Text(
-                '태그설정',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              TagInputChip(
-                onAddTag: _addTag, // Pass the _addTag function
-              ),
-
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                child: FilledButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Color(0xFF363636),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Call your upload function here
-                    _uploadPost(hashtag);
-
-                    // After uploading, navigate to the search route
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) =>
-                    //         ViewPost(), // Replace SearchRoute with the actual route you want to navigate to
-                    //   ),
-                    // );
+                CustomToggleButtons(
+                  onChanged: (index) {
+                    setState(() {
+                      selectedStyle = index == 0 ? "동양" : "서양";
+                    });
                   },
-                  child: Center(
-                    child: Text(
-                      '업로드',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontFamily: 'SUIT',
-                        fontWeight: FontWeight.w700,
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Text(
+                  '카테고리',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                CustomCategoryToggleButtons(
+                  onCategoryChanged: (index) {
+                    setState(() {
+                      type = index == 0 ? "AI" : "일반";
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 42,
+                ),
+                Text(
+                  '태그설정',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                TagInputChip(
+                  onAddTag: _addTag, // Pass the _addTag function
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        Color(0xFF363636),
                       ),
-                      textAlign: TextAlign.right,
+                    ),
+                    onPressed: () {
+                      // Call your upload function here
+                      _uploadPost(hashtag);
+
+                      // After uploading, navigate to the search route
+                      // Navigator.of(context).push(
+                      //   MaterialPageRoute(
+                      //     builder: (context) =>
+                      //         ViewPost(), // Replace SearchRoute with the actual route you want to navigate to
+                      //   ),
+                      // );
+                    },
+                    child: Center(
+                      child: Text(
+                        '업로드',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: 'SUIT',
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ),
+                  width: 356,
+                  height: 56,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32.50),
                     ),
                   ),
                 ),
-                width: 356,
-                height: 56,
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32.50),
-                  ),
-                ),
-              ),
-
-
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    );
+    ));
   }
 
-  Future<void>  _uploadPost(List<String> hashtag) async {
+  Future<void> _uploadPost(List<String> hashtag) async {
     print("Register post");
     final dio = Dio();
     final url = 'http://13.209.160.87:8080/api/v1/contest';
@@ -343,7 +387,6 @@ class _CreatePostState extends State<CreatePost> {
       // Add the image file
       formData.files.add(MapEntry(
         'files',
-
         await MultipartFile.fromFile(_pickedFile!.path),
       ));
     }
@@ -356,10 +399,10 @@ class _CreatePostState extends State<CreatePost> {
         url,
         data: formData,
         options: Options(
-          contentType: 'multipart/form-data', // Use multipart/form-data for file uploads
+          contentType:
+              'multipart/form-data', // Use multipart/form-data for file uploads
         ),
       );
-
 
       print(response.data['data']['photo_list']);
       print(response.data['data']['tag_list']);
@@ -369,7 +412,8 @@ class _CreatePostState extends State<CreatePost> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ViewPost(responseData: response.data), // responseData는 응답 데이터입니다.
+            builder: (context) => ViewPost(
+                responseData: response.data), // responseData는 응답 데이터입니다.
           ),
         );
         // Process successful response
@@ -382,17 +426,20 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 }
+
 class CustomCategoryToggleButtons extends StatefulWidget {
   final ValueChanged<int> onCategoryChanged;
 
-  const CustomCategoryToggleButtons({Key? key,required this.onCategoryChanged}) : super(key: key);
-
+  const CustomCategoryToggleButtons({Key? key, required this.onCategoryChanged})
+      : super(key: key);
 
   @override
-  _CustomCategoryToggleButtonsState createState() => _CustomCategoryToggleButtonsState();
+  _CustomCategoryToggleButtonsState createState() =>
+      _CustomCategoryToggleButtonsState();
 }
 
-class _CustomCategoryToggleButtonsState extends State<CustomCategoryToggleButtons> {
+class _CustomCategoryToggleButtonsState
+    extends State<CustomCategoryToggleButtons> {
   List<bool> isSelected = [false, false];
 
   void _onPressed(int index) {
@@ -402,6 +449,7 @@ class _CustomCategoryToggleButtonsState extends State<CustomCategoryToggleButton
       widget.onCategoryChanged(index);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -431,12 +479,53 @@ class _CustomCategoryToggleButtonsState extends State<CustomCategoryToggleButton
   }
 }
 
+class gotoMainBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          child: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PhotoBoard()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.black,
+          ),
+          width: 15,
+          height: 40,
+        ),
+        // Container(
+        //   child: Text('Art Transfer',
+        //       textAlign: TextAlign.center,
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontSize: 12,
+        //         fontFamily: 'SUIT',
+        //         fontWeight: FontWeight.w600,
+        //       )),
+        //   width: 87,
+        //   height: 18,
+        //   decoration: ShapeDecoration(
+        //     color: Color(0xFF4065DE),
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(14),
+        //     ),
+        //   ),
+        // ),
+      ],
+    );
+  }
+}
 
 class CustomToggleButtons extends StatefulWidget {
   final ValueChanged<int> onChanged;
 
-  const CustomToggleButtons({Key? key,required this.onChanged}) : super(key: key);
-
+  const CustomToggleButtons({Key? key, required this.onChanged})
+      : super(key: key);
 
   @override
   _CustomToggleButtonsState createState() => _CustomToggleButtonsState();
@@ -484,6 +573,7 @@ class _CustomToggleButtonsState extends State<CustomToggleButtons> {
 
 class TagInputChip extends StatefulWidget {
   final Function(String) onAddTag;
+
   TagInputChip({Key? key, required this.onAddTag}) : super(key: key);
 
   @override
@@ -499,7 +589,7 @@ class _TagInputChipState extends State<TagInputChip> {
     return tags;
   }
 
-  void _addTag (String tag) {
+  void _addTag(String tag) {
     setState(() {
       tags.add(tag);
       _tagController.clear();
@@ -508,10 +598,8 @@ class _TagInputChipState extends State<TagInputChip> {
 
       // Update the 'hashtag' variable here
       hashtag = tags;
-
     });
   }
-
 
   void _removeTag(String tag) {
     setState(() {
@@ -536,7 +624,7 @@ class _TagInputChipState extends State<TagInputChip> {
             spacing: 8.0,
             children: [
               ...tags.map(
-                    (tag) => InputChip(
+                (tag) => InputChip(
                   label: Text(tag),
                   onDeleted: () => _removeTag(tag),
                   backgroundColor: Colors.transparent,
@@ -567,8 +655,6 @@ class _TagInputChipState extends State<TagInputChip> {
       ],
     );
   }
-
-
 
   @override
   void dispose() {

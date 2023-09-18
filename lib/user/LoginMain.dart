@@ -218,7 +218,7 @@ class _FirstRouteState extends State<FirstRoute> {
                 height: 50,
                 decoration: BoxDecoration(
 
-                  color: Colors.black,
+                  color: Color(0xFF015EFA),
                 ),
                 // padding: const EdgeInsets.only(
                 //   left: 32,
@@ -566,9 +566,12 @@ class _FirstRouteState extends State<FirstRoute> {
                               elevation: 0,
                               padding: EdgeInsets.zero,
                             ),
-                            child: Image.asset(
-                              'images/kakao_login_medium_narrow.png',  // 이미지 경로 및 파일명으로 수정해야 합니다.
-                            ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2), // 모서리 굴곡 설정
+                    child: Image.asset(
+                      'images/kakao_login_medium_narrow.png', // 이미지 경로 및 파일명으로 수정하세요.
+                    ),
+                          ),
                           ),
 
                         ],

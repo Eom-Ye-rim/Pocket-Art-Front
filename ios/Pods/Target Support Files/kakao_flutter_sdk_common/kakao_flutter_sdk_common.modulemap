@@ -1,4 +1,4 @@
-module kakao_flutter_sdk_common {
+framework module kakao_flutter_sdk_common {
   umbrella header "kakao_flutter_sdk_common-umbrella.h"
 
   export *

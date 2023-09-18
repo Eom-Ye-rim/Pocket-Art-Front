@@ -876,7 +876,7 @@ class Frame427320775 extends StatelessWidget {
                           width: 14,
                           height: 14,
                           decoration: ShapeDecoration(
-                            color: Color(0xFF406BF6),
+                            color: Color(0xFFD9D9D9),
                             shape: OvalBorder(),
                           ),
                         ),
@@ -900,7 +900,7 @@ class Frame427320775 extends StatelessWidget {
                           width: 14,
                           height: 14,
                           decoration: ShapeDecoration(
-                            color: Color(0xFFD9D9D9),
+                            color: Color(0xFF406BF6),
                             shape: OvalBorder(),
                           ),
                         ),
@@ -917,7 +917,7 @@ class Frame427320775 extends StatelessWidget {
                   height: 130,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('images/character.png'),
+                      image: AssetImage('images/character3.png'),
                       fit: BoxFit.fill,
                     ),
                   ),

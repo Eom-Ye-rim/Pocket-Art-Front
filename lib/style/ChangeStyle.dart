@@ -1,16 +1,26 @@
 
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/ImgPrint/SelectingPainter.dart';
+import 'package:flutter_ar_example/style/Chocie.dart';
 
-void main() {
-  runApp(const ChangeStyle());
+import '../mainpage/MainPage.dart';
+
+
+class ChangeStyle extends StatefulWidget {
+   File selectImg;
+
+  ChangeStyle({Key? key, required this.selectImg}) : super(key: key);
+
+  @override
+  _ChangeStyle createState() => _ChangeStyle();
 }
 
-class ChangeStyle extends StatelessWidget {
-  const ChangeStyle({super.key});
-
+class _ChangeStyle extends State<ChangeStyle> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,26 +28,62 @@ class ChangeStyle extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
       ),
       home: Scaffold(
+        appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
+          automaticallyImplyLeading: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios,
+              color: Colors.black,),
+            onPressed: () {
+              //뒤로가기
+              Navigator.pop(context);
+            },
+          ),
+        ),
         body:
-          Frame427320730(),
+          Frame427320730(selectImg: widget.selectImg),
       ),
     );
   }
+
 }
 
+
+
+
+
 class Frame427320730 extends StatefulWidget {
+  final File selectImg; // Declare selectImg as a member variable
+
+  Frame427320730({Key? key, required this.selectImg}) : super(key: key);
+
   @override
-  _Frame427320730State createState() => _Frame427320730State();
+  _Frame427320730State createState() => _Frame427320730State(selectImg: selectImg);
+
 }
+
+
 class _Frame427320730State extends State<Frame427320730> {
+  final File selectImg; // Declare selectImg as a member variable
+  String type="";
+
+  _Frame427320730State({required this.selectImg}) ;
   Color boxColor = Colors.white; // 초기 색상 설정
   @override
   Widget build(BuildContext context) {
+    File file=selectImg;
+    print("File test + $file");
     return Column(
       children: [
         Container(
           width:  MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+          height:792,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -49,7 +95,7 @@ class _Frame427320730State extends State<Frame427320730> {
             children: [
               Positioned(
                 left: 110,
-                top: 161,
+                top: 57,
                 child: Text(
                   '변환하고 싶은 스타일의\n화풍을 선택해주세요.',
                   textAlign: TextAlign.center,
@@ -134,56 +180,14 @@ class _Frame427320730State extends State<Frame427320730> {
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 17,
-                        top: 66,
-                        child: Container(
-                          width: 113,
-                          height: 26,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 26,
-                                top: 4,
-                                child: Container(
-                                  width: 87,
-                                  height: 18,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF4065DE),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 34,
-                                top: 5,
-                                child: SizedBox(
-                                  width: 79,
-                                  height: 15,
-                                  child: Text(
-                                    'Art Transfer',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontFamily: 'Apple SD Gothic Neo',
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+
                     ],
                   ),
                 ),
               ),
               Positioned(
                 left: 27,
-                top: 285,
+                top: 181,
                 child: Container(
                   width: 168,
                   height: 276,
@@ -208,7 +212,7 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 215,
-                top: 285,
+                top: 181,
                 child: Container(
                   width: 168,
                   height: 276,
@@ -233,7 +237,7 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 215,
-                top: 285,
+                top: 181,
                 child: Container(
                   width: 168,
                   height: 204,
@@ -386,7 +390,7 @@ class _Frame427320730State extends State<Frame427320730> {
               // ),
               Positioned(
                 left: 27,
-                top: 285,
+                top: 181,
                 child: Container(
                   width: 168,
                   height: 204,
@@ -413,9 +417,12 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 85,
-                top: 506,
+                top: 402,
                 child: GestureDetector(
                   onTap: () {
+                    setState(() {
+                      type="east";
+                    });
                     // Handle the click event here
                     // _sendImageForTransformation('east');
                   },
@@ -432,7 +439,7 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 64,
-                top: 532,
+                top: 428,
                 child: Text(
                   '동양풍 변환하러 가기 ',
                   textAlign: TextAlign.center,
@@ -446,7 +453,7 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 252,
-                top: 532,
+                top: 428,
                 child: Text(
                   '서양풍 변환하러 가기 ',
                   textAlign: TextAlign.center,
@@ -460,11 +467,12 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 273,
-                top: 506,
+                top: 402,
                 child: GestureDetector(
                   onTap: () {
                     // "서양풍" 클릭 시 박스 색상 변경
                     setState(() {
+                      type="east";
                       boxColor = Color(0xAFFC634);
                     });
                   },
@@ -481,7 +489,7 @@ class _Frame427320730State extends State<Frame427320730> {
     ),
               Positioned(
                 left: 26,
-                top: 622,
+                top: 518,
                 child: Container(
                   width: 358,
                   height: 56,
@@ -503,13 +511,13 @@ class _Frame427320730State extends State<Frame427320730> {
               ),
               Positioned(
                 left: 188,
-                top: 637,
+                top: 533,
                 child: GestureDetector(
                   onTap: () {
                     // "다음" 버튼 클릭 시 페이지 이동
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SelectingPainter()),
+                      MaterialPageRoute(builder: (context) => SelectingPainter(selectImg: file,type:type)),
                     );
                   },
                 child: Text(
@@ -527,9 +535,13 @@ class _Frame427320730State extends State<Frame427320730> {
         ),
       ],
     );
+
   }
-  // Function to send an image for transformation to the server
+
+
+// Function to send an image for transformation to the server
 }
+
 // Future<void> _sendImageForTransformation(String modelname) async {
 //   try {
 //     final dio = Dio();

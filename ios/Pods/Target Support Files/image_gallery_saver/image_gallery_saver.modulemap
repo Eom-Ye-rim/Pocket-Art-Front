@@ -1,4 +1,4 @@
-module image_gallery_saver {
+framework module image_gallery_saver {
   umbrella header "image_gallery_saver-umbrella.h"
 
   export *

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,21 +8,28 @@ import 'package:flutter_ar_example/ImgPrint/ImgDownload.dart';
 import '../mainpage/MainPage.dart';
 import 'package:http/http.dart' as http;
 
-void main() {
-  runApp(MaterialApp(
-    home: SelectingPainter(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
 class SelectingPainter extends StatefulWidget {
-  const SelectingPainter({Key? key}) : super(key: key);
+  File selectImg;
+  String type;
+  SelectingPainter({super.key, required this.selectImg, required this.type});
 
   @override
   State<SelectingPainter> createState() => _SelectingPainterState();
 }
 
-class _SelectingPainterState extends State<SelectingPainter> {
+class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운로드 관련
+
+  File ? imgURL ;
+  String StyleType="";
+  String model="";
+
+  @override
+  void initState() {
+    super.initState();
+    imgURL = widget.selectImg;
+    StyleType=widget.type;
+  }
+
   final Dio dio = Dio();
   @override
   Widget build(BuildContext context) {
@@ -67,7 +76,9 @@ class _SelectingPainterState extends State<SelectingPainter> {
                       ),
                       InkWell(
                         onTap: () {
-                          print('빈센트 반고흐');
+                          setState(() {
+                            model="gogh";
+                          });
                         },
                         child: Container(
                           width: 328,
@@ -128,6 +139,9 @@ class _SelectingPainterState extends State<SelectingPainter> {
                       ),
                       InkWell(
                         onTap: () {
+                          setState(() {
+                            model="cezanne";
+                          });
                           print('폴 세잔느');
                         },
                         child: Container(
@@ -188,57 +202,12 @@ class _SelectingPainterState extends State<SelectingPainter> {
                         height: 19,
                       ),
                       InkWell(
-                        onTap: () async {
-                          final serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=east';
 
-                          // Load the image from your assets (assuming '3.png' is in your assets)
-                          final imageBytes = await rootBundle.load('images/camera.png');
-                          final image = MultipartFile.fromBytes(
-                            imageBytes.buffer.asUint8List(),
-                            filename: 'testA.jpeg',
-                          );
-
-                          try {
-                            FormData formData = FormData.fromMap({
-                              'file': image,
+                          onTap: () {
+                            setState(() {
+                              model="monet``";
                             });
-
-                            final response = await dio.post(
-                              serverUrl,
-                              data: formData,
-                              options: Options(
-                                headers: {
-                                  'Content-Type': 'multipart/form-data', // Set the content type
-                                },
-                              ),
-                            );
-
-
-                            // print(pixelData);
-                            if (response.statusCode == 200) {
-                              // Successful response from the server
-                              print('Image sent successfully');
-                              print(response.data);
-                              print(response.data['url']);
-                                Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ImgDownload(imageUrl:response.data['url']
-                                )),
-                                );
-                            //   Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => ImgDownload()),
-                            //   );
-                             } else {
-                              // Handle errors
-                              print('Error sending image: ${response.statusCode}');
-                              print('Error response: ${response.data}');
-                            }
-                          } catch (e) {
-                            // Handle network errors
-                            print('Network error: $e');
-                          }
-                        },
+                          },
                         child: Container(
                           width: 328,
                           height: 96,
@@ -298,7 +267,9 @@ class _SelectingPainterState extends State<SelectingPainter> {
                       ),
                       InkWell(
                         onTap: () {
-                          print('에드가 드가');
+                          setState(() {
+                            model="edgar";
+                          });
                         },
                         child: Container(
                           width: 328,
@@ -370,9 +341,71 @@ class _SelectingPainterState extends State<SelectingPainter> {
                               MaterialStateProperty.all<Color>(
                                   Colors.transparent),
                             ),
-                            onPressed: () {
-                              print("다음 ");
-                            },
+                            onPressed: () async {
+                                String serverUrl="";
+                                if(StyleType=="east") {
+                                  serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=east';
+                                }
+                                else if(model=="monet"){
+                                  serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=monet';
+                                }
+                                else if(model=="edgar"){
+                                   serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=edgar';
+                                    }
+                                else if(model=="cezanne"){
+                                     serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=cezanne';
+                                    }
+                                else if(model=="gogh"){
+                              serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=gogh';
+                                }
+    // Replace 'imgPath' with the actual file path of the image from the gallery.
+                                final imgPath = imgURL; // Replace with the actual image path
+                                String files = imgPath!.path.split('/').last;
+                                print(imgPath);
+                                print(files);
+                                try {
+                                  FormData formData = FormData.fromMap({
+                                    'file': await MultipartFile.fromFile(imgPath!.path, filename: files),
+                                  });
+                                  ;
+
+                                  final response = await dio.post(
+                                    serverUrl,
+                                    data: formData,
+                                    options: Options(
+                                      headers: {
+                                        'Content-Type': 'multipart/form-data',
+                                      },
+                                    ),
+                                  );
+
+
+                                  // print(pixelData);
+                                  if (response.statusCode == 200) {
+                                    // Successful response from the server
+                                    print('Image sent successfully');
+                                    print(response.data);
+                                    print(response.data['url']);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => ImgDownload(imageUrl:response.data['url']
+                                      )),
+                                    );
+                                    //   Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(builder: (context) => ImgDownload()),
+                                    //   );
+                                  } else {
+                                    // Handle errors
+                                    print('Error sending image: ${response.statusCode}');
+                                    print('Error response: ${response.data}');
+                                  }
+                                } catch (e) {
+                                  // Handle network errors
+                                  print('Network error: $e');
+                                }
+                              },
+
                             child: Text('다음',
                                 style: TextStyle(
                                   color: Colors.white,

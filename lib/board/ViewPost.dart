@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_ar_example/board/PhotoBoard.dart';
 
 // ignore_for_file: prefer_const_constructors
 
@@ -81,22 +82,45 @@ class _ViewPostState extends State<ViewPost> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
 
-      debugShowCheckedModeBanner: false, // 디버그 리본 없애기
-      home: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0),
-          child: AppBar(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.dark,
-              statusBarBrightness: Brightness.light,
-            ),
-            automaticallyImplyLeading: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-          ),
-        ),
+        return MaterialApp(
+    home: DefaultTabController(
+    // 상단 탭 만들기 위해서 DefaultTabController로 감싸줘야함
+    length: 3, //탭 갯수
+    child: Scaffold(
+    appBar: AppBar(
+    leading:gotoMainBtn(),
+    title: Text(
+    '게시물 보기',
+
+    style: TextStyle(
+    color: Color(0xFF484848),
+    fontSize: 20,
+    fontFamily: 'SUIT',
+    fontWeight: FontWeight.w700,
+    ),
+    ),
+
+    actions: <Widget>[
+    IconButton(
+    onPressed: () {
+
+    },
+    icon: Icon(Icons.list),
+    color: Color(0xff626262),
+    )
+    ],
+    systemOverlayStyle: SystemUiOverlayStyle(
+    //status bar 색 변경 -black
+    statusBarIconBrightness: Brightness.dark, //<-- 안드로이드 설정
+    statusBarBrightness: Brightness.light, //<-- ios설정
+    ),
+    automaticallyImplyLeading: true,
+    // 상위페이지 생기면 뒤로가기 버튼 생성
+
+    backgroundColor: Colors.white,
+    ),
+
         body: SingleChildScrollView(
           child: Container(
             child: Column(
@@ -458,10 +482,33 @@ class _ViewPostState extends State<ViewPost> {
               )),
         ),
       ),
-    );
+    ));
   }
 }
 
+class gotoMainBtn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          child: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PhotoBoard()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.black,
+          ),
+          width: 25,
+          height: 40,
+        ),
+      ],
+    );
+  }
+}
 class ExpandableTextWidget extends StatefulWidget {
   final String postString; // Add this line
 

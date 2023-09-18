@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1F59288737812C9DB52A451F85056B0E"
-               BuildableName = "libarkit_plugin.a"
+               BuildableName = "arkit_plugin.framework"
                BlueprintName = "arkit_plugin"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
