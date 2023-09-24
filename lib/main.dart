@@ -1,523 +1,1059 @@
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ar_example/splash/FirstSplash.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'dart:async';
+import 'dart:ui' as ui;
+
 
 void main() {
-  runApp(MyApp());
+  runApp(const FigmaToCodeApp());
 }
 
-class MyApp extends StatelessWidget {
+class FigmaToCodeApp extends StatelessWidget {
+  const FigmaToCodeApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: _MyApp(),
-    );
+      home: Scaffold(
+        body:
+          Frame427320811(),
+        ),
+      );
   }
 }
 
-class _MyApp extends StatefulWidget {
+class Frame427320811 extends StatefulWidget {
   @override
-  _VideoScreenState createState() => _VideoScreenState();
+  _MyCanvasState createState() => _MyCanvasState();
+}
+enum PenType {
+  Pen1,
+  Pen2,
+  Pen3,
+  Pen4,
 }
 
-class _VideoScreenState extends State<_MyApp> {
-  late VideoPlayerController _controller;
+class _MyCanvasState extends State<Frame427320811> {
+  List<Offset?> points = <Offset?>[];
+  Color selectedColor = Colors.black; // Default color
+  ui.Image? edgeImage;
+  Uint8List? edgeImageBytes;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('images/updatemotion.mp4')
-      ..initialize().then((_) {
-        // Ensure the first frame is shown and set the state when the video is initialized.
-        setState(() {
-          print('Video initialized successfully');
-          _controller.play(); // 자동으로 영상 재생 시작
-        });
-      });
-    // Add a listener to detect when the video playback is completed
-    _controller.addListener(() {
-      if (_controller.value.position >= _controller.value.duration) {
+    loadImage();
+  }
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => FirstSplash()),
-        );
-      }
+  // Load the "edge.jpeg" image
+  Future<void> loadImage() async {
+    final imageProvider = AssetImage('images/edge.jpeg');
+    final image = await loadImageFromProvider(imageProvider);
+
+    // Convert the image to bytes
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    edgeImageBytes = byteData!.buffer.asUint8List();
+
+    setState(() {
+      edgeImage = image;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: _controller.value.isInitialized
-            ? AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
-        )
-            : CircularProgressIndicator(), // Show a loading indicator while the video is initializing.
+  void _onPanUpdate(DragUpdateDetails details) {
+    setState(() {
+      RenderBox renderBox = context.findRenderObject() as RenderBox;
+      points.add(renderBox.globalToLocal(details.globalPosition));
+    });
+  }
+
+
+  Future<ui.Image> loadImageFromProvider(ImageProvider provider) async {
+    final completer = Completer<ui.Image>();
+    final imageStream = provider.resolve(const ImageConfiguration());
+
+    imageStream.addListener(
+      ImageStreamListener(
+            (imageInfo, _) {
+          completer.complete(imageInfo.image);
+        },
+        onError: (dynamic exception, StackTrace? stackTrace) {
+          completer.completeError(exception, stackTrace);
+        },
       ),
+    );
+
+    return completer.future;
+  }
+
+  void openColorPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select a color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: selectedColor,
+              onColorChanged: (Color color) {
+                setState(() {
+                  selectedColor = color;
+                });
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 390,
+          height: 844,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(color: Colors.white),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 9,
+                top: 759,
+                child: Container(
+                  width: 434,
+                  height: 81,
+                  decoration: BoxDecoration(color: Color(0xFFEAEAEA)),
+
+                ),
+              ),
+              Positioned(
+                left: 95,
+                top: 633,
+                child: Container(
+                  width: 43,
+                  height: 43,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFEFEFEF),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                top: 0,
+                child: Container(
+                  width: 390,
+                  height: 46,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 308.67,
+                        top: 17.33,
+                        child: Container(
+                          width: 66.66,
+                          height: 11.34,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 42.33,
+                                top: 0,
+                                child: Container(
+                                  width: 24.33,
+                                  height: 11.33,
+                                  child: Stack(children: [
+                                  ]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 42,
+                top: 62,
+                child: Text(
+                  '색칠하기',
+                  style: TextStyle(
+                    color: Color(0xFF505050),
+                    fontSize: 20,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w700,
+                    height: 0,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 8,
+                top: 96,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 41,
+                    height: 40,
+                    padding: const EdgeInsets.only(
+                      top: 11.87,
+                      left: 7.05,
+                      right: 7.05,
+                      bottom: 14.37,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: 0,
+                top: 122,
+                child: GestureDetector(
+                  onPanUpdate: (details) {
+                    _onPanUpdate(details);
+                  },
+                  child: Container(
+                    width: 390,
+                    height: 390,
+                    child: Stack( // Use a Stack widget to layer the image and drawing canvas
+                      children: [
+                        Image.memory(
+                          edgeImageBytes!,
+                          width: 500,
+                          height: 500,
+                          fit: BoxFit.fill,
+                        ),
+                        CustomPaint(
+                          size: Size(500, 500),
+                          painter: DrawingPainter(points, selectedColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: 8,
+                top: 755,
+                child: TextButton(
+                  onPressed: () {
+                    // Open the color picker when the button is pressed
+                    openColorPicker();
+                  },
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    decoration: ShapeDecoration(
+                      color: selectedColor,
+                      // color: Color(0xFFE55532),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),),
+              Positioned(
+                left: 90,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 90,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD9D9D9),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 129,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF738A9C),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 129,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF737D96),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 167,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF838184),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 167,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF6B696C),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 206,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFC4C2C5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 206,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFACAAAD),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 245,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFDFDFDF),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 245,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD7D2D6),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 284,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFF88185),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 284,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFCE5D59),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 322,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFF0967B),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 322,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFFF8173),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 361,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFDE0F39),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 361,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFFFA17B),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 599,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '지우개 모드',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 648,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '펜 선택',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+
+
+              Positioned(
+                left: 14,
+                top: 692,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '펜 두께(1px)',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 727,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '투명도(100)',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 106,
+                top: 599,
+                child: Container(
+                  width: 30,
+                  height: 16,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD9D9D9),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 104,
+                top: 597,
+                child: Container(
+                  width: 21,
+                  height: 21,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 12,
+                top: 521,
+                child: Container(
+                  width: 366,
+                  height: 56,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 366,
+                        height: 56,
+                        decoration: BoxDecoration(color: Color(0xFFE7E7E7)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 586,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 629,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 681,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 717,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 750,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 160,
+                top: 639,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(4.25),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 276,
+                top: 639,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(2.83),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 336,
+                top: 640,
+                child: Container(
+                  width: 41,
+                  padding: const EdgeInsets.only(
+                      left: 5.12, right: 5.12, bottom: 11.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 96,
+                top: 700,
+                child: Container(
+                  width: 10,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF4A4A4A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 701,
+                child: Container(
+                  width: 211,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFD6D6D6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 665,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 710,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 744,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: 125,
+                top: 694,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 125,
+                top: 693,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 359,
+                top: 691,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  padding: const EdgeInsets.all(3.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 96,
+                top: 733,
+                child: Container(
+                  width: 10,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF4A4A4A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 733,
+                child: Container(
+                  width: 211,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFD6D6D6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 733,
+                child: Container(
+                  width: 49,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF3D4ABE),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 174,
+                top: 725,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 359,
+                top: 724,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  padding: const EdgeInsets.all(3.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 336,
+                top: 60,
+                child: Container(
+                  width: 37,
+                  height: 37,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.62, vertical: 9.25),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 325,
+                top: 599,
+                child: Container(
+                  width: 15.35,
+                  height: 13.05,
+                  child: Stack(children: [
+                  ]),
+                ),
+              ),
+              Positioned(
+                left: 376.35,
+                top: 599,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(3.14),
+                  child: Container(
+                    width: 15.35,
+                    height: 13.05,
+                    child: Stack(children: [
+                    ]),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+      ],
+
+    );
   }
 }
 
+  class DrawingPainter extends CustomPainter {
+  final List<Offset?> points;
+  final Color color;
 
+  DrawingPainter(this.points, this.color);
 
+  @override
+  void paint(Canvas canvas, Size size) {
+  final paint = Paint()
+  ..color = color
+  ..strokeCap = StrokeCap.round
+  ..strokeWidth = 5.0;
 
+  for (int i = 0; i < points.length - 1; i++) {
+  if (points[i] != null && points[i + 1] != null) {
+  canvas.drawLine(points[i]!, points[i + 1]!, paint);
+  }
+  }
+  }
 
-
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-//
-// import 'package:arkit_plugin/arkit_plugin.dart';
-// import 'package:flutter_ar_example/ai/aiText.dart';
-// import 'package:flutter_ar_example/first.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:vector_math/vector_math_64.dart';
-// import 'package:vector_math/vector_math_64.dart' as vector;
-//
-// void main() {
-//   runApp(const MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: ManipulationPage(),
-//     );
-//   }
-// }
-//
-// class ManipulationPage extends StatefulWidget {
-//   @override
-//   _ManipulationPageState createState() => _ManipulationPageState();
-// }
-//
-// class _ManipulationPageState extends State<ManipulationPage> {
-//   ARKitController? arkitController;
-//   ARKitNode? imageNode;
-//   ARKitNode? textNode;
-//   bool isDragging = false;
-//   Vector3? lastPosition;
-//   List<ARKitNode> addedNodes = [];
-//   List<File> pickedImages = [];
-//   double scale = 1.0;
-//   double previousScale = 1.0;
-//   bool isSphere = false;
-//   List<String> selectedImages =[];
-//   Map<String, String> imageCaptions = {
-//     'images/gogh1.jpeg': '밤의 카페 테라스',
-//     'images/monet1.jpeg': '생타드레스의 해변가',
-//     'images/monet2.jpeg': '수련',
-//     'images/monet3.jpeg': '자화상',
-//     'images/monet4.jpeg': '파라솔을 든 여인',
-//     'images/gogh4.jpeg': '해바라기',
-//     // Add captions for the images in predefinedImages2 as well
-//     'images/ko1.jpeg': 'Korean Caption 1',
-//     'images/ko2.jpeg': 'Korean Caption 2',
-//     'images/ko3.jpeg': 'Korean Caption 3',
-//     'images/ko4.jpeg': 'Korean Caption 4',
-//     'images/ko5.jpeg': 'Korean Caption 5',
-//     'images/ko6.jpeg': 'Korean Caption 6',
-//   };
-//   List<String> predefinedImages = [
-//     'images/gogh1.jpeg',
-//     'images/monet1.jpeg',
-//     'images/monet2.jpeg',
-//     'images/monet3.jpeg',
-//     'images/monet4.jpeg',
-//     'images/gogh4.jpeg',
-//   ];
-//
-//   List<String> predefinedImages2 = [
-//     'images/ko1.jpeg',
-//     'images/ko2.jpeg',
-//     'images/ko3.jpeg',
-//     'images/ko4.jpeg',
-//     'images/ko5.jpeg',
-//     'images/ko6.jpeg',
-//   ];
-//
-//   bool showButtons = false;
-//
-//   void _showButtons() {
-//     setState(() {
-//       showButtons = true;
-//     });
-//   }
-//
-//   void _hideButtons() {
-//     setState(() {
-//       showButtons = false;
-//     });
-//   }
-//
-//   void _toggleButtons() {
-//     setState(() {
-//       showButtons = !showButtons;
-//     });
-//   }
-//
-//   @override
-//   void dispose() {
-//     arkitController?.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//
-//       backgroundColor:  Color(0x0),
-//       appBar: AppBar(
-//         leadingWidth: 113,
-//         toolbarHeight: 66,
-//         leading: gotoMainBtn(),
-//         backgroundColor: Color(0x27000000), // 투명으로 해도 appBar 자체 그림자 생김
-//         elevation: 0.0, // appBar 그림자 0.0 해주면 완전 투명됨
-//       ),
-//       body: Stack(
-//         alignment: Alignment.topCenter,
-//         children: [
-//           Container(
-//             child: GestureDetector(
-//               onTap: () {
-//                 _hideButtons();
-//               },
-//               onPanStart: _onPanStart,
-//               onPanUpdate: _onPanUpdate,
-//               child: ARKitSceneView(
-//                 onARKitViewCreated: _onARKitViewCreated,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//       floatingActionButton: Column(
-//         mainAxisAlignment: MainAxisAlignment.end,
-//         children: [
-//           FloatingActionButton(
-//             onPressed: () {
-//               _toggleButtons();
-//               _showPredefinedImages();
-//             },
-//             child: Icon(Icons.photo),
-//           ),
-//           SizedBox(height: 16),
-//           FloatingActionButton(
-//             onPressed: () {
-//               _toggleShape();
-//               // Handle the shape toggle button click
-//             },
-//             child: Icon(Icons.transform),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   void _onARKitViewCreated(ARKitController arkitController) {
-//     this.arkitController = arkitController;
-//     addNode();
-//   }
-//
-//   void addNode() {
-//     final defaultImage = AssetImage('images/star.jpeg');
-//
-//     final defaultMaterial = ARKitMaterial(
-//       diffuse: ARKitMaterialImage(defaultImage.assetName),
-//       doubleSided: true,
-//     );
-//
-//     final defaultGeometry = ARKitPlane(
-//       width: 0.5,
-//       height: 0.5,
-//       materials: [defaultMaterial],
-//     );
-//
-//     final defaultNode = ARKitNode(
-//       geometry: defaultGeometry,
-//       position: Vector3(0, 0, -0.7),
-//     );
-//     arkitController?.add(defaultNode);
-//     imageNode = defaultNode;
-//     addedNodes.add(defaultNode);
-//   }
-//
-//   void _onPanStart(DragStartDetails details) {
-//     if (imageNode != null) {
-//       isDragging = true;
-//       lastPosition = imageNode!.position;
-//     }
-//   }
-//
-//   void _onPanUpdate(DragUpdateDetails details) {
-//     if (isDragging && imageNode != null) {
-//       final currentPosition = imageNode!.position;
-//       final newPosition = vector.Vector3(
-//         currentPosition.x + details.delta.dx / 1000,
-//         currentPosition.y - details.delta.dy / 1000,
-//         currentPosition.z,
-//       );
-//
-//       imageNode!.position = newPosition;
-//
-//       // Update position for newly added images
-//       for (final node in addedNodes) {
-//         if (node != imageNode && node.geometry is ARKitPlane) {
-//           final nodePosition = node.position;
-//           final newNodePosition = vector.Vector3(
-//             nodePosition.x - details.delta.dx / 1000,
-//             nodePosition.y + details.delta.dy / 1000,
-//             nodePosition.z,
-//           );
-//
-//           node.position = newNodePosition;
-//         }
-//       }
-//     }
-//   }
-//
-//   void _showPredefinedImages() {
-//     setState(() {
-//       _updateSelectedImages(predefinedImages);
-//     });
-//     showModalBottomSheet(
-//       context: context,
-//       builder: (BuildContext context) {
-//         final int imagesPerPage = 9;
-//         final int pageCount = (selectedImages.length / imagesPerPage).ceil();
-//
-//         return Container(
-//           height: 300, // Increase the height of the container
-//           decoration: ShapeDecoration(
-//             color: Color(0xFF202020),
-//             shape: RoundedRectangleBorder(
-//
-//             ),
-//           ),
-//           child: Column(
-//             children: [
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   FloatingActionButton(
-//                     onPressed: () {
-//
-//                         _updateSelectedImages(predefinedImages);
-//
-//                     },
-//                     backgroundColor: Color(0x3C000000),
-//                     child: Text(
-//                       '동양풍',
-//                       style: TextStyle(fontSize: 12),
-//                     ),
-//                   ),
-//                   SizedBox(width: 40),
-//                   FloatingActionButton(
-//                     onPressed: () {
-//
-//                         _updateSelectedImages(predefinedImages2);
-//
-//                     },
-//                     backgroundColor: Color(0x3C000000),
-//                     child: Text(
-//                       '서양풍',
-//                       style: TextStyle(fontSize: 12),
-//                     ),
-//                   ),
-//                   SizedBox(width: 40),
-//                   FloatingActionButton(
-//                     onPressed: () {
-//                       _showUserPhotoAlbum();
-//                       // Handle 앨범 button click
-//                     },
-//                     backgroundColor: Color(0x3C000000),
-//                     child: Text(
-//                       '앨범',
-//                       style: TextStyle(fontSize: 12),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               Expanded(
-//                 child: ClipRRect(
-//                   child: PageView.builder(
-//                     itemCount: pageCount,
-//                     itemBuilder: (context, pageIndex) {
-//                       final startIndex = pageIndex * imagesPerPage;
-//                       final endIndex = (startIndex + imagesPerPage) < selectedImages.length
-//                           ? (startIndex + imagesPerPage)
-//                           : selectedImages.length;
-//                       final pageImages = selectedImages.sublist(startIndex, endIndex);
-//
-//                       return Container(
-//                         color: Color(0x0),//백그라운드
-//                         padding: EdgeInsets.symmetric(vertical: 14),
-//                         child: GridView.count(
-//                           crossAxisCount: 3,
-//                           padding: EdgeInsets.all(8),
-//                           crossAxisSpacing: 12,
-//                           mainAxisSpacing: 42,
-//                           children: List.generate(selectedImages.length, (index) {
-//                             final imagePath = selectedImages[index];
-//                             final caption = _getCaptionForImagePath(imagePath);
-//                             return GestureDetector(
-//                               onTap: () {
-//                                 //캡션은 지워야 함
-//                                 _addImageNode(imagePath,caption);
-//                                 Navigator.pop(context);
-//                               },
-//
-//                               child: GridTile(
-//                                 child: Column(
-//                                   children: [
-//                                     AspectRatio(
-//                                       aspectRatio: 1.0,
-//                                       child: Image.asset(
-//                                         imagePath,
-//                                         fit: BoxFit.cover,
-//                                       ),
-//                                     ),
-//                                     // SizedBox(height: 12),
-//
-//                             Flexible(
-//                             child: Text(
-//                             caption,
-//                             textAlign: TextAlign.center,
-//                             style: TextStyle(
-//                             fontSize: 12,
-//                             color: Color(0xffffffff), // Set the text color to white
-//                             ),
-//                             ),
-//                             ),
-//                                   ],
-//                                 ),
-//                                 ),
-//
-//
-//                             );
-//                           }),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       },
-//     );
-//   }
-//   Future<void> _showUserPhotoAlbum() async {
-//     final picker = ImagePicker();
-//     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-//
-//     if (pickedImage != null) {
-//       //꼭 추가!!
-//       // _addImageNode(pickedImage.path);
-//     }
-//   }
-//
-//   void _addImageNode(String imagePath, String caption) {
-//     // Remove previous image node and text node if they exist
-//     if (imageNode != null) {
-//       arkitController?.remove(imageNode!.name);
-//       addedNodes.remove(imageNode);
-//     }
-//
-//     final imageNodePosition = imageNode?.position ?? vector.Vector3.zero();
-//     final material = ARKitMaterial(
-//       diffuse: ARKitMaterialImage(imagePath),
-//       doubleSided: true,
-//     );
-//
-//     final geometry = isSphere
-//         ? ARKitSphere(radius: 0.15, materials: [material])
-//         : ARKitPlane(width: 0.5, height: 0.5, materials: [material]);
-//
-//     final node = ARKitNode(
-//       geometry: geometry,
-//       position: imageNodePosition + vector.Vector3(0.5, 0, 0),
-//     );
-//
-//     arkitController?.add(node);
-//     imageNode = node;
-//     addedNodes.add(node);
-//
-//     // Add text node with the caption
-//     final textGeometry = ARKitText(
-//       text: caption,
-//       extrusionDepth: 0,
-//       materials: [ARKitMaterial(
-//         diffuse: ARKitMaterialColor(Color(0x79525252)),
-//       )],
-//     );
-//
-//     final textNodePosition = imageNode!.position +vector.Vector3(-0.15, 0, -8.5) ; // Adjust the position of the text node relative to the image node
-//     final textNode = ARKitNode(
-//       geometry: textGeometry,
-//       position: textNodePosition,
-//       eulerAngles: vector.Vector3.zero(),
-//         scale: vector.Vector3(0.5, 0.5, 0.5), //글자 크기 설정
-//     );
-//
-//     arkitController?.add(textNode);
-//     addedNodes.add(textNode);
-//   }
-//
-//   void _updateSelectedImages(List<String> newImages) {
-//     selectedImages.clear(); // Clear the existing images
-//     selectedImages.addAll(newImages);
-//   }
-//
-//   void _toggleShape() {
-//     setState(() {
-//       isSphere = !isSphere;
-//       if (imageNode != null) {
-//         final imagePath = (imageNode?.geometry?.materials.value?.first?.diffuse as ARKitMaterialImage?)?.image;
-//         final material = ARKitMaterial(
-//           diffuse: ARKitMaterialImage(imagePath ?? ''),
-//           doubleSided: true,
-//         );
-//
-//         final geometry = isSphere
-//             ? ARKitSphere(radius: 0.25, materials: [material])
-//             : ARKitPlane(width: 0.5, height: 0.5, materials: [material]);
-//
-//         final newNode = ARKitNode(
-//           geometry: geometry,
-//           position: imageNode!.position,
-//         );
-//
-//         for (final node in addedNodes) {
-//           arkitController?.remove(node.name);
-//         }
-//         addedNodes.clear();
-//
-//         arkitController?.remove(imageNode!.name);
-//         arkitController?.add(newNode);
-//         imageNode = newNode;
-//         addedNodes.add(newNode);
-//       }
-//     });
-//   }
-//
-//   String _getCaptionForImagePath(String imagePath) {
-//     // Use the imageCaptions map to look up captions based on the image path
-//     final caption = imageCaptions[imagePath] ?? 'Default Caption'; // Provide a default caption if not found
-//     return caption;
-//   }
-// }
-
-
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+  return true;
+  }
+  }

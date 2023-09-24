@@ -371,6 +371,7 @@ class _CreatePostState extends State<CreatePost> {
     print(hashtag);
     final hashtagString = hashtag.join(',');
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     var accessToken = prefs.getString('accessToken');
 
     // Create FormData containing contestRequest data
