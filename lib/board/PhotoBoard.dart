@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // ignore_for_file: prefer_const_constructors
 
-
-
 void main() {
   runApp(const PhotoBoard());
 }
@@ -131,7 +129,7 @@ class AllPhotosScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(20), // 전체패딩
+            padding: EdgeInsets.fromLTRB(20, 20, 0, 20), // 아이폰 11 화면 대응
             child: Column(
               children: [
                 SizedBox(
@@ -179,7 +177,7 @@ class AllPhotosScreen extends StatelessWidget {
           ),
           Container(
             padding: EdgeInsets.all(20),
-            width: 390,
+            // width: 390, // 아이폰 11 화면 대응
             decoration: BoxDecoration(
                 color: Color(0xffF6F6F6),
                 border: Border(
@@ -272,8 +270,6 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Expanded(
       child: GridView.count(
         childAspectRatio: 1 / 1.3,
@@ -295,11 +291,9 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
 }
 
 List<Widget> createPhotos(BuildContext context) {
-
   List<Widget> images = [];
   List<String> urls = [];
 
-
   urls.add(
       'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
   urls.add(
@@ -319,8 +313,6 @@ List<Widget> createPhotos(BuildContext context) {
       'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
   urls.add(
       'https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201503/10/htm_201503101403340104011.jpg');
-
-
 
   List<String> UserProfileImg = [];
   UserProfileImg.add(
@@ -362,7 +354,7 @@ List<Widget> createPhotos(BuildContext context) {
     Widget image = Card(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey, width: 1)),
+          side: BorderSide(color: Colors.grey, width: 0.5)), // 테두리 굵기 조절
       child: Padding(
         padding: EdgeInsets.all(5),
         child: Column(
@@ -384,29 +376,91 @@ List<Widget> createPhotos(BuildContext context) {
                   child: HeartButton2(),
                   top: 1,
                   right: 1,
-                )
+                ),
               ],
             ),
             Expanded(
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 15, //
-                    backgroundImage: NetworkImage(UserProfileImg[i]),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 5,
+                      ),
+                      CircleAvatar(
+                        radius: 15, //
+                        backgroundImage: NetworkImage(UserProfileImg[i]),
+                      ),
+                    ],
                   ),
                   Container(
-                    width: 85,
-                    padding: EdgeInsets.fromLTRB(6, 7, 9, 4),
-                    child: Text(
-                      PostTitle[i], // 게시글 제목
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: Color(0xFF535252),
-                        fontSize: 12,
-                        fontFamily: 'SUIT',
-                        fontWeight: FontWeight.w600,
-                      ),
+                    width: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 85,
+                          padding: EdgeInsets.fromLTRB(6, 7, 9, 4),
+                          child: Text(
+                            PostTitle[i], // 게시글 제목
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            style: TextStyle(
+                              color: Color(0xFF535252),
+                              fontSize: 12,
+                              fontFamily: 'SUIT',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.remove_red_eye_outlined,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              '1111',
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              '11',
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                            Icon(
+                              Icons.favorite_border,
+                              size: 15,
+                              color: Color(0xffBDBDBD),
+                            ),
+                            Text(
+                              '111',
+                              style: TextStyle(
+                                color: Color(0xffBDBDBD),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                   Expanded(
@@ -420,62 +474,6 @@ List<Widget> createPhotos(BuildContext context) {
                 ],
               ),
             ),
-            Row(
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.remove_red_eye_outlined,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      '11111',
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-
-                Row(
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      '11111',
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.favorite_border,
-                      size: 15,
-                      color: Color(0xffBDBDBD),
-                    ),
-                    Text(
-                      '11111',
-                      style: TextStyle(
-                        color: Color(0xffBDBDBD),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
           ],
         ),
       ),
@@ -619,7 +617,7 @@ List<Widget> Best5(int numImg) {
             image: DecorationImage(
                 fit: BoxFit.cover,
                 image: NetworkImage(Best5ImgUrls[i]) //Best5 사진 url
-            ),
+                ),
           ),
         ),
         Positioned(
@@ -761,9 +759,6 @@ class AIPhotosScreen extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-
-
-
           Container(
             padding: EdgeInsets.all(20),
             width: 390,
@@ -773,7 +768,6 @@ class AIPhotosScreen extends StatelessWidget {
                     top: BorderSide(color: Color(0xff444444), width: 0.2))),
             child: GridViewPhotos(),
           ),
-
         ],
       ),
     );
@@ -788,9 +782,6 @@ class NormalPhotosScreen extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-
-
-
           Container(
             padding: EdgeInsets.all(20),
             width: 390,
@@ -800,7 +791,6 @@ class NormalPhotosScreen extends StatelessWidget {
                     top: BorderSide(color: Color(0xff444444), width: 0.2))),
             child: GridViewPhotos(),
           ),
-
         ],
       ),
     );

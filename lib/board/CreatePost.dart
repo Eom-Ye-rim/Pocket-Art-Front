@@ -53,70 +53,102 @@ class _CreatePostState extends State<CreatePost> {
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(21),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 346,
-                height: 346,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 0.50, color: Colors.grey),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 346,
+                  height: 346,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(width: 0.50, color: Colors.grey),
+                    ),
+                  ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      print("사진 추가 ");
+                      var picker = ImagePicker();
+                      var image =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      if (image != null) {
+                        setState(() {
+                          _pickedFile = image;
+                        });
+                      }
+                    },
+                    child: _pickedFile != null
+                        ? Container(
+                            width: 346,
+                            height: 346,
+                            child: Image.file(
+                              File(_pickedFile!.path),
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Container(
+                            width: 346,
+                            height: 346,
+                            color: Colors.transparent, // 빈 상자 채우기용
+                            child: Icon(
+                              Icons.camera_alt_outlined,
+                              size: 30,
+                              color: Color(0xff4A61DE),
+                            ),
+                          ),
                   ),
                 ),
-                child: GestureDetector(
-                  onTap: () async {
-                    print("사진 추가 ");
-                    var picker = ImagePicker();
-                    var image =
-                        await picker.pickImage(source: ImageSource.gallery);
-                    if (image != null) {
-                      setState(() {
-                        _pickedFile = image;
-                      });
-                    }
-                  },
-                  child: _pickedFile != null
-                      ? Container(
-                          width: 346,
-                          height: 346,
-                          child: Image.file(
-                            File(_pickedFile!.path),
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Container(
-                          width: 346,
-                          height: 346,
-                          color: Colors.transparent, // 빈 상자 채우기용
-                          child: Icon(
-                            Icons.camera_alt_outlined,
-                            size: 30,
-                            color: Color(0xff4A61DE),
-                          ),
-                        ),
+                SizedBox(
+                  height: 26,
                 ),
-              ),
-              SizedBox(
-                height: 26,
-              ),
-              Text(
-                '제목',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                Text(
+                  '제목',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Container(
+                SizedBox(
+                  height: 6,
+                ),
+                Container(
+                    padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
+                    width: 346,
+                    height: 55,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 0.50, color: Colors.grey),
+                      ),
+                    ),
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '제목을 입력하세요.',
+                      ),
+                    )),
+                SizedBox(
+                  height: 35,
+                ),
+                Text(
+                  '내용',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Container(
                   padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
                   width: 346,
-                  height: 55,
+                  height: 163,
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -124,113 +156,80 @@ class _CreatePostState extends State<CreatePost> {
                     ),
                   ),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '제목을 입력하세요.',
-                    ),
-                  )),
-              SizedBox(
-                height: 35,
-              ),
-              Text(
-                '내용',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      maxLength: 800,
+                      decoration: InputDecoration(
+                        hintText: '내용을 입력하세요.',
+                        border: InputBorder.none,
+                      )),
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(13, 0, 13, 0),
-                width: 346,
-                height: 163,
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(width: 0.50, color: Colors.grey),
+                SizedBox(
+                  height: 25,
+                ),
+                Text(
+                  '화풍',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                child: TextFormField(
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    maxLength: 800,
-                    decoration: InputDecoration(
-                      hintText: '내용을 입력하세요.',
-                      border: InputBorder.none,
-                    )),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text(
-                '화풍',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                SizedBox(
+                  height: 6,
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              CustomToggleButtons(),
-              SizedBox(
-                height: 42,
-              ),
-              Text(
-                '태그설정',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontFamily: 'SUIT',
-                  fontWeight: FontWeight.w500,
+                CustomToggleButtons(),
+                SizedBox(
+                  height: 42,
                 ),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              TagInputChip(),
-
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                child: FilledButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Color(0xFF363636),
-                    ),
+                Text(
+                  '태그설정',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w500,
                   ),
-                  onPressed: () {},
-                  child: Center(
-                    child: Text(
-                      '업로드',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontFamily: 'SUIT',
-                        fontWeight: FontWeight.w700,
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                TagInputChip(),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        Color(0xFF363636),
                       ),
-                      textAlign: TextAlign.right,
+                    ),
+                    onPressed: () {},
+                    child: Center(
+                      child: Text(
+                        '업로드',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: 'SUIT',
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ),
+                  width: 356,
+                  height: 56,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32.50),
                     ),
                   ),
                 ),
-                width: 356,
-                height: 56,
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32.50),
-                  ),
-                ),
-              ),
-
-
-            ],
+              ],
+            ),
           ),
         ),
       ),
