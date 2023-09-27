@@ -1,1604 +1,1430 @@
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_ar_example/main.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:arkit_plugin/arkit_plugin.dart';
-// import 'package:vector_math/vector_math_64.dart' as vector;
-// import 'package:flutter/material.dart';
+
+import 'dart:typed_data';
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'dart:async';
+import 'dart:ui' as ui;
+
+
+void main() {
+  runApp(const FigmaToCodeApp());
+}
+
+class FigmaToCodeApp extends StatelessWidget {
+  const FigmaToCodeApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body:
+          Frame427320811(),
+        ),
+      );
+  }
+}
+
+class Frame427320811 extends StatefulWidget {
+  @override
+  _MyCanvasState createState() => _MyCanvasState();
+}
+
+enum BrushShape {
+  Circle, // 점
+  Line,   // 선
+  Square, //
+}
+
+class _MyCanvasState extends State<Frame427320811> {
+  List<Offset?> points = <Offset?>[];
+  Color selectedColor = Colors.black; // Default color
+  ui.Image? edgeImage;
+  Uint8List? edgeImageBytes;
+
+  // 브러쉬 모양 결정
+  BrushShape selectedBrushShape = BrushShape.Circle; // Initial brush shape
+  Map<BrushShape, List<Offset>> brushPoints = {
+    BrushShape.Circle: [],
+    BrushShape.Line: [],
+    BrushShape.Square: [],
+  };
+
+  Map<Color, Map<BrushShape, List<Offset>>> colorPoints = {
+    Colors.black: {
+      BrushShape.Circle: [],
+      BrushShape.Line: [],
+      BrushShape.Square: [],
+    },
+  };
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    setState(() {
+      RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final selectedPoints = brushPoints[selectedBrushShape]; // Get points for selected brush
+      final localPosition = renderBox.globalToLocal(details.globalPosition);
+
+      // Ensure that the selectedPoints list is not null
+      if (selectedPoints != null) {
+        // Add the current drawing point to the selected brush shape's points
+        selectedPoints.add(localPosition);
+        // Update the points for the selected color and brush shape
+        colorPoints[selectedColor]![selectedBrushShape] = selectedPoints;
+      }
+    });
+  }
+
+
+  void _changeColor(Color newColor) {
+    setState(() {
+      selectedColor = newColor;
+    });
+  }
+
+  void _changeBrushShape(BrushShape newBrushShape) {
+    setState(() {
+      selectedBrushShape = newBrushShape;
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadImage();
+  }
+
+  // Load the "edge.jpeg" image
+  Future<void> loadImage() async {
+    final imageProvider = AssetImage('images/edge.jpeg');
+    final image = await loadImageFromProvider(imageProvider);
+
+    // Convert the image to bytes
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    edgeImageBytes = byteData!.buffer.asUint8List();
+
+    setState(() {
+      edgeImage = image;
+    });
+  }
+
+
+
+
+  Future<ui.Image> loadImageFromProvider(ImageProvider provider) async {
+    final completer = Completer<ui.Image>();
+    final imageStream = provider.resolve(const ImageConfiguration());
+
+    imageStream.addListener(
+      ImageStreamListener(
+            (imageInfo, _) {
+          completer.complete(imageInfo.image);
+        },
+        onError: (dynamic exception, StackTrace? stackTrace) {
+          completer.completeError(exception, stackTrace);
+        },
+      ),
+    );
+
+    return completer.future;
+  }
+
+  void openColorPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select a color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: selectedColor,
+              onColorChanged: (Color color) {
+                setState(() {
+                  selectedColor = color;
+                });
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 390,
+          height: 844,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(color: Colors.white),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 9,
+                top: 759,
+                child: Container(
+                  width: 434,
+                  height: 81,
+                  decoration: BoxDecoration(color: Color(0xFFEAEAEA)),
+
+                ),
+              ),
+              Positioned(
+                left: 95,
+                top: 633,
+                child: Container(
+                  width: 43,
+                  height: 43,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFEFEFEF),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                top: 0,
+                child: Container(
+                  width: 390,
+                  height: 46,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: 308.67,
+                        top: 17.33,
+                        child: Container(
+                          width: 66.66,
+                          height: 11.34,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 42.33,
+                                top: 0,
+                                child: Container(
+                                  width: 24.33,
+                                  height: 11.33,
+                                  child: Stack(children: [
+                                  ]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 42,
+                top: 62,
+                child: Text(
+                  '색칠하기',
+                  style: TextStyle(
+                    color: Color(0xFF505050),
+                    fontSize: 20,
+                    fontFamily: 'SUIT',
+                    fontWeight: FontWeight.w700,
+                    height: 0,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 8,
+                top: 96,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 41,
+                    height: 40,
+                    padding: const EdgeInsets.only(
+                      top: 11.87,
+                      left: 7.05,
+                      right: 7.05,
+                      bottom: 14.37,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                      ],
+                    ),
+                  ),
+                ),
+              ),Positioned(
+                  left: 0,
+                  top: 122,
+                  child: GestureDetector(
+                    onPanUpdate: _onPanUpdate,
+                    child: Container(
+                      width: 390,
+                      height: 390,
+                      child: Stack(
+                        children: [
+                          Image.memory(
+                            edgeImageBytes!,
+                            width: 500,
+                            height: 500,
+                            fit: BoxFit.fill,
+                          ),
+                        CustomPaint(
+                          size: Size(500, 500),
+                          painter: DrawingPainter(
+                            colorPoints: colorPoints,
+                            selectedColor: selectedColor,
+                            selectedBrushShape: selectedBrushShape,
+                          ),
+                        ),
+                    ],
+                      ),
+                    ),
+                  ),
+                ),
+
+              Positioned(
+                left: 8,
+                top: 755,
+                child: TextButton(
+                  onPressed: () {
+                    // Open the color picker when the button is pressed
+                    openColorPicker();
+                  },
+                  child: Container(
+                    width: 70,
+                    height: 70,
+                    decoration: ShapeDecoration(
+                      color: selectedColor,
+                      // color: Color(0xFFE55532),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),),
+              Positioned(
+                left: 90,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 90,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD9D9D9),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 129,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF738A9C),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 129,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF737D96),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 167,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF838184),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 167,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF6B696C),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 206,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFC4C2C5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 206,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFACAAAD),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 245,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFDFDFDF),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 245,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD7D2D6),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 284,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFF88185),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 284,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFCE5D59),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 322,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFF0967B),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 322,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFFF8173),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 361,
+                top: 804,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFDE0F39),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 361,
+                top: 765,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFFFA17B),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 599,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '지우개 모드',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 648,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '펜 선택',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+
+              //펜 1, 점
+              Positioned(
+                left: 100,
+                top: 638,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedBrushShape = BrushShape.Circle;
+                    });
+                  },
+                child: SizedBox(
+                  width: 34,
+                  height: 34,
+                  child:  Image.asset(
+                    'images/pen1.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                  ),
+                ),
+              ),
+
+              //펜 2, 선
+              Positioned(
+                left: 150,
+                top: 638,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedBrushShape = BrushShape.Line;
+                    });
+                  },
+                child: SizedBox(
+                  width: 34,
+                  height: 34,
+                  child:  Image.asset(
+                    'images/pen2.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                ),
+              ),
+              ),
+
+              //펜 3 ,면
+              Positioned(
+                left: 200,
+                top: 638,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedBrushShape = BrushShape.Square;
+                    });
+                  },
+                child: SizedBox(
+                  width: 34,
+                  height: 34,
+                  child:  Image.asset(
+                    'images/pen3.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                ),
+              ),
+              ),
+              //펜 4 ,채우기
+              Positioned(
+                left: 250,
+                top: 638,
+                child: SizedBox(
+                  width: 34,
+                  height: 34,
+                  child:  Image.asset(
+                    'images/pen4.png',
+                    width: 34,
+                    height: 34,
+                  ),
+                ),
+              ),
+
+
+
+              Positioned(
+                left: 14,
+                top: 692,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '펜 두께(1px)',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 14,
+                top: 727,
+                child: SizedBox(
+                  width: 91,
+                  height: 14,
+                  child: Text(
+                    '투명도(100)',
+                    style: TextStyle(
+                      color: Color(0xFF3C3C3C),
+                      fontSize: 13,
+                      fontFamily: 'Apple SD Gothic Neo',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 106,
+                top: 599,
+                child: Container(
+                  width: 30,
+                  height: 16,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFD9D9D9),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 104,
+                top: 597,
+                child: Container(
+                  width: 21,
+                  height: 21,
+                  decoration: ShapeDecoration(
+                    color: Colors.white,
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 12,
+                top: 521,
+                child: Container(
+                  width: 366,
+                  height: 56,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 366,
+                        height: 56,
+                        decoration: BoxDecoration(color: Color(0xFFE7E7E7)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 586,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 629,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 681,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 717,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                top: 750,
+                child: Container(
+                  width: 375,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 0.20,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF868686),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 160,
+                top: 639,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(4.25),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 276,
+                top: 639,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(2.83),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 336,
+                top: 640,
+                child: Container(
+                  width: 41,
+                  padding: const EdgeInsets.only(
+                      left: 5.12, right: 5.12, bottom: 11.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 96,
+                top: 700,
+                child: Container(
+                  width: 10,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF4A4A4A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 701,
+                child: Container(
+                  width: 211,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFD6D6D6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 665,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 710,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 84,
+                top: 744,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(-1.57),
+                  child: Container(
+                    width: 21,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 0.50,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          color: Color(0xFFBCBCBC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: 125,
+                top: 694,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 125,
+                top: 693,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 359,
+                top: 691,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  padding: const EdgeInsets.all(3.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 96,
+                top: 733,
+                child: Container(
+                  width: 10,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF4A4A4A),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 733,
+                child: Container(
+                  width: 211,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFD6D6D6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 130,
+                top: 733,
+                child: Container(
+                  width: 49,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 3,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFF3D4ABE),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 174,
+                top: 725,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF5363FA),
+                    shape: OvalBorder(),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x3F000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 0),
+                        spreadRadius: 0,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 359,
+                top: 724,
+                child: Container(
+                  width: 19,
+                  height: 19,
+                  padding: const EdgeInsets.all(3.96),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 336,
+                top: 60,
+                child: Container(
+                  width: 37,
+                  height: 37,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4.62, vertical: 9.25),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 325,
+                top: 599,
+                child: Container(
+                  width: 15.35,
+                  height: 13.05,
+                  child: Stack(children: [
+                  ]),
+                ),
+              ),
+              Positioned(
+                left: 376.35,
+                top: 599,
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..translate(0.0, 0.0)
+                    ..rotateZ(3.14),
+                  child: Container(
+                    width: 15.35,
+                    height: 13.05,
+                    child: Stack(children: [
+                    ]),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+      ],
+
+    );
+  }
+}
+class DrawingPainter extends CustomPainter {
+  final Map<Color, Map<BrushShape, List<Offset>>> colorPoints;
+  final Color selectedColor; // 사용자가 선택한 색상
+  final BrushShape selectedBrushShape; // 사용자가 선택한 브러쉬 모양
+
+  DrawingPainter({
+    required this.colorPoints,
+    required this.selectedColor,
+    required this.selectedBrushShape,
+  });
+
+
+  @override
+  @override
+  void paint(Canvas canvas, Size size) {
+    colorPoints.forEach((color, shapePoints) {
+      shapePoints.forEach((shape, points) {
+        if (color == selectedColor && shape == selectedBrushShape) {
+          final paint = Paint()
+            ..color = color
+            ..strokeCap = StrokeCap.round
+            ..strokeWidth = shape == BrushShape.Square ? 10.0 : 5.0; // Adjust width for different shapes
+
+          for (int i = 0; i < points.length - 1; i++) {
+            if (points[i] != null && points[i + 1] != null) {
+              if (shape == BrushShape.Line) {
+                canvas.drawLine(points[i], points[i + 1], paint);
+              } else if (shape == BrushShape.Circle) {
+                final radius = _calculateDistance(points[i], points[i + 1]) / 2.0;
+                canvas.drawCircle(points[i], radius, paint);
+              } else if (shape == BrushShape.Square) {
+                final size = _calculateDistance(points[i], points[i + 1]);
+                final rect = Rect.fromPoints(
+                  points[i],
+                  Offset(points[i].dx + size, points[i].dy + size),
+                );
+                canvas.drawRect(rect, paint);
+              }
+            }
+          }
+        }
+      });
+    });
+  }
+
+  double _calculateDistance(Offset p1, Offset p2) {
+    final dx = p1.dx - p2.dx;
+    final dy = p1.dy - p2.dy;
+    return math.sqrt(dx * dx + dy * dy);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+
+
+// import 'dart:ui';
 //
-// class SecondRoute extends StatelessWidget {
-//   const SecondRoute({Key? key}) : super(key: key);
+// import 'package:flutter/material.dart';
+// import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 //
+// void main() => runApp(MyApp());
+//
+// enum BrushShape { point, line, fill }
+//
+// class MyApp extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
 //     return MaterialApp(
-//       title: 'Flutter Demo',
-//       home: ManipulationPage(),
+//       title: '간단한 그림판',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: MyHomePage(),
 //     );
 //   }
 // }
 //
-//
-//
-// class ManipulationPage extends StatefulWidget {
+// class MyHomePage extends StatefulWidget {
 //   @override
-//   _ManipulationPageState createState() => _ManipulationPageState();
+//   _MyHomePageState createState() => _MyHomePageState();
 // }
 //
-// class _ManipulationPageState extends State<ManipulationPage> {
-//   ARKitController? arkitController;
-//   ARKitNode? imageNode;
-//   bool isDragging = false;
-//   vector.Vector3? lastPosition;
-//   List<ARKitNode> addedNodes = [];
+// class _MyHomePageState extends State<MyHomePage> {
+//   Color _selectedColor = Colors.black;
+//   double _brushSize = 5.0;
+//   BrushShape _brushShape = BrushShape.line; // 기본 브러시 모양
+//   List<Offset?> _points = [];
 //
-//   List<File> pickedImages = [];
-//
-//   @override
-//   void dispose() {
-//     arkitController?.dispose();
-//     super.dispose();
-//   }
-//
-//   //context:  지금 위젯이 누구인지 알려줌
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       appBar: AppBar(title: const Text('Manipulation Sample'),
-//       leading: IconButton(
-//       icon: Icon(Icons.arrow_back),
-//       onPressed: () {
-//         Navigator.push(
-//             context,
-//             MaterialPageRoute(builder: (context) => const FirstRoute()),);
-//       },),),
-//       body: Container(
-//         child: GestureDetector(
-//           onPanStart: _onPanStart,
-//           onPanUpdate: _onPanUpdate,
-//           onPanEnd: _onPanEnd,
-//           child: ARKitSceneView(
-//             onARKitViewCreated: _onARKitViewCreated,
-//           ),
+//       appBar: AppBar(
+//         title: Text('간단한 그림판'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: <Widget>[
+//             Container(
+//               width: 300,
+//               height: 300,
+//               decoration: BoxDecoration(
+//                 border: Border.all(color: Colors.black),
+//               ),
+//               child: GestureDetector(
+//                 onPanUpdate: (details) {
+//                   setState(() {
+//                     RenderBox renderBox = context.findRenderObject() as RenderBox;
+//                     _points.add(renderBox.globalToLocal(details.globalPosition));
+//                   });
+//                 },
+//                 onPanEnd: (details) {
+//                   _points.add(null);
+//                 },
+//                 child: CustomPaint(
+//                   painter: MyPainter(
+//                     points: _points,
+//                     color: _selectedColor,
+//                     brushSize: _brushSize,
+//                     brushShape: _brushShape,
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: 20),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Text('색상 선택: '),
+//                 Container(
+//                   width: 30,
+//                   height: 30,
+//                   color: _selectedColor,
+//                 ),
+//                 SizedBox(width: 10),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     _showColorPickerDialog(context);
+//                   },
+//                   child: Text('색상 변경'),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: 10),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Text('펜 굵기: '),
+//                 Slider(
+//                   value: _brushSize,
+//                   min: 1.0,
+//                   max: 20.0,
+//                   onChanged: (value) {
+//                     setState(() {
+//                       _brushSize = value;
+//                     });
+//                   },
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: 10),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Text('브러시 모양: '),
+//                 DropdownButton<BrushShape>(
+//                   value: _brushShape,
+//                   onChanged: (value) {
+//                     setState(() {
+//                       _brushShape = value!;
+//                     });
+//                   },
+//                   items: BrushShape.values.map((shape) {
+//                     return DropdownMenuItem<BrushShape>(
+//                       value: shape,
+//                       child: Text(shape.toString().split('.').last),
+//                     );
+//                   }).toList(),
+//                 ),
+//               ],
+//             ),
+//             SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () {
+//                 setState(() {
+//                   _points.clear();
+//                 });
+//               },
+//               child: Text('지우기'),
+//             ),
+//           ],
 //         ),
 //       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: _pickImagesFromGallery,
-//         child: Icon(Icons.photo),
-//       ),
 //     );
 //   }
 //
-//   void _onARKitViewCreated(ARKitController arkitController) {
-//     this.arkitController = arkitController;
-//     addNode();
-//   }
-//
-//   void addNode() {
-//     final defaultImage = AssetImage('images/italy.jpeg');
-//
-//     final defaultMaterial = ARKitMaterial(
-//       diffuse: ARKitMaterialImage(defaultImage.assetName),
-//       doubleSided: true,
+//   void _showColorPickerDialog(BuildContext context) {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('색상 선택'),
+//           content: SingleChildScrollView(
+//             child: ColorPicker(
+//               pickerColor: _selectedColor,
+//               onColorChanged: (color) {
+//                 setState(() {
+//                   _selectedColor = color;
+//                 });
+//               },
+//               pickerAreaHeightPercent: 0.8,
+//             ),
+//           ),
+//           actions: <Widget>[
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
+//               child: Text('확인'),
+//             ),
+//           ],
+//         );
+//       },
 //     );
-//
-//     final defaultGeometry = ARKitSphere(
-//       radius: 0.1,
-//       materials: [defaultMaterial],
-//     );
-//
-//     final defaultNode = ARKitNode(
-//       geometry: defaultGeometry,
-//       position: vector.Vector3(0, 0, -0.5),
-//     );
-//
-//     arkitController?.add(defaultNode);
-//     imageNode = defaultNode;
-//     addedNodes.add(defaultNode);
 //   }
+// }
 //
-//   void _onPanStart(DragStartDetails details) {
-//     if (imageNode != null) {
-//       isDragging = true;
-//       lastPosition = imageNode!.position;
-//     }
-//   }
+// class MyPainter extends CustomPainter {
+//   final List<Offset?> points;
+//   final Color color;
+//   final double brushSize;
+//   final BrushShape brushShape;
 //
-//   void _onPanUpdate(DragUpdateDetails details) {
-//     if (isDragging && imageNode != null) {
-//       final currentPosition = imageNode!.position;
-//       final newPosition = vector.Vector3(
-//         currentPosition.x + details.delta.dx / 1000,
-//         currentPosition.y - details.delta.dy / 1000,
-//         currentPosition.z,
-//       );
+//   MyPainter({
+//     required this.points,
+//     required this.color,
+//     required this.brushSize,
+//     required this.brushShape,
+//   });
 //
-//       imageNode!.position = newPosition;
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     Paint paint = Paint()
+//       ..color = color
+//       ..strokeCap = StrokeCap.round
+//       ..strokeWidth = brushSize;
 //
-//       // Update position for newly added images
-//       for (final node in addedNodes) {
-//         if (node != imageNode && node.geometry is ARKitSphere) {
-//           final nodePosition = node.position;
-//           final newNodePosition = vector.Vector3(
-//             nodePosition.x - details.delta.dx / 1000,  // Reverse the direction of movement
-//             nodePosition.y + details.delta.dy / 1000,  // Reverse the direction of movement
-//             nodePosition.z,
-//           );
-//
-//           node.position = newNodePosition;
+//     for (int i = 0; i < points.length - 1; i++) {
+//       if (points[i] != null && points[i + 1] != null) {
+//         if (brushShape == BrushShape.line) {
+//           canvas.drawLine(points[i]!, points[i + 1]!, paint);
+//         } else if (brushShape == BrushShape.point) {
+//           canvas.drawPoints(PointMode.points, [points[i]!], paint);
+//         } else if (brushShape == BrushShape.fill) {
+//           paint.strokeWidth = brushSize * 2; // 면 그리기는 선 굵기를 두 배로 설정
+//           canvas.drawLine(points[i]!, points[i + 1]!, paint);
+//         }
+//       } else if (points[i] != null && points[i + 1] == null) {
+//         if (brushShape == BrushShape.point) {
+//           canvas.drawPoints(PointMode.points, [points[i]!], paint);
 //         }
 //       }
 //     }
 //   }
 //
-//
-//   void _onPanEnd(DragEndDetails details) {
-//     isDragging = false;
-//     lastPosition = null;
-//   }
-//
-//   Future<void> _pickImagesFromGallery() async {
-//     final picker = ImagePicker();
-//     final pickedFiles = await picker.pickMultiImage();
-//
-//     if (pickedFiles != null) {
-//       setState(() {
-//         pickedImages =
-//             pickedFiles.map((pickedFile) => File(pickedFile.path)).toList();
-//       });
-//
-//       for (final imageFile in pickedImages) {
-//         final imageNodePosition = imageNode?.position ?? vector.Vector3.zero();
-//         final material = ARKitMaterial(
-//           diffuse: ARKitMaterialImage(imageFile.path),
-//           doubleSided: true,
-//         );
-//
-//         final geometry = ARKitSphere(
-//           radius: 0.1,
-//           materials: [material],
-//         );
-//
-//         final node = ARKitNode(
-//           geometry: geometry,
-//           position: imageNodePosition + vector.Vector3(0.2, 0, 0),
-//         );
-//
-//         arkitController?.add(node);
-//         addedNodes.add(node);
-//       }
-//     }
+//   @override
+//   bool shouldRepaint(CustomPainter oldDelegate) {
+//     return true;
 //   }
 // }
-
-
-
-//
-//
-// // class MyHomePage extends StatefulWidget {
-// //    MyHomePage({Key?key, required this.title}):super(key: key);
-// //
-// //   // This widget is the home page of your application. It is stateful, meaning
-// //   // that it has a State object (defined below) that contains fields that affect
-// //   // how it looks.
-// //
-// //   // This class is the configuration for the state. It holds the values (in this
-// //   // case the title) provided by the parent (in this case the App widget) and
-// //   // used by the build method of the State. Fields in a Widget subclass are
-// //   // always marked "final".
-// //
-// //   final String title;
-// //
-// //   @override
-// //   State<MyHomePage> createState() => _MyHomePageState();
-// // }
-// //
-// // class _MyHomePageState extends State<MyHomePage> {
-// //
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //         appBar: AppBar(title: Text(widget.title)),
-// //         body: ARKitSceneView(
-// //           onARKitViewCreated: (controller) => arView(controller),)
-// //     );
-// //   }
-// // }
-// //
-// // void arView(ARKitController controller){
-// //
-// //       final nodeAr = ARKitNode(
-// //         geometry: ARKitSphere(
-// //             materials: [
-// //               ARKitMaterial(
-// //                   diffuse:ARKitMaterialProperty.image("images/change.png"),
-// //                   doubleSided: true,
-// //               ),
-// //             ],
-// //           radius: 1
-// //         ),
-// //         position: Vector3(0,0,0),
-// //       );
-// //       controller.add(nodeAr);
-// //   }
-//
-// // import 'package:flutter/material.dart';
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:vector_math/vector_math_64.dart';
-// //
-// // void main() => runApp(MaterialApp(home: MyApp()));
-// //
-// // class MyApp extends StatefulWidget {
-// //   @override
-// //   _MyAppState createState() => _MyAppState();
-// // }
-// //
-// // class _MyAppState extends State<MyApp> {
-// //   late ARKitController arkitController;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //       appBar: AppBar(title: const Text('ARKit in Flutter')),
-// //       body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     final node = ARKitNode(
-// //         geometry: ARKitSphere(radius: 0.1), position: Vector3(0, 0, -0.5));
-// //     this.arkitController.add(node);
-// //   }
-// // }
-//
-//
-//
-//
-//
-// //panorama
-// import 'package:arkit_plugin/arkit_plugin.dart';
-// import 'package:flutter/material.dart';
-// import 'package:vector_math/vector_math_64.dart';
-//
-// void main() => runApp(MaterialApp(home: PanoramaPage()));
-//
-// class PanoramaPage extends StatefulWidget {
-//   @override
-//   _PanoramaPageState createState() => _PanoramaPageState();
-// }
-//
-// class _PanoramaPageState extends State<PanoramaPage> {
-//   late ARKitController arkitController;
-//
-//   @override
-//   void dispose() {
-//     arkitController.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) => Scaffold(
-//     appBar: AppBar(title: const Text('Panorama Sample')),
-//     body: Container(
-//       child: ARKitSceneView(
-//         onARKitViewCreated: onARKitViewCreated,
-//       ),
-//     ),
-//   );
-//
-//   void onARKitViewCreated(ARKitController arkitController) {
-//     this.arkitController = arkitController;
-//
-//     final material = ARKitMaterial(
-//       diffuse: ARKitMaterialProperty.image('images/museum.jpeg'),
-//       doubleSided: true,
-//     );
-//     final sphere = ARKitSphere(
-//       materials: [material],
-//       radius: 1,
-//     );
-//
-//     final node = ARKitNode(
-//       geometry: sphere,
-//       position: Vector3.zero(),
-//       eulerAngles: Vector3.zero(),
-//     );
-//     this.arkitController.add(node);
-//   }
-// }
-//
-
-//
-// //
-// // import 'dart:async';
-// //
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // void main() {
-// //   runApp(ImageDetectionPage());
-// // }
-// //
-// // class ImageDetectionPage extends StatefulWidget {
-// //   @override
-// //   _ImageDetectionPageState createState() => _ImageDetectionPageState();
-// // }
-// //
-// // class _ImageDetectionPageState extends State<ImageDetectionPage> {
-// //   late ARKitController arkitController;
-// //   Timer? timer;
-// //   bool anchorWasFound = false;
-// //
-// //   @override
-// //   void dispose() {
-// //     timer?.cancel();
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Image Detection Sample')),
-// //     body: Container(
-// //       child: Stack(
-// //         fit: StackFit.expand,
-// //         children: [
-// //           ARKitSceneView(
-// //             detectionImagesGroupName: 'AR Resources',
-// //             onARKitViewCreated: onARKitViewCreated,
-// //           ),
-// //           anchorWasFound
-// //               ? Container()
-// //               : Padding(
-// //             padding: const EdgeInsets.all(8.0),
-// //             child: Text(
-// //               'Point the camera at the earth image from the article about Earth on Wikipedia.',
-// //               style: Theme.of(context)
-// //                   .textTheme
-// //                   .headlineSmall
-// //                   ?.copyWith(color: Colors.white),
-// //             ),
-// //           ),
-// //         ],
-// //       ),
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = onAnchorWasFound;
-// //   }
-// //
-// //   void onAnchorWasFound(ARKitAnchor anchor) {
-// //     if (anchor is ARKitImageAnchor) {
-// //       setState(() => anchorWasFound = true);
-// //
-// //       final material = ARKitMaterial(
-// //         lightingModelName: ARKitLightingModel.lambert,
-// //         diffuse: ARKitMaterialProperty.image('images/change.jpeg'),
-// //       );
-// //       final sphere = ARKitSphere(
-// //         materials: [material],
-// //         radius: 0.1,
-// //       );
-// //
-// //       final earthPosition = anchor.transform.getColumn(3);
-// //       final node = ARKitNode(
-// //         geometry: sphere,
-// //         position:
-// //         vector.Vector3(earthPosition.x, earthPosition.y, earthPosition.z),
-// //         eulerAngles: vector.Vector3.zero(),
-// //       );
-// //       arkitController.add(node);
-// //
-// //       timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-// //         final old = node.eulerAngles;
-// //         final eulerAngles = vector.Vector3(old.x + 0.01, old.y, old.z);
-// //         node.eulerAngles = eulerAngles;
-// //       });
-// //     }
-// //   }
-// // }
-//
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // void main() {
-// //   runApp(BodyTrackingPage());
-// // }
-// //
-// // class BodyTrackingPage extends StatefulWidget {
-// //   @override
-// //   _BodyTrackingPageState createState() => _BodyTrackingPageState();
-// // }
-// //
-// // class _BodyTrackingPageState extends State<BodyTrackingPage> {
-// //   late ARKitController arkitController;
-// //   ARKitNode? hand;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Body Tracking Sample')),
-// //     body: ARKitSceneView(
-// //       configuration: ARKitConfiguration.bodyTracking,
-// //       onARKitViewCreated: onARKitViewCreated,
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
-// //     this.arkitController.onUpdateNodeForAnchor = _handleUpdateAnchor;
-// //   }
-// //
-// //   void _handleAddAnchor(ARKitAnchor anchor) {
-// //     if (!(anchor is ARKitBodyAnchor)) {
-// //       return;
-// //     }
-// //     final transform =
-// //     anchor.skeleton.modelTransformsFor(ARKitSkeletonJointName.leftHand);
-// //     hand = _createSphere(transform!);
-// //     arkitController.add(hand!, parentNodeName: anchor.nodeName);
-// //   }
-// //
-// //   ARKitNode _createSphere(Matrix4 transform) {
-// //     final position = vector.Vector3(
-// //       transform.getColumn(3).x,
-// //       transform.getColumn(3).y,
-// //       transform.getColumn(3).z,
-// //     );
-// //     return ARKitReferenceNode(
-// //       url: 'models.scnassets/dash.dae',
-// //       scale: vector.Vector3.all(0.5),
-// //       position: position,
-// //     );
-// //   }
-// //
-// //   void _handleUpdateAnchor(ARKitAnchor anchor) {
-// //     if (anchor is ARKitBodyAnchor && mounted) {
-// //       final transform =
-// //       anchor.skeleton.modelTransformsFor(ARKitSkeletonJointName.leftHand)!;
-// //       final position = vector.Vector3(
-// //         transform.getColumn(3).x,
-// //         transform.getColumn(3).y,
-// //         transform.getColumn(3).z,
-// //       );
-// //       hand?.position = position;
-// //     }
-// //   }
-// // }
-//
-//
-// //
-// // import 'dart:math' as math;
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   // This widget is the root of your application.
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //        home:  VideoPage(),
-// //     );
-// //   }
-// // }
-// //
-// //
-// // class VideoPage extends StatefulWidget {
-// //   @override
-// //   _VideoPageState createState() => _VideoPageState();
-// // }
-// //
-// // class _VideoPageState extends State<VideoPage> {
-// //   late ARKitController arkitController;
-// //   late ARKitMaterialVideo _video;
-// //   bool _isPlaying = true;
-// //
-// //   @override
-// //   void dispose() {
-// //     _video.dispose();
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //       appBar: AppBar(title: const Text('Video Sample')),
-// //       body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated),
-// //       floatingActionButton: FloatingActionButton(
-// //         onPressed: () async {
-// //           if (_isPlaying) {
-// //             await _video.pause();
-// //           } else {
-// //             await _video.play();
-// //           }
-// //           setState(() => _isPlaying = !_isPlaying);
-// //         },
-// //         child: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-// //       ));
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //
-// //     _video = ARKitMaterialProperty.video(
-// //       width: 640,
-// //       height: 320,
-// //       filename: 'london.mp4',
-// //     );
-// //     final material = ARKitMaterial(
-// //       diffuse: _video,
-// //       doubleSided: true,
-// //     );
-// //
-// //     final sphere = ARKitSphere(materials: [material], radius: 1);
-// //
-// //     final node = ARKitNode(geometry: sphere);
-// //     node.eulerAngles = vector.Vector3(0, 0, math.pi); // rotate the node
-// //
-// //     this.arkitController.add(node);
-// //   }
-// // }
-//
-//
-// // import 'dart:math' as math;
-// // import 'package:flutter/material.dart';
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // import 'package:collection/collection.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       debugShowCheckedModeBanner: false,
-// //       home: ManipulationPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   ARKitController? arkitController;
-// //   ARKitNode? imageNode;
-// //   bool isDragging = false;
-// //   Offset dragStartPosition = Offset.zero;
-// //   vector.Vector3? initialNodePosition;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController?.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Manipulation Sample')),
-// //     body: Container(
-// //       child: ARKitSceneView(
-// //         onARKitViewCreated: onARKitViewCreated,
-// //         enableTapRecognizer: true,
-// //         onARTap: _onTapHandler,
-// //         onARTrackingState: _onARTrackingState,
-// //       ),
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController controller) {
-// //     arkitController = controller;
-// //     addNode();
-// //   }
-// //
-// //   void addNode() async {
-// //     final imageFilePath = 'assets/images/earth_texture.jpg'; // Path to the image asset
-// //
-// //     final material = ARKitMaterial(
-// //       diffuse: ARKitMaterialProperty.image(imageFilePath),
-// //     );
-// //
-// //     final plane = ARKitPlane(
-// //       width: 0.2, // Adjust the size as needed
-// //       height: 0.2, // Adjust the size as needed
-// //       materials: [material],
-// //     );
-// //
-// //     final node = ARKitNode(
-// //       geometry: plane,
-// //       position: vector.Vector3(0, 0, -0.5),
-// //     );
-// //
-// //     arkitController?.add(node);
-// //     imageNode = node;
-// //   }
-// //
-// //   void _onTapHandler(List<ARKitTestResult> results) {
-// //     if (results.isEmpty) return;
-// //
-// //     final tapResult = results.first;
-// //
-// //     if (tapResult.type == ARKitTestResultType.plane) {
-// //       final position = tapResult.worldTransform.getColumn(3);
-// //       imageNode?.position = vector.Vector3(position.x, position.y, position.z);
-// //       initialNodePosition = imageNode?.position;
-// //     }
-// //   }
-// //
-// //   void _onARTrackingState(ARKitTrackingState state) {
-// //     if (state == ARKitTrackingState.normal) {
-// //       // Reset dragging state and position when AR tracking state is normal
-// //       isDragging = false;
-// //       initialNodePosition = null;
-// //     }
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return GestureDetector(
-// //       onPanStart: _onPanStart,
-// //       onPanUpdate: _onPanUpdate,
-// //       onPanEnd: _onPanEnd,
-// //       child: Scaffold(
-// //         appBar: AppBar(title: const Text('Manipulation Sample')),
-// //         body: Container(
-// //           child: ARKitSceneView(
-// //             onARKitViewCreated: onARKitViewCreated,
-// //             enableTapRecognizer: true,
-// //             onARTap: _onTapHandler,
-// //             onARTrackingState: _onARTrackingState,
-// //           ),
-// //         ),
-// //       ),
-// //     );
-// //   }
-// //
-// //   void _onPanStart(DragStartDetails details) {
-// //     final RenderBox box = context.findRenderObject() as RenderBox;
-// //     final offset = box.globalToLocal(details.globalPosition);
-// //     dragStartPosition = offset;
-// //     if (imageNode != null) {
-// //       isDragging = true;
-// //     }
-// //   }
-// //
-// //   void _onPanUpdate(DragUpdateDetails details) {
-// //     if (isDragging && imageNode != null) {
-// //       final RenderBox box = context.findRenderObject() as RenderBox;
-// //       final offset = box.globalToLocal(details.globalPosition);
-// //       final delta = offset - dragStartPosition;
-// //       final translation = vector.Vector3(delta.dx, delta.dy, 0);
-// //       imageNode!.position = initialNodePosition! + translation / 300;
-// //     }
-// //   }
-// //
-// //   void _onPanEnd(DragEndDetails details) {
-// //     isDragging = false;
-// //     initialNodePosition = imageNode?.position;
-// //   }
-// // }
-//
-//
-// // import 'package:flutter/material.dart';
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   ARKitController? _arKitController;
-// //   ARKitNode? _imageNode;
-// //
-// //   @override
-// //   void dispose() {
-// //     _arKitController?.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   void _onARKitViewCreated(ARKitController controller) {
-// //     _arKitController = controller;
-// //     _loadImage();
-// //   }
-// //
-// //   void _loadImage() async {
-// //     final image = await _arKitController?.referenceImagesManager.addReferenceImageFromAsset('assets/images/your_image.png');
-// //
-// //     if (image != null) {
-// //       final material = ARKitMaterial(
-// //         diffuse: ARKitMaterialProperty(
-// //           image: image,
-// //         ),
-// //       );
-// //
-// //       final geometry = ARKitPlane(
-// //         width: image.physicalSize.width,
-// //         height: image.physicalSize.height,
-// //         materials: [material],
-// //       );
-// //
-// //       final node = ARKitNode(
-// //         geometry: geometry,
-// //         position: vector.Vector3(0, 0, -1), // Adjust the initial position as needed
-// //       );
-// //
-// //       _imageNode = node;
-// //       _arKitController?.add(node);
-// //     }
-// //   }
-// //
-// //   void _onPanUpdate(DragUpdateDetails details) {
-// //     if (_imageNode != null) {
-// //       final translation = details.delta;
-// //       _imageNode?.position.value += vector.Vector3(translation.dx, -translation.dy, 0);
-// //     }
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(title: const Text('Manipulation Sample')),
-// //       body: ARKitSceneView(
-// //         onARKitViewCreated: _onARKitViewCreated,
-// //         enableTapRecognizer: true,
-// //         planeDetection: ARPlaneDetection.horizontal,
-// //         showFeaturePoints: false,
-// //         onPanUpdate: _onPanUpdate,
-// //       ),
-// //     );
-// //   }
-// // }
-// //
-//
-//
-//
-// // import 'dart:math' as math;
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // import 'package:collection/collection.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   // This widget is the root of your application.
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //        home:  ManipulationPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   late ARKitController arkitController;
-// //   ARKitNode? boxNode;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Manipulation Sample')),
-// //     body: Container(
-// //       child: ARKitSceneView(
-// //         enablePinchRecognizer: true,
-// //         enablePanRecognizer: true,
-// //         enableRotationRecognizer: true,
-// //         onARKitViewCreated: onARKitViewCreated,
-// //       ),
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onNodePinch = (pinch) => _onPinchHandler(pinch);
-// //     this.arkitController.onNodePan = (pan) => _onPanHandler(pan);
-// //     this.arkitController.onNodeRotation =
-// //         (rotation) => _onRotationHandler(rotation);
-// //     addNode();
-// //   }
-// //
-// //   void addNode() {
-// //     final material = ARKitMaterial(
-// //       lightingModelName: ARKitLightingModel.physicallyBased,
-// //       diffuse: ARKitMaterialProperty.color(
-// //         Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
-// //             .withOpacity(1.0),
-// //       ),
-// //     );
-// //     final box =
-// //     ARKitBox(materials: [material], width: 0.1, height: 0.1, length: 0.1);
-// //
-// //     final node = ARKitNode(
-// //       geometry: box,
-// //       position: vector.Vector3(0, 0, -0.5),
-// //     );
-// //     arkitController.add(node);
-// //     boxNode = node;
-// //   }
-// //
-// //   void _onPinchHandler(List<ARKitNodePinchResult> pinch) {
-// //     final pinchNode = pinch.firstWhereOrNull(
-// //           (e) => e.nodeName == boxNode?.name,
-// //     );
-// //     if (pinchNode != null) {
-// //       final scale = vector.Vector3.all(pinchNode.scale);
-// //       boxNode?.scale = scale;
-// //     }
-// //   }
-// //
-// //   void _onPanHandler(List<ARKitNodePanResult> pan) {
-// //     final panNode = pan.firstWhereOrNull((e) => e.nodeName == boxNode?.name);
-// //     if (panNode != null) {
-// //       final old = boxNode?.eulerAngles;
-// //       final newAngleY = panNode.translation.x * math.pi / 180;
-// //       boxNode?.eulerAngles =
-// //           vector.Vector3(old?.x ?? 0, newAngleY, old?.z ?? 0);
-// //     }
-// //   }
-// //
-// //   void _onRotationHandler(List<ARKitNodeRotationResult> rotation) {
-// //     final rotationNode = rotation.firstWhereOrNull(
-// //           (e) => e.nodeName == boxNode?.name,
-// //     );
-// //     if (rotationNode != null) {
-// //       final rotation = boxNode?.eulerAngles ??
-// //           vector.Vector3.zero() + vector.Vector3.all(rotationNode.rotation);
-// //       boxNode?.eulerAngles = rotation;
-// //     }
-// //   }
-// // }
-// //
-// //
-//
-// //박스 드래그
-// // import 'dart:math' as math;
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ManipulationPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   late ARKitController arkitController;
-// //   ARKitNode? boxNode;
-// //   bool isDragging = false;
-// //   vector.Vector3? lastPosition;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(title: const Text('Manipulation Sample')),
-// //       body: Container(
-// //         child: GestureDetector(
-// //           onPanStart: _onPanStart,
-// //           onPanUpdate: _onPanUpdate,
-// //           onPanEnd: _onPanEnd,
-// //           child: ARKitSceneView(
-// //             onARKitViewCreated: _onARKitViewCreated,
-// //           ),
-// //         ),
-// //       ),
-// //     );
-// //   }
-// //
-// //   void _onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     addNode();
-// //   }
-// //
-// //   void addNode() {
-// //     final material = ARKitMaterial(
-// //       lightingModelName: ARKitLightingModel.physicallyBased,
-// //       diffuse: ARKitMaterialProperty.color(
-// //         Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0).withOpacity(1.0),
-// //       ),
-// //     );
-// //     final box = ARKitBox(materials: [material], width: 0.1, height: 0.1, length: 0.1);
-// //
-// //     final node = ARKitNode(
-// //       geometry: box,
-// //       position: vector.Vector3(0, 0, -0.5),
-// //     );
-// //     arkitController.add(node);
-// //     boxNode = node;
-// //   }
-// //
-// //   void _onPanStart(DragStartDetails details) {
-// //     if (boxNode != null) {
-// //       isDragging = true;
-// //       lastPosition = boxNode!.position;
-// //     }
-// //   }
-// //
-// //   void _onPanUpdate(DragUpdateDetails details) {
-// //     if (isDragging && boxNode != null) {
-// //       final dx = details.delta.dx / 300;
-// //       final dy = -details.delta.dy / 300;
-// //       final newPosition = vector.Vector3(
-// //         lastPosition!.x + dx,
-// //         lastPosition!.y + dy,
-// //         boxNode!.position.z, // Maintain the original z position
-// //       );
-// //       boxNode!.position = newPosition;
-// //     }
-// //   }
-// //
-// //   void _onPanEnd(DragEndDetails details) {
-// //     isDragging = false;
-// //     lastPosition = null;
-// //   }
-// // }
-//
-//
-//
-// //Image drag
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ManipulationPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   late ARKitController arkitController;
-// //   ARKitNode? imageNode;
-// //   bool isDragging = false;
-// //   vector.Vector3? lastPosition;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(title: const Text('Manipulation Sample')),
-// //       body: Container(
-// //         child: GestureDetector(
-// //           onPanStart: _onPanStart,
-// //           onPanUpdate: _onPanUpdate,
-// //           onPanEnd: _onPanEnd,
-// //           child: ARKitSceneView(
-// //             onARKitViewCreated: _onARKitViewCreated,
-// //           ),
-// //         ),
-// //       ),
-// //     );
-// //   }
-// //
-// //   void _onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     addNode();
-// //   }
-// //
-// //   void addNode() {
-// //     final imageTexture = ARKitMaterialProperty.image('images/italy.jpeg');
-// //
-// //     final material = ARKitMaterial(
-// //       diffuse: imageTexture,
-// //       doubleSided: true,
-// //     );
-// //
-// //     final geometry = ARKitSphere(
-// //       radius: 0.1,
-// //       materials: [material],
-// //     );
-// //
-// //     final node = ARKitNode(
-// //       geometry: geometry,
-// //       position: vector.Vector3(0, 0, -0.5),
-// //     );
-// //
-// //     arkitController.add(node);
-// //     imageNode = node;
-// //   }
-// //
-// //   void _onPanStart(DragStartDetails details) {
-// //     if (imageNode != null) {
-// //       isDragging = true;
-// //       lastPosition = imageNode!.position;
-// //     }
-// //   }
-// //
-// //   void _onPanUpdate(DragUpdateDetails details) {
-// //     if (isDragging) {
-// //       final currentPosition = imageNode?.position ?? vector.Vector3.zero();
-// //       final newPosition = vector.Vector3(
-// //         currentPosition.x + details.delta.dx / 1000,
-// //         currentPosition.y - details.delta.dy / 1000,
-// //         currentPosition.z,
-// //       );
-// //       imageNode?.position = newPosition;
-// //     }
-// //   }
-// //
-// //   void _onPanEnd(DragEndDetails details) {
-// //     isDragging = false;
-// //     lastPosition = null;
-// //   }
-// // }
-// //
-//
-//
-// // import 'dart:typed_data';
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:flutter/services.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // import 'package:image_picker/image_picker.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ManipulationPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ManipulationPage extends StatefulWidget {
-// //   @override
-// //   _ManipulationPageState createState() => _ManipulationPageState();
-// // }
-// //
-// // class _ManipulationPageState extends State<ManipulationPage> {
-// //   late ARKitController arkitController;
-// //   ARKitNode? imageNode;
-// //   bool isDragging = false;
-// //   vector.Vector3? lastPosition;
-// //
-// //   @override
-// //   void dispose() {
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(title: const Text('Manipulation Sample')),
-// //       body: Container(
-// //         child: GestureDetector(
-// //           onPanStart: _onPanStart,
-// //           onPanUpdate: _onPanUpdate,
-// //           onPanEnd: _onPanEnd,
-// //           child: ARKitSceneView(
-// //             onARKitViewCreated: _onARKitViewCreated,
-// //           ),
-// //         ),
-// //       ),
-// //       floatingActionButton: FloatingActionButton(
-// //         onPressed: _pickImageFromGallery,
-// //         child: Icon(Icons.photo),
-// //       ),
-// //     );
-// //   }
-// //
-// //   void _onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     addNode();
-// //   }
-// //
-// //   void addNode() {
-// //     final material = ARKitMaterial(
-// //       diffuse: ARKitMaterialImage(
-// //         'images/italy.jpeg'),
-// //
-// //         doubleSided: true,
-// //     );
-// //
-// //     final geometry = ARKitSphere(
-// //     radius: 0.1,
-// //     materials: [material],
-// //     );
-// //
-// //     final node = ARKitNode(
-// //     geometry: geometry,
-// //     position: vector.Vector3(0, 0, -0.5),
-// //     );
-// //
-// //     arkitController.add(node);
-// //     imageNode = node;
-// //   }
-// //
-// //   Future<Uint8List> _getImageBytes(String imagePath) async {
-// //     final imageBytes = await rootBundle.load(imagePath);
-// //     return imageBytes.buffer.asUint8List();
-// //   }
-// //
-// //   void _onPanStart(DragStartDetails details) {
-// //     if (imageNode != null) {
-// //       isDragging = true;
-// //       lastPosition = imageNode!.position;
-// //     }
-// //   }
-// //
-// //   void _onPanUpdate(DragUpdateDetails details) {
-// //     if (isDragging) {
-// //       final currentPosition = imageNode?.position ?? vector.Vector3.zero();
-// //       final newPosition = vector.Vector3(
-// //         currentPosition.x + details.delta.dx / 1000,
-// //         currentPosition.y - details.delta.dy / 1000,
-// //         currentPosition.z,
-// //       );
-// //       imageNode?.position = newPosition;
-// //     }
-// //   }
-// //
-// //   void _onPanEnd(DragEndDetails details) {
-// //     isDragging = false;
-// //     lastPosition = null;
-// //   }
-// //
-// //   void _pickImageFromGallery() async {
-// //     final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-// //     if (pickedImage != null) {
-// //       // Use the picked image and add it as a material to the ARKit node
-// //       // Here, you can call a function to process the picked image and update the ARKit node's material
-// //     }
-// //   }
-// // }
-//
-//
-// // import 'dart:async';
-// //
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ImageDetectionPage(),
-// //     );
-// //   }
-// // }
-// // class ImageDetectionPage extends StatefulWidget {
-// //   @override
-// //   _ImageDetectionPageState createState() => _ImageDetectionPageState();
-// // }
-// //
-// // class _ImageDetectionPageState extends State<ImageDetectionPage> {
-// //   late ARKitController arkitController;
-// //   Timer? timer;
-// //   bool anchorWasFound = false;
-// //
-// //   @override
-// //   void dispose() {
-// //     timer?.cancel();
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Image Detection Sample')),
-// //     body: Container(
-// //       child: Stack(
-// //         fit: StackFit.expand,
-// //         children: [
-// //           ARKitSceneView(
-// //             detectionImagesGroupName: 'AR Resources',
-// //             onARKitViewCreated: onARKitViewCreated,
-// //           ),
-// //           anchorWasFound
-// //               ? Container()
-// //               : Padding(
-// //             padding: const EdgeInsets.all(8.0),
-// //             child: Text(
-// //               'Point the camera at the earth image from the article about Earth on Wikipedia.',
-// //               style: Theme.of(context)
-// //                   .textTheme
-// //                   .headlineSmall
-// //                   ?.copyWith(color: Colors.white),
-// //             ),
-// //           ),
-// //         ],
-// //       ),
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = onAnchorWasFound;
-// //   }
-// //
-// //   void onAnchorWasFound(ARKitAnchor anchor) {
-// //     if (anchor is ARKitImageAnchor) {
-// //       setState(() => anchorWasFound = true);
-// //
-// //       final material = ARKitMaterial(
-// //         lightingModelName: ARKitLightingModel.lambert,
-// //         diffuse: ARKitMaterialProperty.image('earth.jpg'),
-// //       );
-// //       final sphere = ARKitSphere(
-// //         materials: [material],
-// //         radius: 0.1,
-// //       );
-// //
-// //       final earthPosition = anchor.transform.getColumn(3);
-// //       final node = ARKitNode(
-// //         geometry: sphere,
-// //         position:
-// //         vector.Vector3(earthPosition.x, earthPosition.y, earthPosition.z),
-// //         eulerAngles: vector.Vector3.zero(),
-// //       );
-// //       arkitController.add(node);
-// //
-// //       timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-// //         final old = node.eulerAngles;
-// //         final eulerAngles = vector.Vector3(old.x + 0.01, old.y, old.z);
-// //         node.eulerAngles = eulerAngles;
-// //       });
-// //     }
-// //   }
-// // }
-//
-//
-//
-//
-// // import 'dart:async';
-// //
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // import 'package:url_launcher/url_launcher.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ImageDetectionPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ImageDetectionPage extends StatefulWidget {
-// //   @override
-// //   _ImageDetectionPageState createState() => _ImageDetectionPageState();
-// // }
-// //
-// // class _ImageDetectionPageState extends State<ImageDetectionPage> {
-// //   late ARKitController arkitController;
-// //   Timer? timer;
-// //   bool anchorWasFound = false;
-// //
-// //   @override
-// //   void dispose() {
-// //     timer?.cancel();
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) => Scaffold(
-// //     appBar: AppBar(title: const Text('Image Detection Sample')),
-// //     body: Container(
-// //       child: Stack(
-// //         fit: StackFit.expand,
-// //         children: [
-// //           ARKitSceneView(
-// //             detectionImagesGroupName: 'AR Resources',
-// //             onARKitViewCreated: onARKitViewCreated,
-// //           ),
-// //           anchorWasFound
-// //               ? Container()
-// //               : Padding(
-// //             padding: const EdgeInsets.all(8.0),
-// //             child: Text(
-// //               'Point the camera at the earth image from the article about Earth on Wikipedia.',
-// //               style: Theme.of(context)
-// //                   .textTheme
-// //                   .headlineSmall
-// //                   ?.copyWith(color: Colors.white),
-// //             ),
-// //           ),
-// //         ],
-// //       ),
-// //     ),
-// //   );
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = onAnchorWasFound;
-// //   }
-// //
-// //   void onAnchorWasFound(ARKitAnchor anchor) {
-// //     if (anchor is ARKitImageAnchor) {
-// //       setState(() => anchorWasFound = true);
-// //
-// //       final earthPosition = anchor.transform.getColumn(3);
-// //
-// //       // Create a plane with a default size
-// //       final plane = ARKitPlane(
-// //         width: 1.0,
-// //         height: 1.0,
-// //         materials: [
-// //           ARKitMaterial(
-// //             diffuse: ARKitMaterialProperty.image('images/van.jpeg'),
-// //           ),
-// //         ],
-// //       );
-// //
-// //       final node = ARKitNode(
-// //         geometry: plane,
-// //         position:
-// //         vector.Vector3(earthPosition.x, earthPosition.y, earthPosition.z),
-// //         eulerAngles: vector.Vector3.zero(),
-// //       );
-// //       arkitController.add(node);
-// //
-// //       timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-// //         final old = node.eulerAngles;
-// //         final eulerAngles = vector.Vector3(old.x + 0.01, old.y, old.z);
-// //         node.eulerAngles = eulerAngles;
-// //       });
-// //
-// //       // Launch the URL when the image is detected
-// //       if (anchor.referenceImageName == 'earth') {
-// //         launchURL('https://www.youtube.com/watch?v=ZknwqieFqwk');
-// //       }
-// //     }
-// //   }
-// //
-// //   void launchURL(String url) async {
-// //     if (await canLaunch(url)) {
-// //       await launch(url);
-// //     } else {
-// //       throw 'Could not launch $url';
-// //     }
-// //   }
-// // }
-//
-//
-// // import 'dart:async';
-// //
-// // import 'package:arkit_plugin/arkit_plugin.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:vector_math/vector_math_64.dart' as vector;
-// // import 'package:url_launcher/url_launcher.dart';
-// //
-// // void main() {
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       title: 'Flutter Demo',
-// //       home: ImageDetectionPage(),
-// //     );
-// //   }
-// // }
-// //
-// // class ImageDetectionPage extends StatefulWidget {
-// //   @override
-// //   _ImageDetectionPageState createState() => _ImageDetectionPageState();
-// // }
-// //
-// // class _ImageDetectionPageState extends State<ImageDetectionPage> {
-// //   late ARKitController arkitController;
-// //   Timer? timer;
-// //   bool anchorWasFound = false;
-// //
-// //   @override
-// //   void dispose() {
-// //     timer?.cancel();
-// //     arkitController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) =>
-// //       Scaffold(
-// //         appBar: AppBar(title: const Text('Image Detection Sample')),
-// //         body: Container(
-// //           child: Stack(
-// //             fit: StackFit.expand,
-// //             children: [
-// //               ARKitSceneView(
-// //                 detectionImagesGroupName: 'AR Resources',
-// //                 onARKitViewCreated: onARKitViewCreated,
-// //               ),
-// //               anchorWasFound
-// //                   ? Container()
-// //                   : Padding(
-// //                 padding: const EdgeInsets.all(8.0),
-// //                 child: Text(
-// //                   'Point the camera at the van.jpeg image to display the link.',
-// //                   style: Theme
-// //                       .of(context)
-// //                       .textTheme
-// //                       .headline6
-// //                       ?.copyWith(color: Colors.white),
-// //                 ),
-// //               ),
-// //             ],
-// //           ),
-// //         ),
-// //       );
-// //
-// //
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = onAddNodeForAnchor;
-// //   }
-// //
-// //   void onAddNodeForAnchor(ARKitAnchor anchor) {
-// //     if (anchor is ARKitImageAnchor) {
-// //       // 대상 이미지를 인식한 경우 실행할 동작을 구현합니다.
-// //       // 예를 들어, 대상 이미지 위에 가상 객체를 배치할 수 있습니다.
-// //       final material = ARKitMaterial(
-// //         diffuse: ARKitMaterialProperty.color(const Color(0xFFFF0000)),
-// //       );
-// //       final cube = ARKitBox(
-// //         materials: [material],
-// //         width: 0.1,
-// //         height: 0.1,
-// //         length: 0.1,
-// //       );
-// //       final node = ARKitNode(
-// //         geometry: cube,
-// //         position: anchor.transform.getTranslation(),
-// //         eulerAngles: vector.Vector3.zero(),
-// //       );
-// //       arkitController.add(node);
-// //     }
-// //   }
-// // }
-// //   void onARKitViewCreated(ARKitController arkitController) {
-// //     this.arkitController = arkitController;
-// //     this.arkitController.onAddNodeForAnchor = onAnchorWasFound;
-// //   }
-// //
-// //   void onAnchorWasFound(ARKitAnchor anchor) {
-// //     if (anchor is ARKitImageAnchor) {
-// //       setState(() => anchorWasFound = true);
-// //
-// //       final anchorPosition = anchor.transform.getColumn(3);
-// //
-// //       // Create a plane with a default size
-// //       final plane = ARKitPlane(
-// //         width: 1.0,
-// //         height: 1.0,
-// //         materials: [
-// //           ARKitMaterial(
-// //             diffuse: ARKitMaterialProperty.image('images/van.jpeg'),
-// //           ),
-// //         ],
-// //       );
-// //
-// //       final node = ARKitNode(
-// //         geometry: plane,
-// //         position: vector.Vector3(
-// //           anchorPosition.x,
-// //           anchorPosition.y,
-// //           anchorPosition.z,
-// //         ),
-// //         eulerAngles: vector.Vector3.zero(),
-// //       );
-// //       arkitController.add(node);
-// //
-// //       timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-// //         final old = node.eulerAngles;
-// //         final eulerAngles = vector.Vector3(old.x + 0.01, old.y, old.z);
-// //         node.eulerAngles = eulerAngles;
-// //       });
-// //
-// //       // Launch the URL when the "van.jpeg" image is detected
-// //       if (anchor.referenceImageName == 'van.jpeg') {
-// //         launchURL('https://www.youtube.com/watch?v=ZknwqieFqwk');
-// //       }
-// //     }
-// //   }
-// //
-// //   void launchURL(String url) async {
-// //     if (await canLaunch(url)) {
-// //       await launch(url);
-// //     } else {
-// //       throw 'Could not launch $url';
-// //     }
-// //   }
-// // }
-// //
-//
-//
