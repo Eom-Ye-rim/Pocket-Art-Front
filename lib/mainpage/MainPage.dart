@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ar_example/ChatBot/ChatBot.dart';
+
 
 void main() {
   runApp(MaterialApp(
@@ -594,6 +596,21 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
+
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.transparent,
+            onPressed: () {
+              // FAB가 눌렸을 때 실행할 작업을 여기에 추가하세요.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyChatApp()),
+              );
+
+              print('FAB가 눌렸습니다.');
+            },
+            child: Image.asset('images/img_35.png',
+                fit: BoxFit.cover,),          ),
+
         ),
       ),
     );
