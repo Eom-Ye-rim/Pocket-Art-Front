@@ -1,6 +1,0 @@
-version: "Apple Swift version 5.6.1 (swiftlang-5.6.0.323.66 clang-1316.0.20.12)"
-options: "252a7a8efd4bce870a8418ddad3a1161424b434cd020fa2395d3227220e4ccb4"
-build_start_time: [1653452924, 852440834]
-build_end_time: [1653452925, 341276168]
-inputs:
-  "/Users/jspman/Developer/flutter_ar_example/ios/Runner/AppDelegate.swift": [1638779617, 0]
