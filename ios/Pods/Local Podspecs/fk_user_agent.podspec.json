@@ -1,0 +1,30 @@
+{
+  "name": "fk_user_agent",
+  "version": "2.0.0",
+  "summary": "A new Flutter project.",
+  "description": "Retrieve Android/iOS device user agents in Flutter.",
+  "homepage": "https://github.com/flutter-fast-kit/fk_user_agent",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "lunnnnul": "lunnnnul@gmail.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [
+
+    ]
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES",
+    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": "i386"
+  }
+}
