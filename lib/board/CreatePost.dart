@@ -362,7 +362,7 @@ class _CreatePostState extends State<CreatePost> {
   Future<void> _uploadPost(List<String> hashtag) async {
     print("Register post");
     final dio = Dio();
-    final url = 'http://13.209.160.87:8080/api/v1/contest';
+    final url = 'http://54.180.79.174:8080/api/v1/contest';
 
     print(title);
     print(contents);

@@ -52,6 +52,15 @@ class _ManipulationPageState extends State<ManipulationPage> {
               statusBarBrightness: Brightness.light,
             ),
             automaticallyImplyLeading: true,
+
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios,
+                color: Colors.black,),
+              onPressed: () {
+                //뒤로가기
+                Navigator.pop(context);
+              },
+            ),
             title: Text(
               '회원가입',
               style: TextStyle(
@@ -105,7 +114,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
                   child: Stack(
                     children: [
                       Positioned(
-                        left: 11,
+                        left: 18,
                         top: 8.80,
                         child: Container(
                           width: 189.20,
@@ -133,7 +142,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
                               height: 220,
                             ),
                             Image(
-                              image: AssetImage('images/phonecode.jpg'),
+                              image: AssetImage('images/EmailG.png'),
                               width: 240.53,
                               height: 225.87,
                               fit: BoxFit.fill,
@@ -378,7 +387,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
       return isSuccess;
     }
     final url = Uri.parse(
-        'http://13.209.160.87:8080/verifyCode?email=$enteredEmail&code=$number');
+        'http://54.180.79.174:8080/verifyCode?email=$enteredEmail&code=$number');
     print(url);
     final response = await http.post(url);
     print(response.statusCode);

@@ -2,9 +2,13 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Runner.xcodeproj">
+      location = "group:/Applications/Xcode.app/Contents/Developer/Runner"
+      assignedFileDataType = "com.apple.xcode.project">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Runner.xcodeproj">
    </FileRef>
 </Workspace>

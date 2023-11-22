@@ -1,9 +1,12 @@
 
 
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ar_example/style/Sketch.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -12,20 +15,22 @@ import 'package:path_provider/path_provider.dart';
 import '../mainpage/MainPage.dart';
 
 class ImgDownload extends StatefulWidget {
+  File ? selectImg;
   String imageUrl;
-  ImgDownload({super.key, required this.imageUrl});
+  ImgDownload({super.key, required this.selectImg, required this.imageUrl});
 
   @override
   State<ImgDownload> createState() => _ImgDownloadState();
 }
 
 class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관련
-
+  File ? img ;
   String imgURL ="";
 
   @override
   void initState() {
     super.initState();
+    img=widget.selectImg;
     imgURL = widget.imageUrl;
   }
 
@@ -41,11 +46,6 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
     // 갤러리에 이미지 저장
     await ImageGallerySaver.saveFile(file.path);
   }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -130,8 +130,6 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-
-
                           InkWell(
                             // splashColor: Colors.red, // 터치 효과 색상
                             highlightColor: Colors.grey, // 눌림 효과 색상
@@ -148,9 +146,6 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
                                       elevation: 0,
                                       insetPadding: const EdgeInsets.fromLTRB(
                                           0, 0, 0, 100),
-
-
-
                                     );
                                   });
                             },
@@ -215,7 +210,6 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
 
                         ],
                       ),
-
                       SizedBox(height: 34,),
                       Divider(
                         color: Color(0xffB4B4B4),
@@ -238,7 +232,7 @@ class _ImgDownloadState extends State<ImgDownload> {//갤러리 다운로드 관
                                   Colors.transparent),
                             ),
                             onPressed: () {
-                              print("색칠하기 버튼 ");
+                              sendImageToServer(context,img!);
                             },
                             child: Text('색칠하기',
                                 style: TextStyle(
@@ -300,6 +294,44 @@ class gotoMainBtn extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+Future<void> sendImageToServer(BuildContext context, File file) async {
+  String sketchImageUrl = "";
+
+  var uri = Uri.parse("http://54.180.79.174:8080/api/v1/sketch");
+  var request = http.MultipartRequest('POST', uri);
+
+  // Attach the file as a MultipartFile
+  var multipartFile = await http.MultipartFile.fromPath('file', file.path);
+  request.files.add(multipartFile);
+
+  try {
+    // Send the request
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(await response.stream.bytesToString());
+      final String data = responseData['data'];
+
+        sketchImageUrl = data;
+        print(sketchImageUrl);
+
+
+      // 이미지가 성공적으로 서버로 업로드되었을 때 화면을 이동하고 싶다면
+      // 아래와 같이 Navigator.push를 사용할 수 있습니다.
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Sketch(selectImg: sketchImageUrl)),
+      );
+
+      print('Image sent successfully');
+    } else {
+      print('Error sending image');
+    }
+  } catch (e) {
+    print('Error: $e');
   }
 }
 

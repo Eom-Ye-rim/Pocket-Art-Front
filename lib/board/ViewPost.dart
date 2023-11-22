@@ -3,30 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_ar_example/board/PhotoBoard.dart';
-
-// ignore_for_file: prefer_const_constructors
-
-//To do : 좋아요, 조회수 ,댓글 리스트 가져오기
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Comment {
   static int _nextId = 1;
   final int id;
   final String content;
   final String author;
+  final String profileImg;
   final DateTime timestamp;
 
   Comment({
     required this.id,
     required this.content,
     required this.author,
+    required this.profileImg,
     required this.timestamp,
   });
 
-// Comment({
-//   required this.content,
-//   required this.author,
-//   required this.timestamp,
-// }) : id = _nextId++;
 }
 
 class ViewPost extends StatefulWidget {
@@ -39,13 +34,28 @@ class ViewPost extends StatefulWidget {
 }
 
 class _ViewPostState extends State<ViewPost> {
+  Future<void> fetchComments(List<dynamic> commentDataList) async {
 
+    final List<Comment> fetchedCommentList = commentDataList.map((commentData) {
+      return Comment(
+        id: commentData['id'],
+        content: commentData['content'],
+        author: commentData['author'],
+        profileImg: commentData['users']['profileImg'],
+        timestamp: DateTime.parse(commentData['createDate']),
+      );
+    }).toList();
 
+    setState(() {
+      comments = fetchedCommentList;
+    });
+  }
 
 
   String PostUserName = '';
   String PostTitle = '';
   String TimeStamp = '';
+
   int Views =0; // 조회수 최대 4자리까지 가능( 5자리부터는 overflow 에러 나도록 화면 범위 설정돼있음)
   int like = 0;
   int Comments = 0;
@@ -53,29 +63,32 @@ class _ViewPostState extends State<ViewPost> {
   String postString = '';
   List<String> photolist=[];
   String user_img='';
+  List<Comment> comments = [];
   List<String> taglist=[];
   @override
   void initState() {
     super.initState();
-    print(widget.responseData);
     // Initialize postString with the responseData contents if available
     if (widget.responseData!=null) {
+      print(widget.responseData);
       postString = widget.responseData['data']['contents'];
       PostUserName = widget.responseData['data']['author'];
       Views = widget.responseData['data']['view_count'];
       PostTitle = widget.responseData['data']['title'];
       photolist = (widget.responseData['data']['photo_list'] as List<dynamic>?)?.cast<String>() ?? [];
       user_img = widget.responseData['data']['user_img'];
+
+      final List<dynamic> commentDataList = widget.responseData['data']['comment_list'];
+      fetchComments(commentDataList);
+
       TimeStamp = widget.responseData['data']['created_date'];
       taglist = (widget.responseData['data']['tag_list'] as List<dynamic>?)?.cast<String>() ?? [];
-      print(taglist);
 
       print("실행");
     }
   }
 
   TextEditingController _commentController = TextEditingController();
-  List<Comment> comments = [];
 
   // 선택한 댓글의 ID를 저장하는 변수, null값으로 초기화
   int? selectedCommentId;
@@ -145,11 +158,12 @@ class _ViewPostState extends State<ViewPost> {
                       Row(
                         children: [
                           CircleAvatar(
-                            radius: 19,
-                            //유저 프로필 이미지 url
-                            backgroundImage: NetworkImage(
-                                user_img),
-                          ),
+                              radius: 19,
+                              backgroundImage: NetworkImage(user_img),
+                              backgroundColor: Colors.transparent, // 이 부분은 제거
+                              foregroundColor: Colors.transparent,
+                            ),
+
                           SizedBox(
                             width: 8,
                           ),
@@ -179,15 +193,13 @@ class _ViewPostState extends State<ViewPost> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                            width: 164,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.linear_scale),
-                            onPressed: () {
-                              print('팝업메뉴 버튼');
-                            },
-                          ),
+
+                          // IconButton(
+                          //   icon: Icon(Icons.linear_scale),
+                          //   onPressed: () {
+                          //     print('팝업메뉴 버튼');
+                          //   },
+                          // ),
                         ],
                       ),
                       SizedBox(
@@ -212,23 +224,26 @@ class _ViewPostState extends State<ViewPost> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(
-                            width: 144,
-                          ),
-                          Icon(
-                            Icons.remove_red_eye_outlined,
-                            color: Color(0xffAAAAAA),
-                            size: 14,
-                          ),
-                          Text(
-                            Views.toString(),
-                            style: TextStyle(
-                              color: Color(0xffAAAAAA),
-                              fontSize: 10,
-                              fontFamily: 'SUIT',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          // SizedBox(
+                          //   width: 114,
+                          // ),
+                            // Padding(
+                            //   padding: EdgeInsets.only(right: 10), // 원하는 여백 값으로 설정
+                            //   child: Icon(
+                            //     Icons.remove_red_eye_outlined,
+                            //     color: Color(0xffAAAAAA),
+                            //     size: 14,
+                            //   ),
+                            // ),
+                          // Text(
+                          //   Views.toString(),
+                          //   style: TextStyle(
+                          //     color: Color(0xffAAAAAA),
+                          //     fontSize: 10,
+                          //     fontFamily: 'SUIT',
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
                         ],
                       ),
                       SizedBox(height: 11),
@@ -313,9 +328,10 @@ class _ViewPostState extends State<ViewPost> {
                 ListView.builder(
                   itemCount: comments.length,
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: ClampingScrollPhysics(),
                   itemBuilder: (context, index) {
-                    Comment comment = comments[index];
+
+                    Comment comment = comments[index]; //comment_list 불러오도록 수정
                     return Container(
                       decoration: ShapeDecoration(
                         color: Colors.transparent,
@@ -326,8 +342,10 @@ class _ViewPostState extends State<ViewPost> {
                       ),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              'https://www.qrart.kr:491/wys2/file_attach/2017/08/04/1501830205-47.jpg'), // 사용자 프로필 이미지 경로로 변경
+                          radius: 19,
+                          backgroundImage: NetworkImage(user_img),
+                          backgroundColor: Colors.transparent, // 이 부분은 제거
+                          foregroundColor: Colors.transparent,
                         ),
                         title: Text(
                           comment.author,
@@ -395,6 +413,7 @@ class _ViewPostState extends State<ViewPost> {
             ),
           ),
         ),
+
         bottomNavigationBar: BottomAppBar(
           child: Container(
               width: 390,
@@ -407,9 +426,11 @@ class _ViewPostState extends State<ViewPost> {
               padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        user_img), // 사용자 프로필 이미지 경로로 변경
+              CircleAvatar(
+                    radius: 19,
+                    backgroundImage: NetworkImage(user_img),
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.transparent,
                   ),
                   SizedBox(
                     width: 10,
@@ -419,11 +440,17 @@ class _ViewPostState extends State<ViewPost> {
                       keyboardType: TextInputType.multiline,
                       controller: _commentController,
                       decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '댓글을 입력하세요...',
-                          hintStyle: TextStyle(
-                            color: Color(0xffC1C1C1),
-                          )),
+                        border: InputBorder.none,
+                        hintText: '댓글을 입력하세요...',
+                        hintStyle: TextStyle(
+                          color: Color(0xffC1C1C1),
+                        ),
+                      ),
+                      onEditingComplete: () {
+                        // 입력 완료 시 실행할 동작
+                        // 포커스를 해제하면 키보드가 숨겨집니다.
+                        FocusScope.of(context).unfocus();
+                      },
                     ),
                   ),
                   Container(
@@ -435,48 +462,37 @@ class _ViewPostState extends State<ViewPost> {
                           borderRadius: BorderRadius.zero,
                         ),
                       ),
-                      onPressed: () {
-                        if (_commentController.text.isNotEmpty) {
-                          if (selectedCommentId != null) {
-                            // 댓글 수정 동작
-                            final Comment updatedComment = Comment(
-                              id: selectedCommentId!, // 선택한 댓글의 ID
-                              content: _commentController.text,
-                              author: PostUserName, // 사용자 이름 설정
-                              timestamp: DateTime.now(),
-                            );
+                        onPressed: () async{
+                          if (_commentController.text.isNotEmpty) {
+                            if (selectedCommentId != null) {
+                              // 댓글 수정 동작
+                              final Comment updatedComment = comments.firstWhere((c) => c.id == selectedCommentId);
+                              // 수정된 댓글로 업데이트
+                              setState(() {
+                                final index = comments.indexWhere((c) => c.id == selectedCommentId);
+                                if (index != -1) {
+                                  comments[index] = updatedComment;
+                                }
+                                selectedCommentId = null; // 선택한 댓글 ID 초기화
+                              });
+                            } else {
 
-                            // 수정된 댓글로 업데이트
-                            setState(() {
-                              final index = comments
-                                  .indexWhere((c) => c.id == selectedCommentId);
-                              if (index != -1) {
-                                comments[index] = updatedComment;
+                                final response = await addComment(widget.responseData['data']['id'], _commentController.text);
+                                if (response != null) {
+                                setState(() {
+                                print("호출");
+                                comments.add(response);
+                                _commentController.clear();
+                                });
                               }
-                              selectedCommentId = null; // 선택한 댓글 ID 초기화
-                              _commentController.clear();
-                            });
-                          } else {
-                            // 새로운 댓글 추가 동작
-                            Comment newComment = Comment(
-                              id: comments.length + 1, // 고유 ID 부여
-                              content: _commentController.text,
-                              author: PostUserName, // 사용자 이름 설정
-                              timestamp: DateTime.now(),
-                            );
-
-                            setState(() {
-                              comments.add(newComment);
-                              _commentController.clear();
-                            });
+                            }
                           }
-                        }
-                      },
-                      child: Text(selectedCommentId != null
-                          ? '수정'
-                          : '입력',
-                      ),
-                    ),
+                        },
+
+                        child: Text(selectedCommentId != null
+                            ? '수정'
+                            : '입력',)
+                    )
                   )
                 ],
               )),
@@ -485,6 +501,9 @@ class _ViewPostState extends State<ViewPost> {
     ));
   }
 }
+
+
+
 
 class gotoMainBtn extends StatelessWidget {
   @override
@@ -661,3 +680,47 @@ class ShareButton extends StatelessWidget {
         ));
   }
 }
+
+Future<Comment> addComment(int postId, String commentContent) async {
+  final dio = Dio();
+  final url = 'http://54.180.79.174:8080/api/v1/comment/$postId';
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+
+    // 인증 헤더 설정
+    dio.options.headers['Authorization'] = 'Bearer $accessToken';
+
+    final response = await dio.post(
+      url,
+      data: {'content': commentContent}, // 요청 바디에 데이터 추가
+    );
+
+    if (response.statusCode == 200) {
+      // 서버 응답이 성공인 경우
+      final responseData = response.data; // JSON 데이터를 Map으로 가져옴
+      print("responseDate + $responseData");
+      // JSON 데이터를 Comment 객체로 파싱
+      Comment newComment = Comment(
+        id: responseData['data']['id'], // 고유 ID 부여
+        content: responseData['data']['author'],
+        author: responseData['data']['content'], // 사용자 이름 설정
+        profileImg: responseData['data']['userImg'],
+        timestamp: DateTime.now(),
+      );
+
+      return newComment;
+    } else {
+      // 서버 응답이 실패인 경우
+      // 오류 처리 코드 추가
+      return Future.error('Failed to add comment: ${response.statusCode}');
+    }
+  } catch (e) {
+    // 오류 처리 코드 추가
+    return Future.error('Error adding comment: $e');
+  }
+}
+
+
+

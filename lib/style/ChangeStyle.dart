@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/ImgPrint/SelectingPainter.dart';
+import 'package:flutter_ar_example/ImgPrint/SelectingPainterEast.dart';
 import 'package:flutter_ar_example/style/Chocie.dart';
 
 import '../mainpage/MainPage.dart';
@@ -144,34 +145,6 @@ class _Frame427320730State extends State<Frame427320730> {
                                               ]),
                                         ),
                                       ),
-                                      // Positioned(
-                                      //   left: 22.03,
-                                      //   top: 0,
-                                      //   child: Container(
-                                      //     width: 15.27,
-                                      //     height: 10.97,
-                                      //     decoration: BoxDecoration(
-                                      //       image: DecorationImage(
-                                      //         image: NetworkImage("https://via.placeholder.com/15x11"),
-                                      //         fit: BoxFit.fill,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // Positioned(
-                                      //   left: 0,
-                                      //   top: 0.34,
-                                      //   child: Container(
-                                      //     width: 17,
-                                      //     height: 10.67,
-                                      //     decoration: BoxDecoration(
-                                      //       image: DecorationImage(
-                                      //         image: NetworkImage("images/1.png"),
-                                      //         fit: BoxFit.fill,
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
                                     ],
                                   ),
                                 ),
@@ -262,135 +235,17 @@ class _Frame427320730State extends State<Frame427320730> {
                   ),
                 ),
               ),
-              // Positioned(
-              //   left: 205,
-              //   top: 285,
-              //   child: Container(
-              //     width: 168,
-              //     height: 204,
-              //     child: Stack(
-              //       children: [
-              //         Positioned(
-              //           left: 0,
-              //           top: 0,
-              //           child: Container(
-              //             width: 168,
-              //             height: 204,
-              //             decoration: ShapeDecoration(
-              //               color: Colors.white,
-              //               shape: RoundedRectangleBorder(
-              //                 side: BorderSide(
-              //                   width: 1,
-              //                   color: Colors.black.withOpacity(0.30000001192092896),
-              //                 ),
-              //               ),
-              //               shadows: [
-              //                 BoxShadow(
-              //                   color: Color(0x3F000000),
-              //                   blurRadius: 10,
-              //                   offset: Offset(0, 0),
-              //                   spreadRadius: 0,
-              //                 )
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-                      // Positioned(
-                      //   left: -77,
-                      //   top: 0,
-                      //   child: Container(
-                      //     width: 244,
-                      //     height: 213,
-                      //     decoration: BoxDecoration(
-                      //       image: DecorationImage(
-                      //         image: NetworkImage("images/1.png"),
-                      //         fit: BoxFit.fill,
-                      //       ),
-                      //       border: Border.all(width: 0.50),
-                      //     ),
-                      //   ),
-                      // ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // Positioned(
-              //   left: 205,
-              //   top: 285,
-              //   child: Container(
-              //     width: 168,
-              //     height: 276,
-              //     decoration: ShapeDecoration(
-              //       color: Colors.white.withOpacity(0),
-              //       shape: RoundedRectangleBorder(
-              //         side: BorderSide(width: 1, color: Color(0xB26F6F6F)),
-              //       ),
-              //       shadows: [
-              //         BoxShadow(
-              //           color: Color(0x3F000000),
-              //           blurRadius: 10,
-              //           offset: Offset(0, 0),
-              //           spreadRadius: 0,
-              //         )
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // Positioned(
-              //   left: 17,
-              //   top: 285,
-              //   child: Container(
-              //     width: 168,
-              //     height: 204,
-              //     child: Stack(
-              //       children: [
-              //         Positioned(
-              //           left: 0,
-              //           top: 0,
-              //           child: Container(
-              //             width: 168,
-              //             height: 204,
-              //             decoration: ShapeDecoration(
-              //               color: Colors.white,
-              //               shape: RoundedRectangleBorder(
-              //                 side: BorderSide(
-              //                   width: 1,
-              //                   color: Colors.black.withOpacity(0.30000001192092896),
-              //                 ),
-              //               ),
-              //               shadows: [
-              //                 BoxShadow(
-              //                   color: Color(0x3F000000),
-              //                   blurRadius: 10,
-              //                   offset: Offset(0, 0),
-              //                   spreadRadius: 0,
-              //                 )
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //         Positioned(
-              //           left: -43,
-              //           top: 1,
-              //           child: Container(
-              //             width: 211,
-              //             height: 210.96,
-              //             decoration: BoxDecoration(
-              //               image: DecorationImage(
-              //                 image: NetworkImage("images/1.png"),
-              //                 fit: BoxFit.fill,
-              //               ),
-              //               border: Border.all(width: 0.50),
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
               Positioned(
                 left: 27,
                 top: 181,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      type="east";
+                    });
+                    // Handle the click event here
+                    // _sendImageForTransformation('east');
+                  },
                 child: Container(
                   width: 168,
                   height: 204,
@@ -412,6 +267,7 @@ class _Frame427320730State extends State<Frame427320730> {
                         spreadRadius: 0,
                       ),
                     ],
+                  ),
                   ),
                 ),
               ),
@@ -472,7 +328,7 @@ class _Frame427320730State extends State<Frame427320730> {
                   onTap: () {
                     // "서양풍" 클릭 시 박스 색상 변경
                     setState(() {
-                      type="east";
+                      type="west";
                       boxColor = Color(0xAFFC634);
                     });
                   },
@@ -490,6 +346,14 @@ class _Frame427320730State extends State<Frame427320730> {
               Positioned(
                 left: 26,
                 top: 518,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      type="west";
+                    });
+                    // Handle the click event here
+                    // _sendImageForTransformation('east');
+                  },
                 child: Container(
                   width: 358,
                   height: 56,
@@ -508,17 +372,33 @@ class _Frame427320730State extends State<Frame427320730> {
                     ],
                   ),
                 ),
+                ),
               ),
               Positioned(
-                left: 188,
-                top: 533,
-                child: GestureDetector(
-                  onTap: () {
-                    // "다음" 버튼 클릭 시 페이지 이동
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SelectingPainter(selectImg: file,type:type)),
-                    );
+                left: 168,
+                top: 523,
+                child: FilledButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(
+                        Colors.transparent),
+                  ),
+                  onPressed: () {
+                    if(type=="east"){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SelectingPainterEast(selectImg: file,type:type)),
+                      );
+                    }
+                    else {
+                      // "다음" 버튼 클릭 시 페이지 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SelectingPainter(
+                                selectImg: file, type: type)),
+                      );
+                    }
                   },
                 child: Text(
                   '다음',

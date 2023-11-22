@@ -53,12 +53,12 @@ class _ManipulationPageState extends State<ManipulationPage> {
     'images/monet4.jpeg': '파라솔을 든 여인',
     'images/flower.jpeg': '해바라기',
     // Add captions for the images in predefinedImages2 as well
-    'images/ko1.jpeg': 'Korean Caption 1',
-    'images/ko2.jpeg': 'Korean Caption 2',
-    'images/ko3.jpeg': 'Korean Caption 3',
-    'images/ko4.jpeg': 'Korean Caption 4',
-    'images/ko5.jpeg': 'Korean Caption 5',
-    'images/ko6.jpeg': 'Korean Caption 6',
+    'images/ko1.jpeg': '동양화 1',
+    'images/ko2.jpeg': '동양화 2',
+    'images/ko3.jpeg': '동양화 3',
+    'images/ko4.jpeg': '동양화 4',
+    'images/ko5.jpeg': '동양화 5',
+    'images/ko6.jpeg': '동양화 6',
   };
   List<String> predefinedImages = [
     'images/gogh1.jpeg',
@@ -67,15 +67,21 @@ class _ManipulationPageState extends State<ManipulationPage> {
     'images/monet3.jpeg',
     'images/monet4.jpeg',
     'images/flower.jpeg',
-  ];
-
-  List<String> predefinedImages2 = [
     'images/ko1.jpeg',
     'images/ko2.jpeg',
     'images/ko3.jpeg',
     'images/ko4.jpeg',
     'images/ko5.jpeg',
     'images/ko6.jpeg',
+  ];
+
+  List<String> predefinedImages2 = [
+    // 'images/ko1.jpeg',
+    // 'images/ko2.jpeg',
+    // 'images/ko3.jpeg',
+    // 'images/ko4.jpeg',
+    // 'images/ko5.jpeg',
+    // 'images/ko6.jpeg',
   ];
 
   bool showButtons = false;
@@ -389,25 +395,29 @@ class _ManipulationPageState extends State<ManipulationPage> {
                 children: [
                   FloatingActionButton(
                     onPressed: () {
-                      _updateSelectedImages(predefinedImages);
+                      setState(() {
+                        _updateSelectedImages(predefinedImages);
+                      });
                     },
                     backgroundColor: Color(0x3C000000),
                     child: Text(
-                      '동양풍',
+                      '작품',
                       style: TextStyle(fontSize: 12),
                     ),
                   ),
-                  SizedBox(width: 40),
-                  FloatingActionButton(
-                    onPressed: () {
-                      _updateSelectedImages(predefinedImages2);
-                    },
-                    backgroundColor: Color(0x3C000000),
-                    child: Text(
-                      '서양풍',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ),
+                  // SizedBox(width: 40),
+                  // FloatingActionButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       _updateSelectedImages(predefinedImages2);
+                  //     });
+                  //   },
+                  //   backgroundColor: Color(0x3C000000),
+                  //   child: Text(
+                  //     '서양풍',
+                  //     style: TextStyle(fontSize: 12),
+                  //   ),
+                  // ),
                   SizedBox(width: 40),
                   FloatingActionButton(
                     onPressed: () {
@@ -580,8 +590,10 @@ class _ManipulationPageState extends State<ManipulationPage> {
   }
 
   void _updateSelectedImages(List<String> newImages) {
-    selectedImages.clear(); // Clear the existing images
-    selectedImages.addAll(newImages);
+    setState(() {
+      selectedImages.clear(); // Clear the existing images
+      selectedImages.addAll(newImages);
+    });
   }
 
   void _toggleShape() {

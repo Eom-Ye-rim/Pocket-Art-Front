@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/mainpage/MainPage.dart';
 import 'package:flutter_ar_example/user/signupcode.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Chatbot.dart';
 
 void main() {
   KakaoSdk.init(nativeAppKey:'077a09d06719ae6dd518a8049399d4a0');
@@ -217,22 +220,13 @@ class _FirstRouteState extends State<FirstRoute> {
                 width: 320,
                 height: 50,
                 decoration: BoxDecoration(
-
-                  color: Color(0xFF015EFA),
+                  color: Color(0xEA1567F6),
                 ),
-                // padding: const EdgeInsets.only(
-                //   left: 32,
-                //   right: 39,
-                //   top: 15,
-                //   bottom: 20,
-                // ),
                 child: TextButton(
-                  //
-
                   onPressed: () async {
                     print("click");
                     final url = Uri.parse(
-                        'http://13.209.160.87:8080/login');
+                        'http://54.180.79.174:8080/login');
                     Map<String, dynamic> data = {
                       'email': email,
                       'password': password,
@@ -250,11 +244,12 @@ class _FirstRouteState extends State<FirstRoute> {
                       print(response.statusCode);
 
                       if (response.statusCode == 200) {
+                        print(response);
                         var responseData = json.decode(response.body);
                         var accessToken = responseData['data']['accessToken'];
                         print(accessToken);
 
-                        // shared_preferences를 사용하여 accessToken 안전하게 저장
+                       // shared_preferences를 사용하여 accessToken 안전하게 저장
                         SharedPreferences prefs = await SharedPreferences
                             .getInstance();
                         await prefs.setString('accessToken', accessToken);
@@ -276,48 +271,6 @@ class _FirstRouteState extends State<FirstRoute> {
                       print('Error: $e');
                     }
                   },
-
-
-    //
-    // if (await isKakaoTalkInstalled()) {
-    //                     try {
-    //                       await UserApi.instance.loginWithKakaoTalk();
-    //                       print('카카오톡으로 로그인 성공');
-    //                     } catch (error) {
-    //                       print('카카오톡으로 로그인 실패 $error');
-    //
-    //                       // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-    //                       // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-    //                       if (error is PlatformException && error.code == 'CANCELED') {
-    //                         return;
-    //                       }
-    //                       // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
-    //                       try {
-    //                         await UserApi.instance.loginWithKakaoAccount();
-    //                         print('카카오계정으로 로그인 성공');
-    //                       } catch (error) {
-    //                         print('카카오계정으로 로그인 실패 $error');
-    //                       }
-    //                     }
-    //                   } else {
-    //                     try {
-    //                       await UserApi.instance.loginWithKakaoAccount();
-    //                       print('카카오계정으로 로그인 성공');
-    //                     } catch (error) {
-    //                       print('카카오계정으로 로그인 실패 $error');
-    //                     }
-    //                   }
-    //
-    //               },
-    //               onPressed: () async {
-    //                 final url =
-    //                     'https://kauth.kakao.com/oauth/authorize?client_id=179011b75542e1a21fa2207d50a4df57&redirect_uri=http://localhost:8080/auth/kakao/callback&response_type=code';
-    //                 if (await canLaunch(url)) {
-    //                   await launch(url);
-    //                 } else {
-    //                   throw 'Could not launch $url';
-    //                 }
-    //               },
 
                   child: Text(
                     "로그인",
@@ -516,71 +469,71 @@ class _FirstRouteState extends State<FirstRoute> {
               ),
             ),
 
-            Positioned(
-              left: 94,
-              top: 709,
-              child: Container(
-                width: 320,
-                height: 57,
-
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      child: Row(
-                        children: [
-                          Text(
-                            "SNS 계정으로 간편하게 로그인하세요.",
-                            style: TextStyle(
-                              color: Color(0xff000000),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-            Positioned(
-              left: 110,
-              top: 740,
-              child: Container(
-                width: 400,
-                height: 57,
-                child: Column(
-
-                  children: [
-                    Container(
-                      width: 400,
-                      child: Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              padding: EdgeInsets.zero,
-                            ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(2), // 모서리 굴곡 설정
-                    child: Image.asset(
-                      'images/kakao_login_medium_narrow.png', // 이미지 경로 및 파일명으로 수정하세요.
-                    ),
-                          ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Positioned(
+            //   left: 94,
+            //   top: 709,
+            //   child: Container(
+            //     width: 320,
+            //     height: 57,
+            //
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         Container(
+            //           width: double.infinity,
+            //           child: Row(
+            //             children: [
+            //               Text(
+            //                 "SNS 계정으로 간편하게 로그인하세요.",
+            //                 style: TextStyle(
+            //                   color: Color(0xff000000),
+            //                   fontSize: 14,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            //
+            //
+            // Positioned(
+            //   left: 110,
+            //   top: 740,
+            //   child: Container(
+            //     width: 400,
+            //     height: 57,
+            //     child: Column(
+            //
+            //       children: [
+            //         Container(
+            //           width: 400,
+            //           child: Row(
+            //             children: [
+            //               ElevatedButton(
+            //                 onPressed: () {
+            //                 },
+            //                 style: ElevatedButton.styleFrom(
+            //                   elevation: 0,
+            //                   padding: EdgeInsets.zero,
+            //                 ),
+            //                 child: ClipRRect(
+            //                   borderRadius: BorderRadius.circular(2), // 모서리 굴곡 설정
+            //                   child: Image.asset(
+            //                     'images/kakao_login_medium_narrow.png', // 이미지 경로 및 파일명으로 수정하세요.
+            //                   ),
+            //                 ),
+            //               ),
+            //
+            //             ],
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
 
 
             Positioned(
@@ -653,4 +606,27 @@ class _FirstRouteState extends State<FirstRoute> {
       ),
     );
   }
+}
+
+Future<void> signIn() async {
+
+  // 고유한 redirect uri
+  const APP_REDIRECT_URI = "http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/google";
+
+  // 백엔드에서 미리 작성된 API 호출
+  final url = Uri.parse('http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/googl');
+
+  // 백엔드가 제공한 로그인 페이지에서 로그인 후 callback 데이터 반환
+  final result = await FlutterWebAuth.authenticate(
+      url: url.toString(), callbackUrlScheme: APP_REDIRECT_URI);
+
+  // 백엔드에서 redirect한 callback 데이터 파싱
+  // final accessToken = Uri.parse(result).queryParameters['access-token'];
+  // final refreshToken = Uri.parse(result).queryParameters['refresh-token'];
+
+  // . . .
+  // FlutterSecureStorage 또는 SharedPreferences 를 통한
+  // Token 저장 및 관리
+  // . . .
+
 }

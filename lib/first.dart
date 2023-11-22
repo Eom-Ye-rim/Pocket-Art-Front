@@ -233,7 +233,7 @@ class _FirstRouteState extends State<FirstRoute> {
                   onPressed: () async {
                     final dio = Dio(); // Dio 객체 생성
 
-                    final url = 'http://13.209.160.87:8080/login';
+                    final url = 'http://13.125.41.46:8080/login';
                     final data = {
                       'email': email,
                       'password': password,
@@ -1914,3 +1914,67 @@ class _FirstRouteState extends State<FirstRoute> {
 // //
 // //
 // //
+
+//======
+// import 'package:flutter/material.dart';
+// import 'package:flutter_ar_example/user/LoginMain.dart';
+// import 'package:flutter_web_auth/flutter_web_auth.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:universal_html/js.dart';
+// import 'package:url_launcher/url_launcher.dart';
+//
+//
+// void main() {
+//   runApp(MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: MyHomePage(),
+//     );
+//   }
+// }
+//
+// class MyHomePage extends StatelessWidget {
+//   final String clientId = "969542110950-o4f05po4gpihkrrjf6vpofnoi7log0og.apps.googleusercontent.com"; // Google Cloud Console에서 생성한 클라이언트 ID
+//   final String redirectUri = "http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google"; // OAuth 인증 완료 후 리디렉션되는 URI
+//   Future<void> _loginWithGoogle() async {
+//     final oauthUrl = "http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/google";
+//     try {
+//       if (await canLaunch(oauthUrl)) {
+//         await launch(oauthUrl, forceSafariVC: false, forceWebView: false);
+//         final response = await http.get(Uri.parse(oauthUrl));
+//         final authorizationHeaderValue = response.headers['Authorization'];
+//         print(authorizationHeaderValue);
+//
+//         if (response.statusCode == 200) {
+//           // Request was successful, you can access the response body.
+//           final responseBody = response.body;
+//
+//           print("성공");
+//         } else {
+//           debugPrint('Could not launch $oauthUrl');
+//         }
+//       }
+//     } catch (e) {
+//       debugPrint('Error: $e');
+//     }
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Google OAuth Login'),
+//       ),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: _loginWithGoogle,
+//           child: Text('Google 로그인'),
+//         ),
+//       ),
+//     );
+//   }
+// }
+

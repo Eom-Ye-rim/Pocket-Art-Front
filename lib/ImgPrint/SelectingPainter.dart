@@ -205,7 +205,7 @@ class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운
 
                           onTap: () {
                             setState(() {
-                              model="monet``";
+                              model="monet";
                             });
                           },
                         child: Container(
@@ -288,7 +288,6 @@ class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
                                         fit: BoxFit.cover,
-                                        //에드가 드가 이미지 url 추가해야 함
                                         image: AssetImage('images/ed.png'))),
                               ),
                               SizedBox(
@@ -344,19 +343,19 @@ class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운
                             onPressed: () async {
                                 String serverUrl="";
                                 if(StyleType=="east") {
-                                  serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=east';
+                                  serverUrl = 'http://54.180.79.174:8080/api/v1/image?modelname=east';
                                 }
                                 else if(model=="monet"){
-                                  serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=monet';
+                                  serverUrl = 'http://54.180.79.174:8080/api/v1/image?modelname=monet';
                                 }
                                 else if(model=="edgar"){
-                                   serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=edgar';
+                                   serverUrl = 'http://54.180.79.174:8080/api/v1/image?modelname=edgar';
                                     }
                                 else if(model=="cezanne"){
-                                     serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=cezanne';
+                                     serverUrl = 'http://54.180.79.174:8080/api/v1/image?modelname=cezanne';
                                     }
                                 else if(model=="gogh"){
-                              serverUrl = 'http://13.209.160.87:8080/api/v1/image?modelname=gogh';
+                                  serverUrl = 'http://54.180.79.174:8080/api/v1/image?modelname=gogh';
                                 }
     // Replace 'imgPath' with the actual file path of the image from the gallery.
                                 final imgPath = imgURL; // Replace with the actual image path
@@ -378,9 +377,6 @@ class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운
                                       },
                                     ),
                                   );
-
-
-                                  // print(pixelData);
                                   if (response.statusCode == 200) {
                                     // Successful response from the server
                                     print('Image sent successfully');
@@ -388,13 +384,9 @@ class _SelectingPainterState extends State<SelectingPainter> {//갤러리 다운
                                     print(response.data['url']);
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => ImgDownload(imageUrl:response.data['url']
+                                      MaterialPageRoute(builder: (context) => ImgDownload(selectImg:imgURL,imageUrl:response.data['url']
                                       )),
                                     );
-                                    //   Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(builder: (context) => ImgDownload()),
-                                    //   );
                                   } else {
                                     // Handle errors
                                     print('Error sending image: ${response.statusCode}');

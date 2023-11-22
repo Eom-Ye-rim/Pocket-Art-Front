@@ -1,974 +1,794 @@
-import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_ar_example/mainpage/MainPage.dart';
+import 'package:flutter_ar_example/splash/FirstSplash.dart';
+import 'package:flutter_ar_example/user/LoginMain.dart';
+import 'package:video_player/video_player.dart';
 
+import 'MyPage/ForgotPassword.dart';
+import 'MyPage/MyPage.dart';
+import 'Chatbot.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home: MyApp(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _sketchState();
-}
-
-
-class EraseModeToggle extends StatelessWidget {
-  final bool eraseMode;
-  final VoidCallback onPressed;
-
-  EraseModeToggle({required this.eraseMode, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: Text(eraseMode ? '그리기 모드' : '지우개 모드'),
-    );
-  }
-}
-
-enum BrushShape {
-  Point, // 점
-  Line,   // 선
-  Surface, //
-}
-
-
-
-class _sketchState extends State<MyApp> {
-  List<List<Offset>> strokes = []; // 각 획을 저장할 리스트
-  bool eraseMode = false;
-  List<Color> strokeColors = [];
-  Color selectedColor = Colors.black; // Default color
-  double touchRadius = 10.0;
-  List<Offset> currentPath = []; // 현재 경로를 저장할 리스트
-  double progress = 5.0;
-  // Store the paths for each brush shape
-  double initialPositionX = 100.0; // Initial left position of the circle
-  double circleWidth = 15.0;
-  List<BrushShape> strokeBrushShapes=[];
-  BrushShape previousBrushShape = BrushShape.Line; // Initialize with a default brush shape
-
-  // 브러쉬 모양 결정
-  BrushShape selectedBrushShape = BrushShape.Point; // Initial brush shape
-  Map<BrushShape, List<Offset>> strokePaths = {
-    BrushShape.Point: [],
-    BrushShape.Line: [],
-    BrushShape.Surface: [],
-  };
-
-  Map<Color, Map<BrushShape, List<Offset>>> colorPoints = {
-    Colors.black: {
-      BrushShape.Point: [],
-      BrushShape.Line: [],
-      BrushShape.Surface: [],
-    },
-  };
-  void updateProgress(double newValue) {
-    setState(() {
-      progress = newValue;
-    });
-  }
-
-
-
-  void _toggleEraseMode(bool value) {
-    setState(() {
-      eraseMode = value;
-      if (eraseMode) {
-        currentPath.clear(); // 지우개 모드일 때 현재 경로 비우기
-      }
-    });
-  }
-
-  void _changeColor(Color newColor) {
-    setState(() {
-      selectedColor = newColor;
-    });
-  }
-
-  //색상 선택
-  void openColorPicker() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('색깔 선택'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: selectedColor,
-              onColorChanged: (Color color) {
-                setState(() {
-                  selectedColor = color;
-                });
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _handleMenuClick(String value) {
-    switch (value) {
-      case '비우기':
-        setState(() {
-          strokes.clear();
-        });
-        print('비우기 선택');
-        break;
-      case '다운로드':
-        print('다운로드 선택');
-        break;
-      case '공유하기':
-        print('공유하기 선택');
-        break;
-      default:
-        print('알 수 없는 항목 선택: $value');
-    }
-  }
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Scaffold(
-          appBar: AppBar(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: Brightness.dark,
-              statusBarBrightness: Brightness.light,
-            ),
-            backgroundColor: Colors.white,
-            elevation: 0.0,
-            leadingWidth: 140,
-            leading: Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                Text(
-                  '색칠하기',
-                  style: TextStyle(
-                    color: Color(0xFF505050),
-                    fontSize: 20,
-                    fontFamily: 'SUIT',
-                    fontWeight: FontWeight.w700,
-                    height: 0,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              PopupMenuButton<String>(
-                icon: Icon(Icons.menu, color: Colors.black),
-                onSelected: _handleMenuClick,
-                itemBuilder: (BuildContext context) {
-                  return <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      value: '비우기',
-                      child: Container(
-                        height: 23,
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'images/img_26.png',
-                              width: 21.73,
-                              height: 21.73,
-                            ),
-                            SizedBox(
-                              width: 8.27,
-                            ),
-                            Text("비우기"),
-                          ],
-                        ),
-                      ),
-                    ),
-                    PopupMenuDivider(),
-                    PopupMenuItem<String>(
-                      value: '다운로드',
-                      child: Container(
-                        height: 23,
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'images/img_27.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(
-                              width: 7,
-                            ),
-                            Text("다운로드"),
-                          ],
-                        ),
-                      ),
-                    ),
-                    PopupMenuDivider(),
-                    PopupMenuItem<String>(
-                      value: '공유하기',
-                      child: Container(
-                        height: 23,
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'images/img_28.png',
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(
-                              width: 7,
-                            ),
-                            Text("공유하기"),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ];
-                },
-              ),
-            ],
-          ),
-          body: Container(
-            color: Colors.white,
-            child: Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 390,
-                    height: 390,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                          "https://c8.alamy.com/comp/2G5R0FX/cartoon-vector-illustration-of-tree-black-outlined-and-white-colored-2G5R0FX.jpg",
-                        ),
-                      ),
-                    ),
-                    child: GestureDetector(
-                      onPanDown: (details) {
-                        if (eraseMode) {
-                          setState(() {
-                            currentPath = [];
-                            currentPath.add(details.localPosition);
-                          });
-                        } else {
-                          if (details.localPosition.dx >= 0 &&
-                              details.localPosition.dx <= 390 &&
-                              details.localPosition.dy >= 0 &&
-                              details.localPosition.dy <= 390) {
-                            setState(() {
-                              strokes.add([details.localPosition]);
-                              strokeColors.add(selectedColor);
-                            });
-                          }
-                        }
-                      },
-                      onPanUpdate: (details) {
-                        if (strokes.isNotEmpty && !eraseMode) {
-                          if (details.localPosition.dx >= 0 &&
-                              details.localPosition.dx <= 390 &&
-                              details.localPosition.dy >= 0 &&
-                              details.localPosition.dy <= 390) {
-                            setState(() {
-                              strokes.last.add(details.localPosition);
-                            });
-                          }
-                        } else if (eraseMode) {
-                          setState(() {
-                            currentPath.add(details.localPosition);
-                          });
-                        }
-                      },
-                      onPanEnd: (details) {},
-                      child:
-                      CustomPaint(
-                        painter: MyPainter(
-                          strokes, // Pass the strokePaths map here
-                          strokeBrushShapes,
-                          strokeColors,
-                          currentPath,
-                          eraseMode,
-                          selectedColor,
-                          progress,
-                          selectedBrushShape,
-                        ),
-                      ),
-
-                    ),
-                  ),
-                  Divider(
-                    color: Color(0xff878787),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(9, 0, 9, 0),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 64,
-                        ),
-                        Divider(
-                          color: Color(0xff878787),
-                        ),
-                        Container(
-                          height: 43,
-                          child: Row(
-                            children: [
-                              Text(
-                                '지우개 모드',
-                                style: TextStyle(
-                                  color: Color(0xFF3C3C3C),
-                                  fontSize: 13,
-                                  fontFamily: 'SUIT',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                ),
-                              ),
-                              Switch(
-                                value: eraseMode,
-                                onChanged: _toggleEraseMode,
-                              ),
-                            ],
-                          ),
-                        ),
-                        //펜 선택
-                        Divider(
-                          color: Color(0xff878787),
-                        ),
-                        Container(
-                          width: 434,
-                          height: 207,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 106,
-                                child: Container(
-                                  width: 434,
-                                  height: 81,
-                                  decoration: BoxDecoration(color: Color(0xFFEAEAEA)),
-                                ),
-                              ),
-                              Positioned(
-                                left: 86,
-                                top: 0,
-                                child: Container(
-                                  width: 43,
-                                  height: 43,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFEFEFEF),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 5,
-                                top: 112,
-                                child: Container(
-                                  width: 70,
-                                  height: 70,
-
-                                  child: TextButton(
-                                       onPressed: () {
-                                    openColorPicker();},
-
-                            child: Container(
-
-                            decoration: ShapeDecoration(
-                              color: selectedColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                ),
-                                ),
-                               ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 81,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Colors.black,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 81,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFD9D9D9),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 120,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF738A9C),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 120,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF737D96),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 158,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF838184),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 158,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF6B696C),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 197,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFC4C2C5),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 197,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFACAAAD),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 236,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFDFDFDF),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 236,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFD7D2D6),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 275,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFF88185),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 275,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFCE5D59),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 313,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFF0967B),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 313,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFFF8173),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 352,
-                                top: 151,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFDE0F39),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 352,
-                                top: 112,
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFFFFA17B),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 5,
-                                top: 15,
-                                child: SizedBox(
-                                  width: 91,
-                                  height: 14,
-                                  child: Text(
-                                    '펜 선택',
-                                    style: TextStyle(
-                                      color: Color(0xFF3C3C3C),
-                                      fontSize: 13,
-                                      fontFamily: 'Apple SD Gothic Neo',
-                                      fontWeight: FontWeight.w600,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 85,
-                                top: 5,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedBrushShape = BrushShape.Point;
-
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 34,
-                                    height: 34,
-                                    child:  Image.asset(
-                                      'images/pen1.png',
-                                      width: 34,
-                                      height: 34,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 138,
-                                top: 5,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedBrushShape = BrushShape.Surface;
-
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 34,
-                                    height: 34,
-                                    child:  Image.asset(
-                                      'images/pen2.png',
-                                      width: 34,
-                                      height: 34,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 185,
-                                top: 5,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedBrushShape = BrushShape.Line;
-
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 34,
-                                    height: 34,
-                                    child:  Image.asset(
-                                      'images/pen3.png',
-                                      width: 34,
-                                      height: 34,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 225,
-                                top: 5,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                    //  selectedBrushShape = BrushShape.Point;
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 34,
-                                    height: 34,
-                                    child:  Image.asset(
-                                      'images/pen4.png',
-                                      width: 34,
-                                      height: 34,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 5,
-                                top: 59,
-                                child: SizedBox(
-                                  width: 91,
-                                  height: 14,
-                                  child: Text(
-                                    '펜 두께(1px)',
-                                    style: TextStyle(
-                                      color: Color(0xFF3C3C3C),
-                                      fontSize: 13,
-                                      fontFamily: 'Apple SD Gothic Neo',
-                                      fontWeight: FontWeight.w600,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 0,
-                                top: 48,
-                                child: Container(
-                                  width: 375,
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        width: 0.20,
-                                        strokeAlign: BorderSide.strokeAlignCenter,
-                                        color: Color(0xFF868686),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 0,
-                                top: 84,
-                                child: Container(
-                                  width: 375,
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        width: 0.20,
-                                        strokeAlign: BorderSide.strokeAlignCenter,
-                                        color: Color(0xFF868686),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 87,
-                                top: 67,
-                                child: Container(
-                                  width: 10,
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        width: 1,
-                                        strokeAlign: BorderSide.strokeAlignCenter,
-                                        color: Color(0xFF4A4A4A),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-
-                              Positioned(
-                                left:  initialPositionX, // Adjust the left position as needed
-                                top: 40, // Adjust the top position as needed
-                                width: 200,
-                                child: Slider(
-                                  value: progress,
-                                  min: 1.0,
-                                  max: 70.0,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      progress = value; // Update brush size
-                                    });
-                                  },
-                                  activeColor: Color(0xFF001438), // Change the active color
-                                  inactiveColor: Colors.grey, // Change the inactive color
-                                ),
-                              ),
-
-                              Positioned(
-                                left: 350,
-                                top: 58,
-                                child: Container(
-                                  width: 19,
-                                  height: 19,
-                                  padding: const EdgeInsets.all(3.96),
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Positioned(
-                              //   left: 87,
-                              //   top: 100,
-                              //   child: Container(
-                              //     width: 10,
-                              //     decoration: ShapeDecoration(
-                              //       shape: RoundedRectangleBorder(
-                              //         side: BorderSide(
-                              //           width: 1,
-                              //           strokeAlign: BorderSide.strokeAlignCenter,
-                              //           color: Color(0xFF4A4A4A),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              // Positioned(
-                              //   left: 121,
-                              //   top: 100,
-                              //   child: Container(
-                              //     width: 49,
-                              //     decoration: ShapeDecoration(
-                              //       shape: RoundedRectangleBorder(
-                              //         side: BorderSide(
-                              //           width: 3,
-                              //           strokeAlign: BorderSide.strokeAlignCenter,
-                              //           color: Color(0xFF3D4ABE),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              // Positioned(
-                              //   left: 165,
-                              //   top: 92,
-                              //   child: Container(
-                              //     width: 15,
-                              //     height: 15,
-                              //     decoration: ShapeDecoration(
-                              //       color: Color(0xFF5363FA),
-                              //       shape: OvalBorder(),
-                              //       shadows: [
-                              //         BoxShadow(
-                              //           color: Color(0x3F000000),
-                              //           blurRadius: 2,
-                              //           offset: Offset(0, 0),
-                              //           spreadRadius: 0,
-                              //         )
-                              //       ],
-                              //     ),
-                              //   ),
-                              // ),
-                              Positioned(
-                                left: 350,
-                                top: 91,
-                                child: Container(
-                                  width: 19,
-                                  height: 19,
-                                  padding: const EdgeInsets.all(3.96),
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-
-                                    ],
-                                  ),
-                                ),
-                              ),
-                               ],
-                          ),
-                        ),
-            ]),
-            ),
-          ]),
-        )))));
+      home: _MyApp(),
+    );
   }
 }
 
+class _MyApp extends StatefulWidget {
+  @override
+  _VideoScreenState createState() => _VideoScreenState();
+}
 
-
-
-
-class MyPainter extends CustomPainter {
-  final List<List<Offset>> strokes;
-  final List<BrushShape> strokeBrushShapes;
-  final List<Color> strokeColors;
-  final List<Offset> currentPath;
-  final bool eraseMode;
-  Color selectedColor;
-  BrushShape selectedBrushShape;
-  BrushShape previousBrushShape = BrushShape.Line; // 처음엔 기본 선으로 초기화
-
-
-  double progress;
-  double maxStrokeWidth = 10.0;
-  double minStrokeWidth = 1.0;
-
-  MyPainter(this.strokes, this.strokeBrushShapes, this.strokeColors, this.currentPath, this.eraseMode, this.selectedColor, this.progress, this.selectedBrushShape) {
-    previousBrushShape = selectedBrushShape;
-  }
+class _VideoScreenState extends State<_MyApp> {
+  late VideoPlayerController _controller;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    // 프로그레스 계산
-    double? currentStrokeWidth = lerpDouble(minStrokeWidth, maxStrokeWidth, progress / 100);
-
-
-    for (int i = 0; i < strokes.length; i++) {
-      var paint = Paint()
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = currentStrokeWidth!
-        ..color = strokeColors[i];
-
-      //브러쉬 타입 확인
-      if (i < strokeBrushShapes.length && strokeBrushShapes[i] == previousBrushShape) {
-        for (int j = 0; j < strokes[i].length - 1; j++) {
-          if (strokes[i][j] != null && strokes[i][j + 1] != null) {
-           //브러쉬 모양이랑 선 그림 -> 같이 그려져서 수정
-            if (previousBrushShape == BrushShape.Point) {
-              canvas.drawCircle(strokes[i][j], currentStrokeWidth / 2, paint);
-            } else if (previousBrushShape == BrushShape.Line) {
-              canvas.drawLine(strokes[i][j], strokes[i][j + 1], paint);
-            } else if (previousBrushShape == BrushShape.Surface) {
-              final rect = Rect.fromPoints(strokes[i][j], strokes[i][j + 1]);
-              canvas.drawRect(rect, paint);
-            }
-          }
-        }
-      } else {
-        for (int j = 0; j < strokes[i].length - 1; j++) {
-          if (strokes[i][j] != null && strokes[i][j + 1] != null) {
-            if (selectedBrushShape == BrushShape.Point) {
-              canvas.drawCircle(strokes[i][j], currentStrokeWidth / 2, paint);
-            } else if (selectedBrushShape == BrushShape.Line) {
-              canvas.drawLine(strokes[i][j], strokes[i][j + 1], paint);
-            } else if (selectedBrushShape == BrushShape.Surface) {
-              final rect = Rect.fromPoints(strokes[i][j], strokes[i][j + 1]);
-              canvas.drawRect(rect, paint);
-            }
-          }
-        }
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset('images/updatemotion.mp4')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown and set the state when the video is initialized.
+        setState(() {
+          print('Video initialized successfully');
+          _controller.play(); // 자동으로 영상 재생 시작
+        });
+      });
+    // Add a listener to detect when the video playback is completed
+    _controller.addListener(() {
+      if (_controller.value.position >= _controller.value.duration) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) =>FirstSplash()),
+        );
       }
-    }
-  }
-
-
-  void changeBrushType(BrushShape newBrushType) {
-    selectedBrushShape = newBrushType; // 새로운 브러쉬 모양 설정
-
-    // To do -> 이전 펜 획에는 영향을 미치지 않도록 -> 근데 영향 미침
-    if (currentPath.isNotEmpty && strokes.isNotEmpty) {
-      int currentIndex = strokes.length - 1;
-      strokeBrushShapes[currentIndex] = selectedBrushShape;
-    }
+    });
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _controller.value.isInitialized
+            ? AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: VideoPlayer(_controller),
+        )
+            : CircularProgressIndicator(), // Show a loading indicator while the video is initializing.
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
   }
 }
+
+
+
+
+// import 'dart:js';
+//
+// import 'package:flutter/material.dart';
+// import 'package:flutter_ar_example/user/signupcode.dart';
+// import 'package:flutter_web_auth/flutter_web_auth.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:dio/dio.dart';
+//
+// import 'user/email.dart';
+//
+// void main() {
+//   runApp(MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: MyHomePage(),
+//     );
+//   }
+// }
+//
+// class MyHomePage extends StatelessWidget {
+//   Future<void> _loginWithGoogle() async {
+//     //clientId 하드 코딩 말고 다른 파일로 빼기
+//     final GoogleSignIn _googleSignIn =GoogleSignIn(clientId: '254832965764-f943aleetqt0vcvndtidlj4j1d20h6h4.apps.googleusercontent.com');
+//     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+//
+//     if (googleUser == null) {
+//       // 로그인 취소한 경우 또는 오류가 발생한 경우
+//       print('Google 로그인 취소 또는 오류');
+//     } else {
+//       // 로그인  성공
+//       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+//       // 구글 accessToken 출력
+//       final String? accessToken = googleAuth.accessToken;
+//
+//       if (accessToken != null) {
+//         final dio = Dio();
+//         final response = await dio.post(
+//             'http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/users/login?access_token=$accessToken');
+//
+//         if (response.statusCode == 200) {
+//           // 액세스 토큰 출력
+//           //이거 전역 변수로 따로 저장하는게 편함
+//           print(response.headers['authorization']);
+//         }
+//       }
+//     }
+//     // final oauthUrl = "http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/google?"
+//     //     "client_id=969542110950-o4f05po4gpihkrrjf6vpofnoi7log0og.apps.googleusercontent.com"
+//     //     "&redirect_uri=http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google"
+//     //     "&response_type=code&scope=email";
+//     // try {
+//     //   final result = await FlutterWebAuth.authenticate(
+//     //       url: oauthUrl,
+//     //       callbackUrlScheme: "myapp");
+//     //   debugPrint("OAuth 성공 : $result");
+//     //   debugPrint(result);
+//     // } catch (e) {
+//     //   debugPrint("OAuth 오류: $e");
+//     // }
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Google OAuth Login'),
+//       ),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: _loginWithGoogle,
+//           child: Text('Google 로그인'),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+//
+//
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_ar_example/mainpage/MainPage.dart';
+// import 'package:flutter_ar_example/user/signupcode.dart';
+// import 'package:flutter_web_auth/flutter_web_auth.dart';
+// import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:shared_preferences/shared_preferences.dart';
+//
+// import '../Chatbot.dart';
+//
+// void main() {
+//   KakaoSdk.init(nativeAppKey:'077a09d06719ae6dd518a8049399d4a0');
+//   runApp(const MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   const MyApp({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: const FirstRoute(),
+//     );
+//   }
+// }
+//
+// class FirstRoute extends StatefulWidget {
+//   const FirstRoute({Key? key}) : super(key: key);
+//
+//   @override
+//   _FirstRouteState createState() => _FirstRouteState();
+// }
+//
+// class _FirstRouteState extends State<FirstRoute> {
+//   String email='';
+//   String password='';
+//
+//   bool _isChecked = false;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       resizeToAvoidBottomInset: false,
+//       body: Container(
+//         child: Stack(
+//           children: [
+//             Positioned.fill(
+//               child: Align(
+//                 alignment: Alignment.topLeft,
+//                 child: Opacity(
+//                   opacity: 1,
+//                   child: Container(
+//                     width: 536,
+//                     height: 1050,
+//                     child: Stack(
+//                       children: [],
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Positioned(
+//               left: 44,
+//               top: 332,
+//               child: Container(
+//                 width: 320,
+//                 child: Column(
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       height: 57,
+//                       decoration: BoxDecoration(
+//                         border: Border.all(
+//                           color: Color(0xffb3b3b3),
+//                           width: 1,
+//                         ),
+//                       ),
+//                       child: Column(
+//                         children: [
+//                           Container(
+//                             width: 309,
+//                             child: Row(
+//                               children: [
+//                                 Expanded(
+//                                   child: Column(
+//                                     children: [
+//                                       SizedBox(
+//                                         width: 309,
+//                                         child: TextField(
+//                                           onChanged: (value) {
+//                                             setState(() {
+//                                               email = value;
+//                                             });
+//                                           },
+//                                           decoration: InputDecoration(
+//                                             hintText: "이메일 주소 입력",
+//                                             hintStyle: TextStyle(
+//                                               color: Color(0xffb3b3b3),
+//                                               fontSize: 14,
+//                                             ),
+//                                             border: InputBorder.none,
+//                                           ),
+//                                           style: TextStyle(
+//                                             color: Color(0xff121319),
+//                                             fontSize: 14,
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Positioned(
+//               left: 44,
+//               top: 405,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//                 decoration: BoxDecoration(
+//                   border: Border.all(
+//                     color: Color(0xffb3b3b3),
+//                     width: 1,
+//                   ),
+//                 ),
+//                 child: Column(
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Expanded(
+//                             child: Column(
+//                               children: [
+//                                 SizedBox(
+//                                   width: 309,
+//                                   child: TextField(
+//                                     onChanged: (value) {
+//                                       setState(() {
+//                                         password = value;
+//                                       });
+//                                     },
+//                                     decoration: InputDecoration(
+//                                       hintText: "비밀번호 입력",
+//                                       hintStyle: TextStyle(
+//                                         color: Color(0xffb3b3b3),
+//                                         fontSize: 14,
+//                                       ),
+//                                       border: InputBorder.none,
+//                                     ),
+//                                     style: TextStyle(
+//                                       color: Color(0xffb3b3b3),
+//                                       fontSize: 14,
+//                                     ),
+//                                     obscureText: true,
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Positioned(
+//               left: 30,
+//               top: 455,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Checkbox(
+//                             value: _isChecked,
+//                             onChanged: (value) {
+//                               setState(() {
+//                                 _isChecked = value!;
+//                               });
+//                             },
+//                           ),
+//                           Text(
+//                             "로그인 상태 유지",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             Positioned(
+//               left: 47,
+//               top: 520,
+//
+//               child: Container(
+//                 width: 320,
+//                 height: 50,
+//                 decoration: BoxDecoration(
+//                   color: Color(0xEA1567F6),
+//                 ),
+//                 child: TextButton(
+//                   onPressed: () async {
+//                     print("click");
+//                     final url = Uri.parse(
+//                         'http://52.78.214.57:8080/login');
+//                     Map<String, dynamic> data = {
+//                       'email': email,
+//                       'password': password,
+//                     };
+//                     String jsonData = json.encode(data);
+//                     print(jsonData);
+//                     try {
+//                       final response = await http.post(
+//                         url,
+//                         headers: {'Content-Type': 'application/json'},
+//                         // Set the request header
+//                         body: jsonData, // Set the JSON data as the request body
+//                       );
+//                       print(response);
+//                       print(response.statusCode);
+//
+//                       if (response.statusCode == 200) {
+//                         print(response);
+//                         var responseData = json.decode(response.body);
+//                         var accessToken = responseData['data']['accessToken'];
+//                         print(accessToken);
+//
+//                         // shared_preferences를 사용하여 accessToken 안전하게 저장
+//                         SharedPreferences prefs = await SharedPreferences
+//                             .getInstance();
+//                         await prefs.setString('accessToken', accessToken);
+//                         Navigator.push(
+//                           context,
+//                           //PhotoBoard
+//                           MaterialPageRoute(builder: (context) => MainPage()),
+//                         );
+//
+//                         // Request successful
+//                         print('Data sent successfully.');
+//                       } else {
+//                         // Request failed
+//                         print('Failed to send data. Status code: ${response
+//                             .statusCode}');
+//                       }
+//                     } catch (e) {
+//                       // Handle any exceptions that might occur during the API call
+//                       print('Error: $e');
+//                     }
+//                   },
+//
+//                   child: Text(
+//                     "로그인",
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontSize: 14,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//
+//             Positioned(
+//               left: 88,
+//               top: 575,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Text(
+//                             "이메일 찾기",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//             Positioned(
+//               left: 156,
+//               top: 575,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Text(
+//                             "|",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//             Positioned(
+//               left: 171,
+//               top: 575,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Text(
+//                             "비밀번호 찾기",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//             Positioned(
+//               left: 88,
+//               top: 575,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Text(
+//                             "이메일 찾기",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//             Positioned(
+//               left: 251,
+//               top: 575,
+//               child: Container(
+//                 width: 320,
+//                 height: 57,
+//
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       width: double.infinity,
+//                       child: Row(
+//                         children: [
+//                           Text(
+//                             "|",
+//                             style: TextStyle(
+//                               color: Color(0xff000000),
+//                               fontSize: 11,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//
+//
+//
+//             Positioned(
+//               left: 270,
+//               top: 575,
+//               child: GestureDetector(
+//                 onTap: () {
+//                   // Handle the sign-up button tap
+//                   Navigator.push(
+//                     context,
+//                     MaterialPageRoute(builder: (context) => ThirdRoute()),
+//                   );
+//                 },
+//                 child: Container(
+//                   width: 320,
+//                   height: 57,
+//
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Container(
+//                         width: double.infinity,
+//                         child: Row(
+//                           children: [
+//                             Text(
+//                               "회원가입",
+//                               style: TextStyle(
+//                                 color: Color(0xff000000),
+//                                 fontSize: 11,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//
+//             // Positioned(
+//             //   left: 94,
+//             //   top: 709,
+//             //   child: Container(
+//             //     width: 320,
+//             //     height: 57,
+//             //
+//             //     child: Column(
+//             //       crossAxisAlignment: CrossAxisAlignment.start,
+//             //       children: [
+//             //         Container(
+//             //           width: double.infinity,
+//             //           child: Row(
+//             //             children: [
+//             //               Text(
+//             //                 "SNS 계정으로 간편하게 로그인하세요.",
+//             //                 style: TextStyle(
+//             //                   color: Color(0xff000000),
+//             //                   fontSize: 14,
+//             //                 ),
+//             //               ),
+//             //             ],
+//             //           ),
+//             //         ),
+//             //       ],
+//             //     ),
+//             //   ),
+//             // ),
+//             //
+//             //
+//             // Positioned(
+//             //   left: 110,
+//             //   top: 740,
+//             //   child: Container(
+//             //     width: 400,
+//             //     height: 57,
+//             //     child: Column(
+//             //
+//             //       children: [
+//             //         Container(
+//             //           width: 400,
+//             //           child: Row(
+//             //             children: [
+//             //               ElevatedButton(
+//             //                 onPressed: () {
+//             //                 },
+//             //                 style: ElevatedButton.styleFrom(
+//             //                   elevation: 0,
+//             //                   padding: EdgeInsets.zero,
+//             //                 ),
+//             //                 child: ClipRRect(
+//             //                   borderRadius: BorderRadius.circular(2), // 모서리 굴곡 설정
+//             //                   child: Image.asset(
+//             //                     'images/kakao_login_medium_narrow.png', // 이미지 경로 및 파일명으로 수정하세요.
+//             //                   ),
+//             //                 ),
+//             //               ),
+//             //
+//             //             ],
+//             //           ),
+//             //         ),
+//             //       ],
+//             //     ),
+//             //   ),
+//             // ),
+//
+//
+//             Positioned(
+//               left: 56,
+//               top: 202,
+//               child: Container(
+//                 width: 284,
+//                 height: 67,
+//                 child: Image.asset('images/logos.png', width: 67),
+//               ),
+//             ),
+//             Positioned.fill(
+//               child: Align(
+//                 alignment: Alignment.topLeft,
+//                 child: Container(
+//                   width: 414,
+//                   height: 49,
+//                   padding: const EdgeInsets.only(
+//                     left: 33,
+//                     right: 15,
+//                     bottom: 20,
+//                   ),
+//                   child: Row(
+//                     mainAxisSize: MainAxisSize.min,
+//                     mainAxisAlignment: MainAxisAlignment.end,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       Container(
+//                         width: 28.43,
+//                         height: 11.09,
+//                         decoration: BoxDecoration(
+//                           borderRadius: BorderRadius.circular(8),
+//                           color: Color(0xff121319),
+//                         ),
+//                       ),
+//                       SizedBox(width: 25.89),
+//                       Container(
+//                         width: 66.66,
+//                         height: 11.34,
+//                         child: Stack(
+//                           children: [
+//                             Container(
+//                               width: 24.33,
+//                               height: 11.33,
+//                               decoration: BoxDecoration(
+//                                 borderRadius: BorderRadius.circular(8),
+//                               ),
+//                               child: FlutterLogo(
+//                                 size: 11.333333015441895,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             Positioned(
+//               left: 37,
+//               top: 510,
+//               child: Container(
+//                 width: 333,
+//                 height: 1,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+//
+// Future<void> signIn() async {
+//
+//   // 고유한 redirect uri
+//   const APP_REDIRECT_URI = "http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/google";
+//
+//   // 백엔드에서 미리 작성된 API 호출
+//   final url = Uri.parse('http://ec2-15-164-7-100.ap-northeast-2.compute.amazonaws.com:8080/oauth2/authorization/googl');
+//
+//   // 백엔드가 제공한 로그인 페이지에서 로그인 후 callback 데이터 반환
+//   final result = await FlutterWebAuth.authenticate(
+//       url: url.toString(), callbackUrlScheme: APP_REDIRECT_URI);
+//
+//   // 백엔드에서 redirect한 callback 데이터 파싱
+//   // final accessToken = Uri.parse(result).queryParameters['access-token'];
+//   // final refreshToken = Uri.parse(result).queryParameters['refresh-token'];
+//
+//   // . . .
+//   // FlutterSecureStorage 또는 SharedPreferences 를 통한
+//   // Token 저장 및 관리
+//   // . . .
+//
+// }
+

@@ -5,14 +5,17 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_ar_example/Chatbot.dart';
+import 'package:flutter_ar_example/MyPage/MyPage.dart';
 import 'package:flutter_ar_example/board/PhotoBoard.dart';
 import 'package:flutter_ar_example/ARScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ai/aiText.dart';
 import '../style/Chocie.dart';
 
-
+import 'package:dio/dio.dart';
 
 
 void main() {
@@ -34,7 +37,7 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   File ? _selectedImage;
   String fileName = "";
-  void onTabTapped(int index) {
+  Future<void> onTabTapped(int index) async {
     setState(() {
       _currentIndex = index;
     });
@@ -94,7 +97,7 @@ class _MainPageState extends State<MainPage> {
                     ],
                   ),
                   Text(
-                    '내가 원하는 사진을 고전 예술 스타일로 만들고\n색칠하고 art transfer art transfer',
+                    '내가 원하는 사진으로 고전 예술 스타d일로 만들고\n색칠하고 다양하게 즐겨보자!',
                     style: TextStyle(
                       color: Color(0xFF7D7D7D),
                       fontSize: 11,
@@ -193,7 +196,7 @@ class _MainPageState extends State<MainPage> {
               ),
               ),
                 Text(
-                  'AI로 이미지를 생성해요',
+                  'AI로 원하는 이미지를 생성해요.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF8A8A8A),
@@ -306,7 +309,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
 
                                   Text(
-                                    '내가 원하는 그림을 가져와요',
+                                    '내가 원하는 그림을 가져와요.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Color(0xFF8A8A8A),
@@ -331,8 +334,6 @@ class _MainPageState extends State<MainPage> {
         );
 
         break;
-
-
       case 2:
         Navigator.push(
           context,
@@ -344,7 +345,34 @@ class _MainPageState extends State<MainPage> {
       //     MaterialPageRoute(builder: (context) => const textToImg()),
       //   );
         break;
-    }
+
+
+    case 3:
+      final dio = Dio();
+      final url = 'http://54.180.79.174:8080/api/v1/my';
+
+        final prefs = await SharedPreferences.getInstance();
+        final accessToken = prefs.getString('accessToken');
+
+        // 인증 헤더 설정
+        dio.options.headers['Authorization'] = 'Bearer $accessToken';
+
+        final response = await dio.get(url,);
+
+        final responseData=response.data;
+        print("MyPageData $responseData");
+
+
+
+
+        Navigator.push(
+          context,
+
+         MaterialPageRoute(builder: (context) => MyPage(responseData:responseData)),
+    );
+
+    break;
+  }
 
   }
 
@@ -473,6 +501,10 @@ class _MainPageState extends State<MainPage> {
                                     Colors.transparent),
                               ),
                               onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ARScreen()),
+                                );
                                 print('AR전시장가기');
                               },
                               child: Row(
@@ -637,7 +669,21 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-        ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.transparent,
+            onPressed: () {
+              // FAB가 눌렸을 때 실행할 작업을 여기에 추가하세요.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Chatbot()),
+              );
+
+              print('FAB가 눌렸습니다.');
+            },
+            child: Image.asset('images/img_35.png',
+              fit: BoxFit.cover,),          ),
+
+      ),
       ),
     );
   }
@@ -698,7 +744,7 @@ class ContestPageData {
 Future<List<ContestPageData>> getGeneralBoard()  async {
   List<String> boardList = [];
 
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=일반');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/contest/all?boardType=일반');
   final Map<String, String> data = {
     "title": "",
     "content": "",
@@ -739,7 +785,7 @@ Future<List<ContestPageData>> getGeneralBoard()  async {
 Future<List<ContestPageData>> getAIBoard()  async {
   List<String> boardList = [];
 
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=AI');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/contest/all?boardType=AI');
   final Map<String, String> data = {
     "title": "",
     "content": "",

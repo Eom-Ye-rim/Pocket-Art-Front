@@ -37,6 +37,14 @@ class _ManipulationPageState extends State<ManipulationPage> {
             ),
             automaticallyImplyLeading: true, // 하위페이지 생기면 뒤로가기 버튼 생성
 
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios,
+                color: Colors.black,),
+              onPressed: () {
+                //뒤로가기
+                Navigator.pop(context);
+              },
+            ),
             title: Text(
               '회원가입',
               style: TextStyle(
@@ -315,7 +323,7 @@ class _ManipulationPageState extends State<ManipulationPage> {
       try {
         print(enteredEmail);
         final url = Uri.parse(
-            'http://13.209.160.87:8080/emailConfirm?email=$enteredEmail');
+            'http://54.180.79.174:8080/emailConfirm?email=$enteredEmail');
         final response = http.post(url);
         Navigator.push(
           context,

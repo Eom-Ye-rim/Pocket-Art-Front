@@ -1,0 +1,6 @@
+framework module fk_user_agent {
+  umbrella header "fk_user_agent-umbrella.h"
+
+  export *
+  module * { export * }
+}

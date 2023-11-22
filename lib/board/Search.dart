@@ -324,13 +324,12 @@ class _Frame427320768State extends State<Frame427320768> {
                         searchController.clear();
                         setState(() {});
 
-                        // Make an HTTP request to your server with the search criteria
                         Uri uri = Uri.parse(
-                            'http://13.209.160.87:8080/api/v1/contest/all');
+                            'http://54.180.79.174:8080/api/v1/contest/all');
                         final response = await http.post(
                           uri,
                           headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'application/json; charset=UTF-8',
                             // Specify JSON content type
                           },
                           body: json.encode({
@@ -343,14 +342,18 @@ class _Frame427320768State extends State<Frame427320768> {
                         if (response.statusCode == 200) {
                           print("success");
 
-                          final Map<String, dynamic> jsonResponse = json.decode(response.body);
+                          final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
                           final List<dynamic> searchResultsData = jsonResponse['content'] as List<dynamic>;
 
                           List<SearchResult> searchResults = searchResultsData
                               .map((data) => SearchResult.fromJson(data))
                               .toList();
+
+                          print("searchResults: $searchResults");
+
                             // Navigate to the PostSearch() screen and pass the searchResults
                           for (SearchResult result in searchResults) {
+                            print(result);
                             print("Title: ${result.title}");
                             print("Author: ${result.author}");
                             // Print other properties as needed

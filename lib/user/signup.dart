@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ar_example/ai/aiText.dart';
+import 'package:flutter_ar_example/user/LoginMain.dart';
 import 'package:http/http.dart' as http;
 
 class SignupRoute extends StatelessWidget {
@@ -54,6 +55,15 @@ class _ManipulationPageState extends State<ManipulationPage> {
             automaticallyImplyLeading: true,
             // 하위페이지 생기면 뒤로가기 버튼 생성
 
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios,
+                color: Colors.black,),
+              onPressed: () {
+                //뒤로가기
+                Navigator.pop(context);
+              },
+            ),
+
             title: Text(
               '회원가입',
               style: TextStyle(
@@ -99,33 +109,6 @@ class _ManipulationPageState extends State<ManipulationPage> {
                     fontFamily: 'SUIT',
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-
-                SizedBox(height: 12,),
-                Text(
-                  '아이디',
-                  style: TextStyle(
-                    color: Color(0xFF1C1C1C),
-                    fontSize: 15,
-                    fontFamily: 'SUIT',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                TextFormField(
-                    onChanged: (value) {
-                      setState(() {
-                        name =
-                            value; // Update the 'name' variable when the text changes
-                      });
-                    },
-
-                    decoration: InputDecoration(
-                      hintText: '아이디를 입력해주세요',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                    )
-
                 ),
                 SizedBox(height: 12,),
                 Text(
@@ -250,12 +233,10 @@ class _ManipulationPageState extends State<ManipulationPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                TextRoute(),
+                                LoginMain(),
                           ),
                         );
                       }
-
-
                     },
                     child: Center(
                       child: Text(
@@ -270,7 +251,6 @@ class _ManipulationPageState extends State<ManipulationPage> {
 
                       ),
                     ),
-
                   ),
 
                   width: 356,
@@ -294,7 +274,7 @@ Future<bool> signup(String name, String password, String passwordConfirm)  async
    print("호출");
    var email = widget.enteredEmail;
    bool isSuccess=false;
-   final url = Uri.parse('http://13.209.160.87:8080/signUp');
+   final url = Uri.parse('http://54.180.79.174:8080/signUp');
    Map<String, dynamic> data = {
      'name': name,
      'password': password,

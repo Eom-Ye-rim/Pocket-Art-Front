@@ -172,8 +172,7 @@ class _TextToImgState extends State<TextToImg> {
                               _progressValue = 0.0; // 프로그래스 바의 값을 초기화합니다.
                             });
 
-                            final url = Uri.parse(
-                                'http://13.209.160.87:8080/api/image/generate?prompt=$prompt');
+                            final url = Uri.parse('http://54.180.79.174:8080/api/image/generate?prompt=$prompt');
                             final response = await http.post(url);
                             List<dynamic> responseBody =
                             jsonDecode(response.body);
@@ -181,7 +180,7 @@ class _TextToImgState extends State<TextToImg> {
                               res = responseBody;
                             });
 
-                            Timer.periodic(Duration(milliseconds: 500),
+                            Timer.periodic(Duration(milliseconds: 100),
                                     (Timer timer) {
                                   setState(() {
                                     _progressValue += 0.01;

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ar_example/MyPage/MyPage.dart';
 import 'package:flutter_ar_example/board/Search.dart';
 import 'package:flutter_ar_example/mainpage/MainPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'CreatePost.dart';
+import 'package:dio/dio.dart';
 
+import 'ViewPost.dart';
 
 
 
@@ -27,13 +30,36 @@ class PhotoBoard extends StatefulWidget {
 class _PhotoBoardState extends State<PhotoBoard> {
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  Future<void> _onItemTapped(int index) async {
     print("Tapped index: $index");
     if (index == 1) {
       // Navigate to the CreatePostPage when "글쓰기" button is clicked.
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CreatePost()), // Replace CreatePostPage with your actual page name.
+      );
+    }
+    if (index == 2) {
+      // Navigate to the CreatePostPage when "글쓰기" button is clicked.
+      final dio = Dio();
+      final url = 'http://54.180.79.174:8080/api/v1/my';
+
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+
+      // 인증 헤더 설정
+      dio.options.headers['Authorization'] = 'Bearer $accessToken';
+
+      final response = await dio.get(url,);
+
+      final responseData=response.data;
+      print("MyPageData $responseData");
+
+
+      Navigator.push(
+        context,
+
+        MaterialPageRoute(builder: (context) => MyPage(responseData:responseData)),
       );
     }
     setState(() {
@@ -55,7 +81,6 @@ class _PhotoBoardState extends State<PhotoBoard> {
             leading:gotoMainBtn(),
             title: Text(
               '사진 게시판',
-
               style: TextStyle(
                 color: Color(0xFF484848),
                 fontSize: 20,
@@ -239,6 +264,7 @@ class gotoMainBtn extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const MainPage()),
               );
             },
+
             icon: Icon(Icons.arrow_back_ios),
             color: Colors.black,
           ),
@@ -262,7 +288,7 @@ class _RowScrollPhotosState extends State<RowScrollPhotos> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Widget>>(
-      future: Best5(5), // Best5 함수 호출
+      future: Best5(context,5), // Best5 함수 호출
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Future가 완료될 때까지 로딩 인디케이터를 표시
@@ -352,8 +378,6 @@ class _GridViewPhotosState extends State<GridViewPhotos> {
       setState(() {
         // Update the state with the list of images
         _images = images;
-
-
       });
     });
   }
@@ -431,15 +455,21 @@ Future<List<Widget>> createPhotos(BuildContext context , int num) async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
+
               children: [
                 AspectRatio(
                   aspectRatio: 1, // 사진 비율
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image(
-                      image: NetworkImage(PostImage[i]),
-                      fit: BoxFit.cover,
-                    ),
+                      child: GestureDetector(
+                        onTap: () {
+                          _uploadPost(context, urls[i].id);
+                        },
+                        child: Image(
+                          image: NetworkImage(PostImage[i]),
+                          fit: BoxFit.cover,
+                        ),
+                      )
                   ),
                 ),
                 Positioned(
@@ -453,7 +483,6 @@ Future<List<Widget>> createPhotos(BuildContext context , int num) async {
               child: Row(
                 children: [
                   Column(
-
                     children: [
                       SizedBox(height: 5,),
                       Container(
@@ -542,10 +571,6 @@ Future<List<Widget>> createPhotos(BuildContext context , int num) async {
 
                           ],
                         ),
-
-
-
-
                       ],
                     )
                   ),
@@ -681,7 +706,7 @@ class _HeartButton2State extends State<HeartButton2> {
 Future<void> _makeLikeAPIRequest(BigInt postId) async {
   print(postId);
 
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/heart/$postId');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/heart/$postId');
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('accessToken');
   try {
@@ -797,7 +822,7 @@ class ContestData {
 Future<List<ContestPageData>> getGeneralBoard()  async {
   List<String> boardList = [];
 
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=일반');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/contest/all?boardType=일반');
   final Map<String, String> data = {
     "title": "",
     "content": "",
@@ -838,7 +863,7 @@ Future<List<ContestPageData>> getGeneralBoard()  async {
 Future<List<ContestPageData>> getAIBoard()  async {
   List<String> boardList = [];
 
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/contest/all?boardType=AI');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/contest/all?boardType=AI');
   final Map<String, String> data = {
     "title": "",
     "content": "",
@@ -880,7 +905,7 @@ Future<List<ContestPageData>> getAIBoard()  async {
 Future<List<ContestPageData>> getBoard()  async {
   List<String> boardList = [];
   final url = Uri.parse(
-      'http://13.209.160.87:8080/api/v1/contest/all');
+      'http://54.180.79.174:8080/api/v1/contest/all');
   final Map<String, String> data = {
     "title": "",
     "content": "",
@@ -922,7 +947,7 @@ Future<List<ContestPageData>> getBoard()  async {
 Future<List<ContestData>> getTop5Image()  async {
   List<String> Best5ImgUrls = [];
   final url = Uri.parse(
-      'http://13.209.160.87:8080/api/v1/contest/best');
+      'http://54.180.79.174:8080/api/v1/contest/best');
   final response = await http.get(url);
   if(response.statusCode==200){
     final jsonData = json.decode(utf8.decode(response.bodyBytes));
@@ -950,7 +975,7 @@ Future<List<ContestData>> getTop5Image()  async {
 
 
 Future<void> _makeDislikeAPIRequest(BigInt postId) async {
-  final url = Uri.parse('http://13.209.160.87:8080/api/v1/unheart/$postId');
+  final url = Uri.parse('http://54.180.79.174:8080/api/v1/unheart/$postId');
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString('accessToken');
 
@@ -993,7 +1018,7 @@ HeartButton _createHeartButton(BigInt postId) {
 }
 
 //Best5 image
-Future<List<Widget>> Best5(int numImg) async{
+Future<List<Widget>> Best5(BuildContext context,int numImg) async{
   List<Widget> Best5images = [];
   List<ContestData> Best5ImgUrls = await getTop5Image();
   List<String> images = [];
@@ -1023,9 +1048,6 @@ Future<List<Widget>> Best5(int numImg) async{
   } catch (e) {
     print(e);
   }
-
-
-
   Widget image;
   int i = 0;
   while (i < numImg) {
@@ -1041,6 +1063,7 @@ Future<List<Widget>> Best5(int numImg) async{
               color: Colors.grey,
               width: 0.5,
             ),
+
             borderRadius: BorderRadius.circular(22),
             image: DecorationImage(
                 fit: BoxFit.cover,
@@ -1203,6 +1226,40 @@ class AIPhotosScreen extends StatelessWidget {
     );
   }
 }
+
+Future<void> _uploadPost(BuildContext context,BigInt postId) async {
+  print("get post");
+  final dio = Dio();
+  final url = 'http://54.180.79.174:8080/api/v1/contest/$postId';
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+
+    // 인증 헤더 설정
+    dio.options.headers['Authorization'] = 'Bearer $accessToken';
+
+    final response = await dio.get(url);
+    print("zz + $response");
+
+    if (response.statusCode == 200) {
+      // 응답이 성공적으로 돌아왔을 때 응답 데이터를 출력합니다.
+      print('The request was sent successfully.');
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewPost(
+                responseData: response.data), // responseData는 응답 데이터입니다.
+          ));
+    } else {
+      // 서버가 200 OK 응답을 반환하지 않았을 때 예외를 throw합니다.
+      throw Exception('데이터를 불러오지 못했습니다. 상태 코드: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('오류: $e');
+  }
+
+}
+
 
 class NormalPhotosScreen extends StatelessWidget {
   const NormalPhotosScreen({Key? key}) : super(key: key);

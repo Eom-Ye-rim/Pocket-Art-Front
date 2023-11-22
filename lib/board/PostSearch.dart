@@ -387,7 +387,7 @@ class _HeartButtonState extends State<HeartButton> {
         IconButton(
           icon: Icon(
             _isLiked ? Icons.favorite : Icons.favorite_border,
-            color: _isLiked ? Colors.red : Colors.white,
+            color: _isLiked ? Colors.white : Colors.white,
           ),
           onPressed: () {
             setState(() {
