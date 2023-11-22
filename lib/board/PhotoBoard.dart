@@ -980,6 +980,7 @@ Future<void> _makeDislikeAPIRequest(BigInt postId) async {
   var accessToken = prefs.getString('accessToken');
 
   try {
+    //응답
     final response = await http.delete(
       url,
       headers: {
